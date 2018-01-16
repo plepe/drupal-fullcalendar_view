@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\fullcalendar_view\TimezoneService.
- */
 
 namespace Drupal\fullcalendar_view;
 
