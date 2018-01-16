@@ -1,0 +1,3 @@
+services:
+  fullcalendar_view.timezone_conversion_service:
+    class: Drupal\fullcalendar_view\TimezoneService

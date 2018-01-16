@@ -1,0 +1,14 @@
+fullcalendar:
+  version: 3.8.0
+  css:
+    theme:
+      css/fullcalendar.min.css: {}
+ 
+  js:
+    js/moment.min.js: {}
+    js/fullcalendar.min.js: {}
+    js/fullcalendar_view.js: {}
+    
+  dependencies:
+    - core/jquery
+    - core/drupalSettings
