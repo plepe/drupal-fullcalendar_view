@@ -34,6 +34,7 @@ class FullCalendarDisplay extends StylePluginBase {
     $options['defaultDate'] = array('default' => '');
     $options['start'] = array('default' => '');
     $options['end'] = array('default' => '');
+    $options['content_type'] = array('default' => '');
     return $options;
   }
   
@@ -64,7 +65,26 @@ class FullCalendarDisplay extends StylePluginBase {
       '#title' => $this->t('End Date Field'),
       '#type' => 'select',
       '#options' => $field_names,
+      '#empty_value' => '',
       '#default_value' => (!empty($this->options['end'])) ? $this->options['end'] : '',
+    ];
+    // All content types.
+    $contentTypes = \Drupal::service('entity_type.manager')
+    ->getStorage('node_type')
+    ->loadMultiple();
+    // Options list.
+    $contentTypesList = [];
+    foreach ($contentTypes as $contentType) {
+      $contentTypesList[$contentType->id()] = $contentType->label();
+    }
+    
+    // New event content type.
+    $form['content_type'] = [
+      '#title' => $this->t('Event content type'),
+      '#description' => $this->t('The content type of a new event. Once this is set, you can create a new event by double clicking a calendar entry.'),
+      '#type' => 'select',
+      '#options' => $contentTypesList,
+      '#default_value' => (!empty($this->options['content_type'])) ? $this->options['content_type'] : '',
     ];
     
     // Extra CSS classes.

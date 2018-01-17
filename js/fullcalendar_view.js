@@ -35,10 +35,10 @@
 		    }
 		        
 		    $("#calendar").dblclick(function() {
-		        if(slotDate){
+		        if(slotDate && drupalSettings.eventContentType){
 		        	var date = slotDate.format();
 		            // Open a new window to create a new event (content).
-		        	//window.open('/node/add?start=' + date, '_blank');
+		        	window.open('/node/add/' + drupalSettings.eventContentType + '?start=' + date + '&start_field=' + drupalSettings.startField, '_blank');
 		        }
 		    });
 	  }

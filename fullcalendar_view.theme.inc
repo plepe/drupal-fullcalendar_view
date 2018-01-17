@@ -23,20 +23,26 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
   
   // Field machine name of start date.
   $start_field = $options['start'];
+  // Start date field is critical.
+  if (empty($start_field)) {
+    return;
+  }
   // Field machine name of end date.
   $end_field = $options['end'];
   // Default date of the calendar.
   $default_date = $options['defaultDate'];
+  // New event content type.
+  $event_content_type = $options['content_type'];
   
   $start_field_option = $fields[$start_field]->options;
-  $end_field_option = $fields[$end_field]->options;
+  $end_field_option = empty($end_field) ? null : $fields[$end_field]->options;
   // Custom timezone or user timezone.
   $timezone = !empty($start_field_option['settings']['timezone_override']) ? $start_field_option['settings']['timezone_override'] : drupal_get_user_timezone();
   // Open a new window for details of an event.
   $link_to_entity = $fields['title']->options['settings']['link_to_entity'];
   $entries = array();
   
-  if (!empty($start_field) && !empty($end_field)) {
+  if (!empty($start_field)) {
     // Timezone conversion service.
     $timezone_service = \Drupal::service('fullcalendar_view.timezone_conversion_service');
     // Save view results into entries array.
@@ -48,7 +54,7 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
       // Calendar event start date. 
       $start_date = $current_entity->get($start_field)->getValue();
       // Calendar event end date.
-      $end_date = $current_entity->get($end_field)->getValue();
+      $end_date = empty($end_field) ? '' : $current_entity->get($end_field)->getValue();
       // Event title.
       $title = strip_tags($style->getField($index, 'title'));
       $entry = [
@@ -72,8 +78,7 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
         
         // By default, Drupal store date time date in UTC timezone.
         // So we need to convert it into user timezone.
-        $start_date = $timezone_service->utcToLocal($start_date, $timezone);
-        $entry['start'] = $start_date;
+        $entry['start'] = $timezone_service->utcToLocal($start_date, $timezone);
       }
       // Cope with end date in the same way as start date above.
       if (!empty($end_date)) {
@@ -100,6 +105,8 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
       'fullCalendarView' => $entries,
       'defaultDate' => empty($default_date) ? date('Y-m-d') : $default_date,
       'linkToEntity' => $link_to_entity,
+      'eventContentType' => $event_content_type,
+      'startField' => $start_field,
     );
   }
 }
