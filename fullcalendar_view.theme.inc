@@ -29,11 +29,17 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
   }
   // Field machine name of end date.
   $end_field = $options['end'];
+  // Field machine name of taxonomy field.
+  $tax_field = $options['tax_field'];
   // Default date of the calendar.
   $default_date = $options['defaultDate'];
   // New event content type.
   $event_content_type = $options['content_type'];
-  
+  // Color for content types.
+  $color_content = $options['color_contents'];
+  // Color for taxonomies.
+  $color_tax = $options['color_taxonomies'];
+  // Date fields.
   $start_field_option = $fields[$start_field]->options;
   $end_field_option = empty($end_field) ? null : $fields[$end_field]->options;
   // Custom timezone or user timezone.
@@ -51,6 +57,14 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
       $current_entity = $row->_entity;
       // Entity id.
       $entity_id = $current_entity->id();
+      // Entity bundle type.
+      $entity_bundle = $current_entity->bundle();
+      // Entity type.
+      $entity_type = $current_entity->getEntityTypeId();
+      if (!empty($tax_field)) {
+        // Event type.
+        $event_type = $current_entity->get($tax_field)->target_id;
+      }
       // Calendar event start date. 
       $start_date = $current_entity->get($start_field)->getValue();
       // Calendar event end date.
@@ -60,7 +74,7 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
       $entry = [
         'title' => $title,
         'id' => $entity_id,
-        'url' => '/' . $current_entity->getEntityTypeId() . '/' . $entity_id];
+        'url' => '/' . $entity_type . '/' . $entity_id];
        
       if (!empty($start_date)) {
         // There might be more than one value for a field,
@@ -97,6 +111,14 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
           $entry['end'] = $timezone_service->utcToLocal($end_date, $timezone);
         }       
       }
+      // Set the color for this event.
+      if (isset($event_type) && isset($color_tax[$event_type])) {
+        $entry['backgroundColor'] = $color_tax[$event_type];
+      }
+      elseif (isset($color_content[$entity_bundle])) {
+        $entry['backgroundColor'] = $color_content[$entity_bundle];
+      }
+      
       
       $entries[] = $entry;
     }
