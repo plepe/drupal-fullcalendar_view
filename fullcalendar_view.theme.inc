@@ -43,7 +43,8 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
   $start_field_option = $fields[$start_field]->options;
   $end_field_option = empty($end_field) ? null : $fields[$end_field]->options;
   // Custom timezone or user timezone.
-  $timezone = !empty($start_field_option['settings']['timezone_override']) ? $start_field_option['settings']['timezone_override'] : drupal_get_user_timezone();
+  $timezone = !empty($start_field_option['settings']['timezone_override']) ? 
+    $start_field_option['settings']['timezone_override'] : drupal_get_user_timezone();
   // Open a new window for details of an event.
   $link_to_entity = $fields['title']->options['settings']['link_to_entity'];
   $entries = array();
@@ -55,20 +56,25 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
     foreach ($view->result as $index => $row) {
       // Result entity of current row.
       $current_entity = $row->_entity;
+      // Start field is vital, if it doesn't exist for this entity then ignore it.
+      if (!$current_entity->hasField($start_field)) {
+        continue;
+      }
       // Entity id.
       $entity_id = $current_entity->id();
       // Entity bundle type.
       $entity_bundle = $current_entity->bundle();
       // Entity type.
       $entity_type = $current_entity->getEntityTypeId();
-      if (!empty($tax_field)) {
+      // Background color based on taxonomy field.
+      if (!empty($tax_field) && $current_entity->hasField($tax_field)) {
         // Event type.
         $event_type = $current_entity->get($tax_field)->target_id;
       }
       // Calendar event start date. 
       $start_date = $current_entity->get($start_field)->getValue();
       // Calendar event end date.
-      $end_date = empty($end_field) ? '' : $current_entity->get($end_field)->getValue();
+      $end_date = empty($end_field) || !$current_entity->hasField($end_field) ? '' : $current_entity->get($end_field)->getValue();
       // Event title.
       $title = strip_tags($style->getField($index, 'title'));
       $entry = [
@@ -90,9 +96,10 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
           continue;
         }
         
+        $date_only = (strlen($start_date) < 11) ? TRUE : FALSE;
         // By default, Drupal store date time date in UTC timezone.
         // So we need to convert it into user timezone.
-        $entry['start'] = $timezone_service->utcToLocal($start_date, $timezone);
+        $entry['start'] = $timezone_service->utcToLocal($start_date, $timezone, $date_only);
       }
       // Cope with end date in the same way as start date above.
       if (!empty($end_date)) {
@@ -107,8 +114,9 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
           $end_date = '';
         }
         
-        if (!empty($end_date)) {         
-          $entry['end'] = $timezone_service->utcToLocal($end_date, $timezone);
+        if (!empty($end_date)) {    
+          $date_only = (strlen($end_date) < 11) ? TRUE : FALSE;
+          $entry['end'] = $timezone_service->utcToLocal($end_date, $timezone, $date_only);
         }       
       }
       // Set the color for this event.
@@ -129,6 +137,7 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
       'linkToEntity' => $link_to_entity,
       'eventContentType' => $event_content_type,
       'startField' => $start_field,
+      'endField' => $end_field,
     );
   }
 }

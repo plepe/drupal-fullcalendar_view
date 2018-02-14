@@ -14,6 +14,30 @@
 		      eventLimit: true, // Allow "more" link when too many events.
 		      events: drupalSettings.fullCalendarView,
 		      dayClick: dayClickCallback,
+		      eventDrop: function(event, delta, revertFunc) {
+		    	  var msg = event.title + " was updated to " + event.start.format() + ". Are you sure about this change?";
+		          if (!confirm(msg)) {
+		              revertFunc();
+		          }
+		          else {
+		        	  /**
+		               * perform ajax call for event update in database
+		               */            
+		              jQuery.post(
+		                  '/fullcalendar-view-event-update'
+		                  , { 
+		                      nid: event.id
+		                      , start: event.start.format()
+		                      , end: (event.end) ? event.end.format() : '' 
+		                      , start_field: drupalSettings.startField
+		                      , end_field: drupalSettings.endField
+		                  }
+		              ).done(function( data ) {
+		            	  alert("Response: " + data);
+		              });  
+		          }
+
+		      },
 		      eventClick: function(calEvent, jsEvent, view) {
 		    	  slotDate = null;
 		    	  if (drupalSettings.linkToEntity) {

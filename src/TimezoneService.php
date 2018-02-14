@@ -9,7 +9,7 @@ class TimezoneService {
   /**
    * Return the value of the converted date from UTC date.
    */
-  public function utcToLocal($utc_date, $local_timezone) {
+  public function utcToLocal($utc_date, $local_timezone, $date_only = FALSE) {
     // UTC timezone.
     $UTC = new \DateTimeZone("UTC");
     // Local time zone.
@@ -18,7 +18,7 @@ class TimezoneService {
     $date = new \DateTime( $utc_date, $UTC );
     $date->setTimezone( $localTZ );
     
-    return $date->format(DATE_ATOM);
+    return $date_only ? $date->format('Y-m-d') : $date->format(DATE_ATOM);
   }
   
 }
