@@ -96,10 +96,10 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
           continue;
         }
         
-        $date_only = (strlen($start_date) < 11) ? TRUE : FALSE;
+        $all_day = (strlen($start_date) < 11) ? TRUE : FALSE;
         // By default, Drupal store date time date in UTC timezone.
         // So we need to convert it into user timezone.
-        $entry['start'] = $timezone_service->utcToLocal($start_date, $timezone, $date_only);
+        $entry['start'] = $timezone_service->utcToLocal($start_date, $timezone, $all_day);
       }
       // Cope with end date in the same way as start date above.
       if (!empty($end_date)) {
@@ -115,9 +115,20 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
         }
         
         if (!empty($end_date)) {    
-          $date_only = (strlen($end_date) < 11) ? TRUE : FALSE;
-          $entry['end'] = $timezone_service->utcToLocal($end_date, $timezone, $date_only);
+          $all_day = (strlen($end_date) < 11) ? TRUE : FALSE;
+          // As designed, the end date is inclusive for all day event,
+          // which is not what we want. So we need one day offset.
+          if ($all_day) {
+            $entry['end'] = $timezone_service->utcToLocal($end_date, $timezone, $all_day, '+1 day');
+          }
+          else {
+            $entry['end'] = $timezone_service->utcToLocal($end_date, $timezone, $all_day);
+          }
         }       
+      }
+      else {
+        // Without end date field, this event can't be resized.
+        $entry['durationEditable'] = FALSE;
       }
       // Set the color for this event.
       if (isset($event_type) && isset($color_tax[$event_type])) {
