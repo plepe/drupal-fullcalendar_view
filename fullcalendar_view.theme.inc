@@ -95,6 +95,10 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
           // This field is not a valid date time field.
           continue;
         }
+        // This event is not editable for a user who doesn't have the permission.
+        if (!$current_entity->access('update')) {
+          $entry['editable'] = FALSE;
+        }
         
         $all_day = (strlen($start_date) < 11) ? TRUE : FALSE;
         // By default, Drupal store date time date in UTC timezone.
