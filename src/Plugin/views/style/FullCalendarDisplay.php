@@ -49,6 +49,10 @@ class FullCalendarDisplay extends StylePluginBase {
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     parent::buildOptionsForm($form, $form_state);
     
+    // Remove the grouping setting.
+    if (isset($form['grouping'])) {
+      unset($form['grouping']);
+    }
     // Default date of the calendar.
     $form['defaultDate'] = array(
       '#type' => 'date',
