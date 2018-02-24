@@ -119,7 +119,8 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
       $entry = [
         'title' => $title,
         'id' => $entity_id,
-        'url' => '/' . $entity_type . '/' . $entity_id];
+        'url' => $current_entity->toUrl()->toString()
+      ];
        
       if (!empty($start_date)) {
         // There might be more than one value for a field,
