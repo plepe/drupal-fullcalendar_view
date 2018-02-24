@@ -6,7 +6,7 @@
 		      header: {
 		        left: 'prev,next today',
 		        center: 'title',
-		        right: 'month,agendaWeek,agendaDay,listMonth'
+		        right: drupalSettings.rightButtons,
 		      },
 		      defaultDate: drupalSettings.defaultDate,
 		      navLinks: true, // Can click day/week names to navigate views.

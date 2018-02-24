@@ -49,6 +49,13 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
     $start_field_option['settings']['timezone_override'] : drupal_get_user_timezone();
   // Open a new window for details of an event.
   $link_to_entity = $fields['title']->options['settings']['link_to_entity'];
+  // Right side buttons
+  $right_buttons = 'month';
+  foreach ($options['right_buttons'] as $key => $value) {
+    if ($value !== 0) {
+      $right_buttons .= ',' . $key;
+    }
+  }
   $entries = array();
   
   if (!empty($start_field)) {
@@ -260,6 +267,7 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
       'eventContentType' => $event_content_type,
       'startField' => $start_field,
       'endField' => $end_field,
+      'rightButtons' => $right_buttons,
     );
   }
 }
