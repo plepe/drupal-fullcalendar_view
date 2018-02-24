@@ -1,0 +1,16 @@
+<?php
+/**
+ * Implements hook_uninstall().
+ *
+ * Removes stale migration configs during uninstall.
+ */
+/*function calendar_recurring_event_uninstall() {
+  // Delete configs of fields.
+  \Drupal::configFactory()->getEditable('field.storage.node.field_weekly_event')->delete();
+  \Drupal::configFactory()->getEditable('field.storage.node.field_monthly_event')->delete();
+  
+  // Deleting field storage.
+//  \Drupal\field\Entity\FieldStorageConfig::loadByName('node', 'field.storage.node.field_weekly_event')->delete();
+//  \Drupal\field\Entity\FieldStorageConfig::loadByName('node', 'field.storage.node.field_monthly_event')->delete();
+}
+*/

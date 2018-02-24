@@ -3,7 +3,7 @@ namespace Drupal\fullcalendar_view\Plugin\views\style;
 
 use Drupal\core\form\FormStateInterface;
 use Drupal\views\Plugin\views\style\StylePluginBase;
-use Drupal\taxonomy\Entity\Term;
+use Drupal\Core\Datetime\DrupalDateTime;
 
 /**
  * Style plugin to render content for FullCalendar
@@ -35,6 +35,8 @@ class FullCalendarDisplay extends StylePluginBase {
     $options['defaultDate'] = array('default' => '');
     $options['start'] = array('default' => '');
     $options['end'] = array('default' => '');
+    $options['business_start'] = array('default' => '');
+    $options['business_end'] = array('default' => '');
     $options['content_type'] = array('default' => '');
     $options['tax_field'] = array('default' => '');
     $options['color_contents'] = ['default' => []];
@@ -164,6 +166,37 @@ class FullCalendarDisplay extends StylePluginBase {
         '#type' => 'color',
       );
     }
+    $moduleHandler = \Drupal::service('module_handler');
+    if ($moduleHandler->moduleExists('calendar_recurring_event')){
+      // Recurring event.
+      $form['recurring'] = array(
+          '#type' => 'details',
+          '#title' => t('Recurring event settings'),
+          // '#description' =>  t('Settings for recurring event.'),
+      );
+      // Recurring business start time.
+      $form['business_start'] = array(
+          '#type' => 'datetime',
+          '#title' => t('Business start time'),
+          '#description' =>  t('The time of a day when a recurring all day event starts. The recurring events whose start date include hour and minute will use their respective start time instead.'),
+          '#fieldset' => 'recurring',
+          '#default_value' => empty($this->options['business_start']) ? new DrupalDateTime('2018-02-24T08:00:00') : new DrupalDateTime($this->options['business_start']),
+          '#date_date_element' => 'none', // hide date element
+          '#date_time_element' => 'time', // you can use text element here as well
+          '#date_time_format' => 'H:i'
+      );
+      // Recurring business end time.
+      $form['business_end'] = array(
+          '#type' => 'datetime',
+          '#title' => t('Business end time'),
+          '#description' =>  t('The time of a day when a recurring event ends. The recurring events whose end date include hour and minute will use their respective end time instead.'),
+          '#fieldset' => 'recurring',
+          '#default_value' => empty($this->options['business_end']) ? new DrupalDateTime('2018-02-24T18:00:00') : new DrupalDateTime($this->options['business_end']),
+          '#date_date_element' => 'none', // hide date element
+          '#date_time_element' => 'time', // you can use text element here as well
+          '#date_time_format' => 'H:i'
+      );
+    }
     // New event content type.
     $form['content_type'] = [
       '#title' => $this->t('Event content type'),
@@ -196,6 +229,14 @@ class FullCalendarDisplay extends StylePluginBase {
         $options['color_taxonomies'][$id] = $color;
       }
     }
+    // Datetime fields in Drupal 8 are stored as strings.
+    if (isset($options['business_start'])) {
+      $options['business_start'] = $options['business_start']->format(DATETIME_DATETIME_STORAGE_FORMAT);
+    }
+    if (isset($options['business_end'])) {
+      $options['business_end'] = $options['business_end']->format(DATETIME_DATETIME_STORAGE_FORMAT);
+    }
+    
     parent::submitOptionsForm($form, $form_state);
   }
   

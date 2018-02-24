@@ -1,4 +1,6 @@
 <?php
+use Drupal\Core\Datetime\DrupalDateTime;
+
 /**
  * @file
  * Theme for Full Calendar views.
@@ -54,11 +56,48 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
     $timezone_service = \Drupal::service('fullcalendar_view.timezone_conversion_service');
     // Save view results into entries array.
     foreach ($view->result as $index => $row) {
+      // Days of a week for a recurring event.
+      $dow = NULL;
+      // Days of a month for a recurring event.
+      $dom = NULL;
+      $monthly = NULL;
+      $weekly = NULL;
+      // Recurring range.
+      $range = NULL;
       // Result entity of current row.
       $current_entity = $row->_entity;
       // Start field is vital, if it doesn't exist for this entity then ignore it.
       if (!$current_entity->hasField($start_field)) {
         continue;
+      }
+      // Monthly recurring.
+      if ($current_entity->hasField('field_monthly_event')) {
+        $monthly = $current_entity->get('field_monthly_event')->getValue();
+      }
+      // If the monthly recurring is set, the weekly recurring will be ignored.
+      if (!empty($monthly)) {
+        $dom = [];
+        foreach ($monthly as $day) {
+          if (!empty($day['value'])) {
+            $dom[] = $day['value'];
+          }
+        }
+      }
+      // Weekly recurring.
+      elseif ($current_entity->hasField('field_weekly_event')) {
+        $weekly = $current_entity->get('field_weekly_event')->getValue();
+      }
+      if (!empty($weekly)) {
+        $dow = [];
+        foreach ($weekly as $day) {
+          if (!empty($day['value'])) {
+            $dow[]= $day['value'];
+          }
+        }
+        
+        if (!empty($dow)) {
+          $dow = '[' . implode(',', $dow) . ']';
+        }
       }
       // Entity id.
       $entity_id = $current_entity->id();
@@ -76,7 +115,7 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
       // Calendar event end date.
       $end_date = empty($end_field) || !$current_entity->hasField($end_field) ? '' : $current_entity->get($end_field)->getValue();
       // Event title.
-      $title = strip_tags($style->getField($index, 'title'));
+      $title = $current_entity->label();
       $entry = [
         'title' => $title,
         'id' => $entity_id,
@@ -101,9 +140,42 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
         }
         
         $all_day = (strlen($start_date) < 11) ? TRUE : FALSE;
-        // By default, Drupal store date time date in UTC timezone.
-        // So we need to convert it into user timezone.
-        $entry['start'] = $timezone_service->utcToLocal($start_date, $timezone, $all_day);
+        
+        if ($all_day) {
+          // By default, Drupal store date time date in UTC timezone.
+          // So we need to convert it into user timezone.
+          $start = $timezone_service->utcToLocal($start_date, $timezone, 'Y-m-d');
+          // Recurring event.
+          if (!empty($dow) || !empty($dom)) {
+            if (empty($options['business_start'])) {
+              $business_start = new DrupalDateTime('2018-02-24T08:00:00');
+            }
+            else {
+              $business_start = new DrupalDateTime($options['business_start']);
+            }
+            $entry['start'] = $business_start->format('H:i'); 
+            $range['start'] = $start;
+          }
+          else {
+            $entry['start'] = $start;
+          }
+        }
+        else {
+          // Recurring event.
+          if (!empty($dow) || !empty($dom)) {
+            $format = 'H:i';
+            $range['start'] = $timezone_service->utcToLocal($start_date, $timezone, 'Y-m-d');
+          }
+          else {
+            $format = DATE_ATOM;
+          }
+          // By default, Drupal store date time date in UTC timezone.
+          // So we need to convert it into user timezone.
+          $entry['start'] = $timezone_service->utcToLocal($start_date, $timezone, $format);
+        }       
+      }
+      else {
+        continue;
       }
       // Cope with end date in the same way as start date above.
       if (!empty($end_date)) {
@@ -119,14 +191,37 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
         }
         
         if (!empty($end_date)) {    
-          $all_day = (strlen($end_date) < 11) ? TRUE : FALSE;
-          // As designed, the end date is inclusive for all day event,
-          // which is not what we want. So we need one day offset.
+          $all_day = (strlen($end_date) < 11) ? TRUE : FALSE;         
           if ($all_day) {
-            $entry['end'] = $timezone_service->utcToLocal($end_date, $timezone, $all_day, '+1 day');
+            // As designed, the end date is inclusive for all day event,
+            // which is not what we want. So we need one day offset.
+            $end = $timezone_service->utcToLocal($end_date, $timezone, 'Y-m-d', '+1 day');
+            // Recurring event.
+            if (!empty($dow) || !empty($dom)) {
+              if (!empty($options['business_end'])) {
+                $business_end = new DrupalDateTime($options['business_end']);
+              }
+              else {
+                $business_end = new DrupalDateTime('2018-02-24T18:00:00');
+              }           
+              $entry['end'] = $business_end->format('H:i');
+              $range['end'] = $end;
+            }
+            else {
+              $entry['end'] = $end;
+            }
           }
           else {
-            $entry['end'] = $timezone_service->utcToLocal($end_date, $timezone, $all_day);
+            // Recurring event.
+            if (!empty($dow) || !empty($dom)) {
+              $format = 'H:i';
+              $range['end'] = $timezone_service->utcToLocal($end_date, $timezone, 'Y-m-d');
+            }
+            else {
+              $format = DATE_ATOM;
+            }
+            
+            $entry['end'] = $timezone_service->utcToLocal($end_date, $timezone, $format);
           }
         }       
       }
@@ -142,7 +237,18 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
         $entry['backgroundColor'] = $color_content[$entity_bundle];
       }
       
-      
+      if (!empty($dom)) {
+        $entry['dom'] = $dom;
+        $entry['ranges'] = [$range];
+        // Recurring event is not editable.
+        $entry['editable'] = FALSE;
+      }
+      elseif (!empty($dow)) {
+        $entry['dow'] = $dow;
+        $entry['ranges'] = [$range];
+        // Recurring event is not editable.
+        $entry['editable'] = FALSE;
+      }
       $entries[] = $entry;
     }
     // Pass data to js file.
