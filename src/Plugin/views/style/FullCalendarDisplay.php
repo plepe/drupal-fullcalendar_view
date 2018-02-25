@@ -42,7 +42,7 @@ class FullCalendarDisplay extends StylePluginBase {
     $options['color_contents'] = ['default' => []];
     $options['color_taxonomies'] = ['default' => []];
     $options['vocabularies'] = array('default' => '');
-    $options['right_buttons'] = array('default' => ['agendaWeek' => 'agendaWeek', 'agendaDay' => 'agendaDay', 'listMonth' => 'listMonth']);
+    $options['right_buttons'] = array('default' => ['agendaWeek' => 'agendaWeek', 'agendaDay' => 'agendaDay', 'listYear' => 'listYear']);
     return $options;
   }
   
@@ -90,7 +90,7 @@ class FullCalendarDisplay extends StylePluginBase {
     $form['right_buttons'] = array(
         '#type' => 'checkboxes',
         '#fieldset' => 'display',
-        '#options' => array('agendaWeek' => $this->t('Week'), 'agendaDay' => $this->t('Day'), 'listMonth' => $this->t('List')),
+        '#options' => array('agendaWeek' => $this->t('Week'), 'agendaDay' => $this->t('Day'), 'listYear' => $this->t('List')),
         '#default_value' => (empty($this->options['right_buttons'])) ? [] : $this->options['right_buttons'],
         '#title' => $this->t('Right side buttons'),
     );
