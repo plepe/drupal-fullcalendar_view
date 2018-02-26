@@ -32,7 +32,7 @@
 		    			  }
 		    			  // test event against all the ranges
 		    			  if (range.end) {
-		    				  return (event.start.isBefore(moment.utc(range.end,'YYYY-MM-DD')) &&
+		    				  return (event.start.isBefore(moment.utc(range.end,'YYYY-MM-DD').add(1, 'days')) &&
 				    	                event.end.isAfter(moment.utc(range.start,'YYYY-MM-DD')));
 		    			  }
 		    			  else {
