@@ -1,21 +1,45 @@
 <?php
-namespace  Drupal\fullcalendar_view\Controller;
 
+namespace Drupal\fullcalendar_view\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use \Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 
 /**
-* Calendar Event Controller
-*/
+ * Calendar Event Controller.
+ */
 class CalendarEventController extends ControllerBase {
-  
-  
+
   /**
-   * Event Update Handler
-   * 
+   * Construct the Controller.
+   *
+   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $loggerFactory
+   *   Logger factory object.
+   */
+  public function __construct(LoggerChannelFactoryInterface $loggerFactory) {
+    $this->loggerFactory = $loggerFactory;
+  }
+
+  /**
+   * Create a CalendarEventController instance.
+   *
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   *   Container object.
+   *
+   * @return \Drupal\fullcalendar_view\Controller\CalendarEventController
+   *   The instance of CalendarEventController.
+   */
+  public static function create(ContainerInterface $container) {
+    $loggerFactory = $container->get('logger.factory');
+    return new static($loggerFactory);
+  }
+
+  /**
+   * Event Update Handler.
    */
   public function updateEvent(Request $request) {
     $user = $this->currentUser();
@@ -25,10 +49,10 @@ class CalendarEventController extends ControllerBase {
       $end_date = $request->request->get('end', '');
       $start_field = $request->request->get('start_field', '');
       $end_field = $request->request->get('end_field', '');
-      
+
       if (!empty($nid) && !empty($start_date) && !empty($start_field)) {
-        $node =  \Drupal\node\Entity\Node::load($nid);
-        
+        $node = $this->entityTypeManager()->getStorage('node')->load($nid);
+
         if (!empty($node) && $node->access('update')) {
           if (isset($node->$start_field)) {
             // Field definitions.
@@ -38,27 +62,29 @@ class CalendarEventController extends ControllerBase {
               $fields_def = $node->getFieldDefinition($end_field);
               $end_type = $fields_def->getType();
             }
-           
+
             // Multiple value of start field.
             if (is_array($node->$start_field)) {
               if ($start_type === 'datetime') {
                 $length = strlen($node->$start_field[0]);
-                
+
                 if ($length > 10) {
                   // Only update the first value.
-                  $node->$start_field[0] = ['value' => substr(gmdate(DATE_ATOM, strtotime($start_date)), 0, $length)];
+                  $node->$start_field[0] = [
+                    'value' => substr(gmdate(DATE_ATOM, strtotime($start_date)), 0, $length),
+                  ];
                 }
                 else {
                   $node->$start_field[0] = ['value' => $start_date];
                 }
               }
             }
-            // Single value field
+            // Single value field.
             else {
-              // Dateime field
+              // Dateime field.
               if ($start_type === 'datetime') {
                 $length = strlen($node->$start_field->value);
-                
+
                 if ($length > 10) {
                   // UTC Date with time.
                   $node->$start_field->value = gmdate("Y-m-d\TH:i:s", strtotime($start_date));
@@ -72,29 +98,31 @@ class CalendarEventController extends ControllerBase {
                 $node->$start_field->value = strtotime($start_date);
               }
             }
-            
-            // End date
+
+            // End date.
             if (isset($end_type)) {
               // Multiple value of end field.
               if (is_array($node->$end_field)) {
                 if ($end_type === 'datetime') {
                   $length = strlen($node->$end_field[0]);
-                  
+
                   if ($length > 10) {
                     // Only update the first value.
-                    $node->$end_field[0] = ['value' => substr(gmdate(DATE_ATOM, strtotime($end_date)), 0, $length)];
+                    $node->$end_field[0] = [
+                      'value' => substr(gmdate(DATE_ATOM, strtotime($end_date)), 0, $length),
+                    ];
                   }
                   else {
                     $node->$end_field[0] = ['value' => $end_date];
                   }
                 }
               }
-              // Single value field
+              // Single value field.
               else {
-                // Dateime field
+                // Dateime field.
                 if ($end_type === 'datetime') {
                   $length = strlen($node->$end_field->value);
-                  
+
                   if ($length > 10) {
                     // UTC Date with time.
                     $node->$end_field->value = gmdate("Y-m-d\TH:i:s", strtotime($end_date));
@@ -109,12 +137,13 @@ class CalendarEventController extends ControllerBase {
                 }
               }
             }
-              
+
             $node->save();
-            \Drupal::logger('content')->notice($node->getType() . ': updated ' . $node->getTitle());
+            // Log the content changed.
+            $this->loggerFactory->get('content')->notice($node->getType() . ': updated ' . $node->getTitle());
             return new Response($node->getTitle() . ' is updated to from ' . $start_date . ' to ' . $end_date);
           }
-          
+
         }
         else {
           return new Response('Access denied!');
@@ -128,6 +157,5 @@ class CalendarEventController extends ControllerBase {
       return new Response('Invalid User!');
     }
   }
-  
-  
+
 }

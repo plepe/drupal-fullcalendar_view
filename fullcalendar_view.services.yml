@@ -6,3 +6,4 @@ services:
   # Taxonomy color service
   fullcalendar_view.taxonomy_color:
     class: Drupal\fullcalendar_view\TaxonomyColor
+    arguments: ['@entity_type.manager']

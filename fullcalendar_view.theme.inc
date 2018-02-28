@@ -1,20 +1,23 @@
 <?php
-use Drupal\Core\Datetime\DrupalDateTime;
 
 /**
  * @file
  * Theme for Full Calendar views.
  */
 
+use Drupal\Core\Datetime\DrupalDateTime;
+
 /**
- * Implement fullcalendar view theme preprocess function
- * @param $variables
+ * Implement fullcalendar view theme preprocess function.
+ *
+ * @param array $variables
+ *   Template variables.
  */
-function template_preprocess_views_view_fullcalendar(&$variables) {
-  
+function template_preprocess_views_view_fullcalendar(array &$variables) {
+
   // Load the fullcalendar js library.
-  $variables['#attached']['library'][] =  'fullcalendar_view/fullcalendar';
-  
+  $variables['#attached']['library'][] = 'fullcalendar_view/fullcalendar';
+
   $view = $variables['view'];
 
   $style = $view->style_plugin;
@@ -22,7 +25,7 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
   $fields = $view->field;
   // Update options for twig.
   $variables['options'] = $options;
-  
+
   // Field machine name of start date.
   $start_field = $options['start'];
   // Start date field is critical.
@@ -43,26 +46,26 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
   $color_tax = $options['color_taxonomies'];
   // Date fields.
   $start_field_option = $fields[$start_field]->options;
-  $end_field_option = empty($end_field) ? null : $fields[$end_field]->options;
+  $end_field_option = empty($end_field) ? NULL : $fields[$end_field]->options;
   // Custom timezone or user timezone.
-  $timezone = !empty($start_field_option['settings']['timezone_override']) ? 
+  $timezone = !empty($start_field_option['settings']['timezone_override']) ?
     $start_field_option['settings']['timezone_override'] : drupal_get_user_timezone();
   // Open a new window for details of an event.
   $link_to_entity = $fields['title']->options['settings']['link_to_entity'];
-  // Right side buttons
+  // Right side buttons.
   $right_buttons = 'month';
   foreach ($options['right_buttons'] as $key => $value) {
     if ($value !== 0) {
       $right_buttons .= ',' . $key;
     }
   }
-  $entries = array();
-  
+  $entries = [];
+
   if (!empty($start_field)) {
     // Timezone conversion service.
     $timezone_service = \Drupal::service('fullcalendar_view.timezone_conversion_service');
     // Save view results into entries array.
-    foreach ($view->result as $index => $row) {
+    foreach ($view->result as $row) {
       // Days of a week for a recurring event.
       $dow = NULL;
       // Days of a month for a recurring event.
@@ -73,7 +76,7 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
       $range = NULL;
       // Result entity of current row.
       $current_entity = $row->_entity;
-      // Start field is vital, if it doesn't exist for this entity then ignore it.
+      // Start field is vital, if it doesn't exist then ignore this entity.
       if (!$current_entity->hasField($start_field)) {
         continue;
       }
@@ -98,10 +101,10 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
         $dow = [];
         foreach ($weekly as $day) {
           if (!empty($day['value'])) {
-            $dow[]= $day['value'];
+            $dow[] = $day['value'];
           }
         }
-        
+
         if (!empty($dow)) {
           $dow = '[' . implode(',', $dow) . ']';
         }
@@ -110,14 +113,12 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
       $entity_id = $current_entity->id();
       // Entity bundle type.
       $entity_bundle = $current_entity->bundle();
-      // Entity type.
-      $entity_type = $current_entity->getEntityTypeId();
       // Background color based on taxonomy field.
       if (!empty($tax_field) && $current_entity->hasField($tax_field)) {
         // Event type.
         $event_type = $current_entity->get($tax_field)->target_id;
       }
-      // Calendar event start date. 
+      // Calendar event start date.
       $start_date = $current_entity->get($start_field)->getValue();
       // Calendar event end date.
       $end_date = empty($end_field) || !$current_entity->hasField($end_field) ? '' : $current_entity->get($end_field)->getValue();
@@ -126,14 +127,14 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
       $entry = [
         'title' => $title,
         'id' => $entity_id,
-        'url' => $current_entity->toUrl()->toString()
+        'url' => $current_entity->toUrl()->toString(),
       ];
-       
+
       if (!empty($start_date)) {
         // There might be more than one value for a field,
         // but we only need the first one and ignore others.
-        $start_date = reset($start_date)['value'];  
-        // Examine the field type
+        $start_date = reset($start_date)['value'];
+        // Examine the field type.
         if ($start_field_option['type'] === 'timestamp') {
           $start_date = intval($start_date);
           $start_date = date(DATE_ATOM, $start_date);
@@ -142,13 +143,13 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
           // This field is not a valid date time field.
           continue;
         }
-        // This event is not editable for a user who doesn't have the permission.
+        // A user who doesn't have the permission can't edit an event.
         if (!$current_entity->access('update')) {
           $entry['editable'] = FALSE;
         }
-        
+
         $all_day = (strlen($start_date) < 11) ? TRUE : FALSE;
-        
+
         if ($all_day) {
           // By default, Drupal store date time date in UTC timezone.
           // So we need to convert it into user timezone.
@@ -161,7 +162,7 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
             else {
               $business_start = new DrupalDateTime($options['business_start']);
             }
-            $entry['start'] = $business_start->format('H:i'); 
+            $entry['start'] = $business_start->format('H:i');
             $range['start'] = $start;
           }
           else {
@@ -180,7 +181,7 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
           // By default, Drupal store date time date in UTC timezone.
           // So we need to convert it into user timezone.
           $entry['start'] = $timezone_service->utcToLocal($start_date, $timezone, $format);
-        }       
+        }
       }
       else {
         continue;
@@ -188,7 +189,7 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
       // Cope with end date in the same way as start date above.
       if (!empty($end_date)) {
         $end_date = reset($end_date)['value'];
-        
+
         if ($end_field_option['type'] === 'timestamp') {
           $end_date = intval($end_date);
           $end_date = date(DATE_ATOM, $end_date);
@@ -197,9 +198,9 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
           // This field is not a valid date time field.
           $end_date = '';
         }
-        
-        if (!empty($end_date)) {    
-          $all_day = (strlen($end_date) < 11) ? TRUE : FALSE;         
+
+        if (!empty($end_date)) {
+          $all_day = (strlen($end_date) < 11) ? TRUE : FALSE;
           if ($all_day) {
             // As designed, the end date is inclusive for all day event,
             // which is not what we want. So we need one day offset.
@@ -211,7 +212,7 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
               }
               else {
                 $business_end = new DrupalDateTime('2018-02-24T18:00:00');
-              }           
+              }
               $entry['end'] = $business_end->format('H:i');
               $range['end'] = $end;
             }
@@ -228,10 +229,10 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
             else {
               $format = DATE_ATOM;
             }
-            
+
             $entry['end'] = $timezone_service->utcToLocal($end_date, $timezone, $format);
           }
-        }       
+        }
       }
       else {
         // Without end date field, this event can't be resized.
@@ -244,7 +245,7 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
       elseif (isset($color_content[$entity_bundle])) {
         $entry['backgroundColor'] = $color_content[$entity_bundle];
       }
-      
+
       if (!empty($dom)) {
         $entry['dom'] = $dom;
         $entry['ranges'] = [$range];
@@ -260,7 +261,7 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
       $entries[] = $entry;
     }
     // Pass data to js file.
-    $variables['#attached']['drupalSettings'] = array(
+    $variables['#attached']['drupalSettings'] = [
       'fullCalendarView' => $entries,
       'defaultDate' => empty($default_date) ? date('Y-m-d') : $default_date,
       'linkToEntity' => $link_to_entity,
@@ -268,6 +269,6 @@ function template_preprocess_views_view_fullcalendar(&$variables) {
       'startField' => $start_field,
       'endField' => $end_field,
       'rightButtons' => $right_buttons,
-    );
+    ];
   }
 }
