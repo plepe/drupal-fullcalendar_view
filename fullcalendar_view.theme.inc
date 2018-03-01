@@ -224,7 +224,7 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
             // Recurring event.
             if (!empty($dow) || !empty($dom)) {
               $format = 'H:i';
-              $range['end'] = $timezone_service->utcToLocal($end_date, $timezone, 'Y-m-d');
+              $range['end'] = $timezone_service->utcToLocal($end_date, $timezone, 'Y-m-d', '+1 day');
             }
             else {
               $format = DATE_ATOM;
