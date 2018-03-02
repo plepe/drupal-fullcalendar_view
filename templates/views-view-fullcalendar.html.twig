@@ -21,4 +21,10 @@
 %}
 <div{{ attributes.addClass(classes) }}>
   <div id="calendar"></div>
+  <div id="bottom-buttons">
+    <div class="fullcalendar-bottom-btn locale-selector">
+      <label for="locale-selector">{{ 'Select Language:'|t }}</label>
+      <select id='locale-selector'></select>
+    </div>
+  </div>
 </div>

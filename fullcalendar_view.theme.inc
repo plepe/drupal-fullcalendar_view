@@ -38,6 +38,8 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
   $tax_field = $options['tax_field'];
   // Default date of the calendar.
   $default_date = $options['defaultDate'];
+  // Default Language.
+  $default_lang = $options['defaultLanguage'];
   // New event content type.
   $event_content_type = $options['content_type'];
   // Color for content types.
@@ -264,6 +266,8 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
     $variables['#attached']['drupalSettings'] = [
       'fullCalendarView' => $entries,
       'defaultDate' => empty($default_date) ? date('Y-m-d') : $default_date,
+      'defaultLang' => $default_lang,
+      'languageSelector' => $options['languageSelector'],
       'linkToEntity' => $link_to_entity,
       'eventContentType' => $event_content_type,
       'startField' => $start_field,

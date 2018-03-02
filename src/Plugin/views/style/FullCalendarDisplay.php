@@ -80,6 +80,8 @@ class FullCalendarDisplay extends StylePluginBase {
           'listYear' => 'listYear',
         ],
     ];
+    $options['defaultLanguage'] = ['default' => 'en'];
+    $options['languageSelector'] = ['default' => 0];
     return $options;
   }
 
@@ -134,6 +136,94 @@ class FullCalendarDisplay extends StylePluginBase {
       ],
       '#default_value' => (empty($this->options['right_buttons'])) ? [] : $this->options['right_buttons'],
       '#title' => $this->t('Right side buttons'),
+    ];
+    // Lanugage and Localization.
+    $locale = [
+      'en' => 'English',
+      'af' => 'Afrikaans',
+      'ar-dz' => 'Arabic - Algeria',
+      'ar-kw' => 'Arabic - Kuwait',
+      'ar-ly' => 'Arabic - Libya',
+      'ar-ma' => 'Arabic - Morocco',
+      'ar-sa' => 'Arabic - Saudi Arabia',
+      'ar-tn' => 'Arabic - Tunisia',
+      'ar' => 'Arabic',
+      'bg' => 'Bulgarian',
+      'ca' => 'Catalan',
+      'cs' => 'Czech',
+      'da' => 'Danish',
+      'de-at' => 'German - Austria',
+      'de-ch' => 'German - Switzerland',
+      'de' => 'German',
+      'el' => 'Greek',
+      'en-au' => 'English - Australia',
+      'en-ca' => 'English - Canada',
+      'en-gb' => 'English - United Kingdom',
+      'en-ie' => 'English - Ireland',
+      'en-nz' => 'English - New Zealand',
+      'es-do' => 'Spanish - Dominican Republic',
+      'es-us' => 'Spanish - United States',
+      'es' => 'Spanish',
+      'et' => 'Estonian',
+      'eu' => 'Basque',
+      'fa' => 'Farsi',
+      'fi' => 'Finnish',
+      'fr-ca' => 'French - Canada',
+      'fr-ch' => 'French - Switzerland',
+      'fr' => 'French',
+      'gl' => 'Galician',
+      'he' => 'Hebrew',
+      'hi' => 'Hindi',
+      'hr' => 'Croatian',
+      'hu' => 'Hungarian',
+      'id' => 'Indonesian',
+      'is' => 'Icelandic',
+      'it' => 'Italian',
+      'ja' => 'Japanese',
+      'kk' => 'Kannada',
+      'ko' => 'Korean',
+      'lb' => 'Lebanon',
+      'lt' => 'Lithuanian',
+      'lv' => 'Latvian',
+      'mk' => 'FYRO Macedonian',
+      'ms-my' => 'Malay - Malaysia',
+      'ms' => 'Malay',
+      'nb' => 'Norwegian (Bokmål) - Norway',
+      'nl-be' => 'Dutch - Belgium',
+      'nl' => 'Dutch',
+      'nn' => 'Norwegian',
+      'pl' => 'Polish',
+      'pt-br' => 'Portuguese - Brazil',
+      'pt' => 'Portuguese',
+      'ro' => 'Romanian',
+      'ru' => 'Russian',
+      'sk' => 'Slovak',
+      'sl' => 'Slovenian',
+      'sq' => 'Albanian',
+      'sr-cyrl' => 'Serbian - Cyrillic',
+      'sr' => 'Serbian',
+      'sv' => 'Swedish',
+      'th' => 'Thai',
+      'tr' => 'Turkish',
+      'uk' => 'Ukrainian',
+      'vi' => 'Vietnamese',
+      'zh-cn' => 'Chinese - China',
+      'zh-tw' => 'Chinese - Taiwan',
+    ];
+    // Default Language.
+    $form['defaultLanguage'] = [
+      '#title' => $this->t('Default Language'),
+      '#fieldset' => 'display',
+      '#type' => 'select',
+      '#options' => $locale,
+      '#default_value' => (!empty($this->options['defaultLanguage'])) ? $this->options['defaultLanguage'] : 'en',
+    ];
+    // Language Selector Switch.
+    $form['languageSelector'] = [
+      '#type' => 'checkbox',
+      '#fieldset' => 'display',
+      '#default_value' => (empty($this->options['languageSelector'])) ? 0 : $this->options['languageSelector'],
+      '#title' => $this->t('Allow client to select language.'),
     ];
     // Legend colors.
     $form['colors'] = [
