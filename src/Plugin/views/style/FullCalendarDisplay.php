@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @ViewsStyle(
  *   id = "fullcalendar_view_display",
- *   title = @Translation("Full Calendar Dispaly"),
+ *   title = @Translation("Full Calendar Display"),
  *   help = @Translation("Render contents in Full Calendar view."),
  *   theme = "views_view_fullcalendar",
  *   display_types = { "normal" }
