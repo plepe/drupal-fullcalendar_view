@@ -117,7 +117,7 @@ class CalendarEventController extends ControllerBase {
                 }
                 // Daterange field.
                 elseif ($end_type === 'daterange') {
-                  $length = strlen($node->$end_field->end_value);
+                  $length = strlen($node->$end_field[0]->end_value);
 
                   if ($length > 10) {
                     // UTC Date with time.
