@@ -6,7 +6,6 @@
 (function ($, Drupal) {
     Drupal.behaviors.fullcalendarView = {
       attach: function (context, settings) {
-          // console.log(drupalSettings.fullCalendarView);.
           $('#calendar').fullCalendar({
               header: {
                 left: 'prev,next today',

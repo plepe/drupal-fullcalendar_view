@@ -141,7 +141,7 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
           $start_date = intval($start_date);
           $start_date = date(DATE_ATOM, $start_date);
         }
-        elseif (strpos($start_field_option['type'], 'datetime') === FALSE) {
+        elseif (strpos($start_field_option['type'], 'datetime') === FALSE && strpos($start_field_option['type'], 'daterange') === FALSE) {
           // This field is not a valid date time field.
           continue;
         }
@@ -190,15 +190,21 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       }
       // Cope with end date in the same way as start date above.
       if (!empty($end_date)) {
-        $end_date = reset($end_date)['value'];
 
         if ($end_field_option['type'] === 'timestamp') {
+          $end_date = reset($end_date)['value'];
           $end_date = intval($end_date);
           $end_date = date(DATE_ATOM, $end_date);
+        }
+        elseif (strpos($end_field_option['type'], 'daterange') !== FALSE) {
+          $end_date = $end_date[0]['end_value'];
         }
         elseif (strpos($end_field_option['type'], 'datetime') === FALSE) {
           // This field is not a valid date time field.
           $end_date = '';
+        }
+        else {
+          $end_date = reset($end_date)['value'];
         }
 
         if (!empty($end_date)) {

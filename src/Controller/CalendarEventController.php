@@ -65,13 +65,13 @@ class CalendarEventController extends ControllerBase {
 
             // Multiple value of start field.
             if (is_array($node->$start_field)) {
-              if ($start_type === 'datetime') {
+              if ($start_type === 'datetime' || $start_type === 'daterange') {
                 $length = strlen($node->$start_field[0]);
 
                 if ($length > 10) {
                   // Only update the first value.
                   $node->$start_field[0] = [
-                    'value' => substr(gmdate(DATE_ATOM, strtotime($start_date)), 0, $length),
+                    'value' => gmdate("Y-m-d\TH:i:s", strtotime($start_date)),
                   ];
                 }
                 else {
@@ -81,8 +81,8 @@ class CalendarEventController extends ControllerBase {
             }
             // Single value field.
             else {
-              // Dateime field.
-              if ($start_type === 'datetime') {
+              // Datetime field.
+              if ($start_type === 'datetime' || $start_type === 'daterange') {
                 $length = strlen($node->$start_field->value);
 
                 if ($length > 10) {
@@ -93,7 +93,6 @@ class CalendarEventController extends ControllerBase {
                   $node->$start_field->value = $start_date;
                 }
               }
-              // Timestamp field.
               elseif ($start_type === 'timestamp') {
                 $node->$start_field->value = strtotime($start_date);
               }
@@ -109,17 +108,33 @@ class CalendarEventController extends ControllerBase {
                   if ($length > 10) {
                     // Only update the first value.
                     $node->$end_field[0] = [
-                      'value' => substr(gmdate(DATE_ATOM, strtotime($end_date)), 0, $length),
+                      'value' => gmdate("Y-m-d\TH:i:s", strtotime($end_date)),
                     ];
                   }
                   else {
                     $node->$end_field[0] = ['value' => $end_date];
                   }
                 }
+                // Daterange field.
+                elseif ($end_type === 'daterange') {
+                  $length = strlen($node->$end_field->end_value);
+
+                  if ($length > 10) {
+                    // UTC Date with time.
+                    $node->$end_field[0]->end_value = gmdate("Y-m-d\TH:i:s", strtotime($end_date));
+                  }
+                  else {
+                    $node->$end_field[0]->end_value = $end_date;
+                  }
+                }
+                // Timestamp field.
+                elseif ($end_type === 'timestamp') {
+                  $node->$end_field[0]->value = strtotime($end_date);
+                }
               }
               // Single value field.
               else {
-                // Dateime field.
+                // Datetime field.
                 if ($end_type === 'datetime') {
                   $length = strlen($node->$end_field->value);
 
@@ -129,6 +144,18 @@ class CalendarEventController extends ControllerBase {
                   }
                   else {
                     $node->$end_field->value = $end_date;
+                  }
+                }
+                // Daterange field.
+                elseif ($end_type === 'daterange') {
+                  $length = strlen($node->$end_field->end_value);
+
+                  if ($length > 10) {
+                    // UTC Date with time.
+                    $node->$end_field->end_value = gmdate("Y-m-d\TH:i:s", strtotime($end_date));
+                  }
+                  else {
+                    $node->$end_field->end_value = $end_date;
                   }
                 }
                 // Timestamp field.
