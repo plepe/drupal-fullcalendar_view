@@ -2,11 +2,11 @@
 
 namespace Drupal\fullcalendar_view\Controller;
 
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 
 /**
@@ -183,6 +183,65 @@ class CalendarEventController extends ControllerBase {
     else {
       return new Response('Invalid User!');
     }
+  }
+
+  /**
+   * New event handler function.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   Http Request object.
+   *
+   * @return array
+   *   A event node form render array
+   */
+  public function addEvent(Request $request) {
+    $type = $request->get('type', '');
+    $start_field = $request->get('start_field', '');
+    $end_field = $request->get('end_field', '');
+    $form = [];
+
+    if (!empty($type)) {
+      $user = $this->currentUser();
+      // Check the user permission.
+      if (!empty($user) && $user->hasPermission("create $type content")) {
+        $data = [
+          'type' => $type,
+        ];
+        // Create a new event node for this form.
+        $node = $this->entityTypeManager()
+          ->getStorage('node')
+          ->create($data);
+
+        if (!empty($node)) {
+          // Node form.
+          $form = $this->entityFormBuilder()->getForm($node);
+          // Field definitions of this node.
+          $field_def = $node->getFieldDefinitions();
+          // Hide those fields we don't need for this form.
+          foreach ($form as $name => &$element) {
+            switch ($name) {
+              case 'advanced';
+              case 'body';
+                $element['#access'] = FALSE;
+            }
+            // Hide all fields that are irrelevant to the event date.
+            if (substr($name, 0, 6) === 'field_' && $name !== $start_field && $name !== $end_field && $name !== 'field_monthly_event' && $name !== 'field_weekly_event' && !$field_def[$name]->isRequired()) {
+              $element['#access'] = FALSE;
+            }
+          }
+          // Hide preview button.
+          if (isset($form['actions']['preview'])) {
+            $form['actions']['preview']['#access'] = FALSE;
+          }
+          // Move the Save button to the bottom of this form.
+          $form['actions']['#weight'] = 10000;
+
+          return $form;
+        }
+      }
+    }
+    // Return access denied for users don't have the permission.
+    throw new AccessDeniedHttpException();
   }
 
 }

@@ -15,16 +15,29 @@ use Drupal\Core\Datetime\DrupalDateTime;
  */
 function template_preprocess_views_view_fullcalendar(array &$variables) {
 
-  // Load the fullcalendar js library.
-  $variables['#attached']['library'][] = 'fullcalendar_view/fullcalendar';
-
   $view = $variables['view'];
-
   $style = $view->style_plugin;
   $options = $style->options;
   $fields = $view->field;
+  // Get current language.
+  $language = \Drupal::languageManager()->getCurrentLanguage();
+  if ($language->isDefault()) {
+    $variables['language'] = '';
+  }
+  else {
+    $variables['language'] = $language->getId() . '/';
+  }
+  // Load the fullcalendar js library.
+  $variables['#attached']['library'][] = 'fullcalendar_view/fullcalendar';
+  // Current user.
+  $user = $variables['user'];
+  // New event content type.
+  $event_content_type = $options['content_type'];
   // Update options for twig.
   $variables['options'] = $options;
+  // Hide the create event link from user who doesn't have the permission
+  // or if this feature is turn off.
+  $variables['showAddEvent'] = (!empty($user) && $user->hasPermission("create $event_content_type content")) && $options['createEventLink'] ? TRUE : FALSE;
 
   // Field machine name of start date.
   $start_field = $options['start'];
@@ -40,8 +53,6 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
   $default_date = $options['defaultDate'];
   // Default Language.
   $default_lang = $options['defaultLanguage'];
-  // New event content type.
-  $event_content_type = $options['content_type'];
   // Color for content types.
   $color_content = $options['color_contents'];
   // Color for taxonomies.

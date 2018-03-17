@@ -82,6 +82,7 @@ class FullCalendarDisplay extends StylePluginBase {
     ];
     $options['defaultLanguage'] = ['default' => 'en'];
     $options['languageSelector'] = ['default' => 0];
+    $options['createEventLink'] = ['default' => 0];
     return $options;
   }
 
@@ -224,6 +225,14 @@ class FullCalendarDisplay extends StylePluginBase {
       '#fieldset' => 'display',
       '#default_value' => (empty($this->options['languageSelector'])) ? 0 : $this->options['languageSelector'],
       '#title' => $this->t('Allow client to select language.'),
+    ];
+    // Create new event link.
+    $form['createEventLink'] = [
+      '#type' => 'checkbox',
+      '#fieldset' => 'display',
+      '#default_value' => (empty($this->options['createEventLink'])) ? 0 : $this->options['createEventLink'],
+      '#title' => $this->t('Create a new event via the Off-Canvas dialog.'),
+      '#description' => t('If this option is selected, there wiil be an Add Event link below the calendar that provides the ability to create an event In-Place.'),
     ];
     // Legend colors.
     $form['colors'] = [

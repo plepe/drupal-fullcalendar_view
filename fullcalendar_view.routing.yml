@@ -4,3 +4,11 @@ fullcalendar_view.update_event:
     _controller: '\Drupal\fullcalendar_view\Controller\CalendarEventController::updateEvent'
   requirements: 
     _permission: 'access content'
+    
+fullcalendar_view.add_event:
+  path: '/fullcalendar-view-event-add' 
+  defaults: 
+    _controller: '\Drupal\fullcalendar_view\Controller\CalendarEventController::addEvent' 
+    _title: 'Add Event'
+  requirements: 
+    _permission: 'access content'

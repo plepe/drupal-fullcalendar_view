@@ -13,3 +13,4 @@ fullcalendar:
   dependencies:
     - core/jquery
     - core/drupalSettings
+    - core/drupal.dialog.ajax
