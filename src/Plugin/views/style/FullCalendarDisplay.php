@@ -65,6 +65,7 @@ class FullCalendarDisplay extends StylePluginBase {
     $options['defaultDate'] = ['default' => ''];
     $options['start'] = ['default' => ''];
     $options['end'] = ['default' => ''];
+    $options['des'] = ['default' => ''];
     $options['business_start'] = ['default' => ''];
     $options['business_end'] = ['default' => ''];
     $options['content_type'] = ['default' => ''];
@@ -119,6 +120,15 @@ class FullCalendarDisplay extends StylePluginBase {
       '#options' => $field_names,
       '#empty_value' => '',
       '#default_value' => (!empty($this->options['end'])) ? $this->options['end'] : '',
+    ];
+    // Field for description.
+    $form['des'] = [
+      '#title' => $this->t('Description Field'),
+      '#description' => t('Description for event tooltip. If select none, there will not be popup tooltip.'),
+      '#type' => 'select',
+      '#options' => $field_names,
+      '#empty_value' => '',
+      '#default_value' => (!empty($this->options['des'])) ? $this->options['des'] : '',
     ];
     // Display settings.
     $form['display'] = [

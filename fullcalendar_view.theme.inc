@@ -47,6 +47,8 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
   }
   // Field machine name of end date.
   $end_field = $options['end'];
+  // Field machine name for event description.
+  $des_field = $options['des'];
   // Field machine name of taxonomy field.
   $tax_field = $options['tax_field'];
   // Default date of the calendar.
@@ -135,10 +137,19 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       $start_date = $current_entity->get($start_field)->getValue();
       // Calendar event end date.
       $end_date = empty($end_field) || !$current_entity->hasField($end_field) ? '' : $current_entity->get($end_field)->getValue();
+      // Description for events.
+      $des = empty($des_field) || !$current_entity->hasField($des_field) ? '' : $current_entity->get($des_field)->getValue();
+      if (is_array($des)) {
+        $des = reset($des);
+        if (isset($des['value'])) {
+          $des = $des['value'];
+        }
+      }
       // Event title.
       $title = $current_entity->label();
       $entry = [
         'title' => $title,
+        'description' => $des,
         'id' => $entity_id,
         'url' => $current_entity->toUrl()->toString(),
       ];

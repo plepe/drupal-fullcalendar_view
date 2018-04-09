@@ -19,7 +19,14 @@
               eventLimit: true, // Allow "more" link when too many events.
               events: drupalSettings.fullCalendarView,
               dayClick: dayClickCallback,
-              eventRender: function (event) {
+              eventRender: function (event, $el) {
+                  // Popup tooltip.
+                  if (event.description) {
+                      if ($el.fullCalendarTooltip !== "undefined") {
+                          $el.fullCalendarTooltip(event.title, event.description);
+                      }
+                  }
+                  // Recurring event.
                   if (event.ranges) {
                       return (event.ranges.filter(function (range) {
                           if (event.dom) {
