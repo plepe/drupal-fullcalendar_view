@@ -2,18 +2,25 @@ fullcalendar:
   version: 3.8.0
   css:
     theme:
-      css/jquery.qtip.min.css: {}
       css/fullcalendar.min.css: {}
  
   js:
-    js/jquery.qtip.min.js: {}
     js/moment.min.js: {}
     js/fullcalendar.min.js: {}
     js/locale-all.js: {}
-    js/tooltip-plugin.js: {}
     js/fullcalendar_view.js: {}
     
   dependencies:
     - core/jquery
     - core/drupalSettings
     - core/drupal.dialog.ajax
+    
+tooltip:
+  version: 1.0
+  css:
+    theme:
+      css/jquery.qtip.min.css: {}
+      
+  js:
+    js/jquery.qtip.min.js: {}
+    js/tooltip-plugin.js: {}

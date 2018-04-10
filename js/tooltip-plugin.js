@@ -2,7 +2,7 @@
  * @file
  * Fullcalendar Tooltip plugin JavaScript file.
  *
- * Custom tooltip for FullCalendar.
+ * Custom tooltip plugin for FullCalendar.
  * More options see:
  * http://qtip2.com/options.
  */

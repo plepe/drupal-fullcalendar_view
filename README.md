@@ -63,3 +63,5 @@ Features:
  * Resize event (Only available for all day event)
  * Recurring (Repeated) event
  * Supports Multilingual
+ * Off-Canvas editing
+ * Popup Tooltip for event descrption

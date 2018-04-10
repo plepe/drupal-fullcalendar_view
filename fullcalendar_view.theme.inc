@@ -27,8 +27,6 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
   else {
     $variables['language'] = $language->getId() . '/';
   }
-  // Load the fullcalendar js library.
-  $variables['#attached']['library'][] = 'fullcalendar_view/fullcalendar';
   // Current user.
   $user = $variables['user'];
   // New event content type.
@@ -290,6 +288,12 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       }
       $entries[] = $entry;
     }
+    // Load tooltip plugin.
+    if (!empty($des_field)) {
+      $variables['#attached']['library'][] = 'fullcalendar_view/tooltip';
+    }
+    // Load the fullcalendar js library.
+    $variables['#attached']['library'][] = 'fullcalendar_view/fullcalendar';
     // Pass data to js file.
     $variables['#attached']['drupalSettings'] = [
       'fullCalendarView' => $entries,
