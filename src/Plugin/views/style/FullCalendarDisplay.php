@@ -102,7 +102,7 @@ class FullCalendarDisplay extends StylePluginBase {
       '#type' => 'date',
       '#title' => t('Default Date'),
       '#default_value' => (isset($this->options['defaultDate'])) ? $this->options['defaultDate'] : '',
-      '#description' => t('The initial date displayed when the calendar first loads. It should be in ISO 8601 format. For example: 2018-01-24'),
+      '#description' => t('The initial date displayed when the calendar first loads. If this option has not been specified, the current date is chosen as default.'),
     ];
     // All selected fields.
     $field_names = $this->displayHandler->getFieldLabels();
