@@ -113,8 +113,9 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       if (!empty($weekly)) {
         $dow = [];
         foreach ($weekly as $day) {
-          if (!empty($day['value'])) {
-            $dow[] = $day['value'];
+          if (isset($day['value'])) {
+            // Sunday is 0.
+            $dow[] = $day['value'] % 7;
           }
         }
 

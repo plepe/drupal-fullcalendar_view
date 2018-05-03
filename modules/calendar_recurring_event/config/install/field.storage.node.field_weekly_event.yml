@@ -31,7 +31,7 @@ settings:
       value: 6
       label: Saturday
     -
-      value: 7
+      value: 0
       label: Sunday
   allowed_values_function: ''
 module: calendar_recurring_event
