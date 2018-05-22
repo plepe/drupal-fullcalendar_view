@@ -301,6 +301,7 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       'defaultDate' => empty($default_date) ? date('Y-m-d') : $default_date,
       'defaultLang' => $default_lang,
       'languageSelector' => $options['languageSelector'],
+      'alloweventOverlap' => $options['alloweventOverlap'],
       'linkToEntity' => $link_to_entity,
       'eventContentType' => $event_content_type,
       'startField' => $start_field,

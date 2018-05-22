@@ -18,6 +18,14 @@
               editable: true,
               eventLimit: true, // Allow "more" link when too many events.
               events: drupalSettings.fullCalendarView,
+              eventOverlap: function () {
+              	if (drupalSettings.alloweventOverlap) {
+              	  return true;
+              	}
+              	else {
+              	  return false;
+              	}
+              },
               dayClick: dayClickCallback,
               eventRender: function (event, $el) {
                   // Popup tooltip.

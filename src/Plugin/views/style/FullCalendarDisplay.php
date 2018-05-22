@@ -83,6 +83,7 @@ class FullCalendarDisplay extends StylePluginBase {
     ];
     $options['defaultLanguage'] = ['default' => 'en'];
     $options['languageSelector'] = ['default' => 0];
+	$options['alloweventOverlap'] = ['default' => 1];
     $options['createEventLink'] = ['default' => 0];
     return $options;
   }
@@ -147,6 +148,14 @@ class FullCalendarDisplay extends StylePluginBase {
       ],
       '#default_value' => (empty($this->options['right_buttons'])) ? [] : $this->options['right_buttons'],
       '#title' => $this->t('Right side buttons'),
+    ];
+    // Allow/disallow event overlap.
+    $form['alloweventOverlap'] = [
+      '#type' => 'checkbox',
+      '#fieldset' => 'display',
+      '#default_value' => (empty($this->options['alloweventOverlap'])) ? 1 : $this->options['alloweventOverlap'],
+      '#title' => $this->t('Allow calendar events to overlap'),
+      '#description' => t('If this option is selected, calendar events are allowed to overlap (default).'),
     ];
     // Lanugage and Localization.
     $locale = [
