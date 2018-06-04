@@ -14,7 +14,8 @@ use Drupal\Core\Datetime\DrupalDateTime;
  *   Template variables.
  */
 function template_preprocess_views_view_fullcalendar(array &$variables) {
-
+  global $base_path;
+  
   $view = $variables['view'];
   $style = $view->style_plugin;
   $options = $style->options;
@@ -22,10 +23,10 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
   // Get current language.
   $language = \Drupal::languageManager()->getCurrentLanguage();
   if ($language->isDefault()) {
-    $variables['language'] = '';
+    $variables['language'] = $base_path;
   }
   else {
-    $variables['language'] = $language->getId() . '/';
+    $variables['language'] = $base_path . $language->getId() . '/';
   }
   // Current user.
   $user = $variables['user'];

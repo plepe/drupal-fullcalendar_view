@@ -75,7 +75,7 @@
                        * Perform ajax call for event update in database.
                        */
                       jQuery.post(
-                          'fullcalendar-view-event-update'
+                    		  drupalSettings.path.baseUrl + 'fullcalendar-view-event-update'
                           , {
                               nid: event.id
                               , start: event.start.format()
@@ -104,7 +104,7 @@
                        * Perform ajax call for event update in database.
                        */
                       jQuery.post(
-                          'fullcalendar-view-event-update'
+                    		  drupalSettings.path.baseUrl + 'fullcalendar-view-event-update'
                           , {
                               nid: event.id
                               , start: event.start.format()
@@ -163,7 +163,7 @@
                 if (slotDate && drupalSettings.eventContentType) {
                     var date = slotDate.format();
                     // Open a new window to create a new event (content).
-                    window.open('node/add/' + drupalSettings.eventContentType + '?start=' + date + '&start_field=' + drupalSettings.startField, '_blank');
+                    window.open(drupalSettings.path.baseUrl + 'node/add/' + drupalSettings.eventContentType + '?start=' + date + '&start_field=' + drupalSettings.startField, '_blank');
                 }
             });
       }
