@@ -160,7 +160,7 @@
             }
 
             $("#calendar").dblclick(function () {
-                if (slotDate && drupalSettings.eventContentType) {
+                if (slotDate && drupalSettings.eventContentType && drupalSettings.dblClickToCreate) {
                     var date = slotDate.format();
                     // Open a new window to create a new event (content).
                     window.open(drupalSettings.path.baseUrl + 'node/add/' + drupalSettings.eventContentType + '?start=' + date + '&start_field=' + drupalSettings.startField, '_blank');

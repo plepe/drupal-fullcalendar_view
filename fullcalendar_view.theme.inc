@@ -290,6 +290,13 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       }
       $entries[] = $entry;
     }
+
+    // Can the user add a new event?
+    $dbl_click_to_create = FALSE;
+    if ($user->hasPermission("create $event_content_type content")) {
+      $dbl_click_to_create = TRUE;
+    }
+
     // Load tooltip plugin.
     if (!empty($des_field)) {
       $variables['#attached']['library'][] = 'fullcalendar_view/tooltip';
@@ -308,6 +315,7 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       'startField' => $start_field,
       'endField' => $end_field,
       'rightButtons' => $right_buttons,
+      'dblClickToCreate' => $dbl_click_to_create,
     ];
   }
 }
