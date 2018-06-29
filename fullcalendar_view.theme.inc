@@ -15,7 +15,7 @@ use Drupal\Core\Datetime\DrupalDateTime;
  */
 function template_preprocess_views_view_fullcalendar(array &$variables) {
   global $base_path;
-  
+
   $view = $variables['view'];
   $style = $view->style_plugin;
   $options = $style->options;
@@ -316,6 +316,7 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       'endField' => $end_field,
       'rightButtons' => $right_buttons,
       'dblClickToCreate' => $dbl_click_to_create,
+	  'navLinks' => $options['nav_links'],
     ];
   }
 }

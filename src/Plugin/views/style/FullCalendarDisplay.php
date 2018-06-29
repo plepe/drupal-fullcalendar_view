@@ -81,6 +81,7 @@ class FullCalendarDisplay extends StylePluginBase {
           'listYear' => 'listYear',
         ],
     ];
+    $options['nav_links'] = ['default' => 1];
     $options['defaultLanguage'] = ['default' => 'en'];
     $options['languageSelector'] = ['default' => 0];
 	$options['alloweventOverlap'] = ['default' => 1];
@@ -149,11 +150,19 @@ class FullCalendarDisplay extends StylePluginBase {
       '#default_value' => (empty($this->options['right_buttons'])) ? [] : $this->options['right_buttons'],
       '#title' => $this->t('Right side buttons'),
     ];
+    // Nav Links.
+    $form['nav_links'] = [
+      '#type' => 'checkbox',
+      '#fieldset' => 'display',
+      '#default_value' => (!isset($this->options['nav_links'])) ? 1 : $this->options['nav_links'],
+      '#title' => $this->t('Day/Week are links'),
+      '#description' => t('If this option is selected, day/week names will be linked to navigation views.'),
+    ];
     // Allow/disallow event overlap.
     $form['alloweventOverlap'] = [
       '#type' => 'checkbox',
       '#fieldset' => 'display',
-      '#default_value' => (empty($this->options['alloweventOverlap'])) ? 1 : $this->options['alloweventOverlap'],
+      '#default_value' => (!isset($this->options['alloweventOverlap'])) ? 1 : $this->options['alloweventOverlap'],
       '#title' => $this->t('Allow calendar events to overlap'),
       '#description' => t('If this option is selected, calendar events are allowed to overlap (default).'),
     ];

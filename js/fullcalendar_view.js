@@ -14,18 +14,12 @@
               },
               defaultDate: drupalSettings.defaultDate,
               locale: drupalSettings.defaultLang,
-              navLinks: true, // Can click day/week names to navigate views.
+			  // Can click day/week names to navigate views.
+              navLinks: (drupalSettings.navLinks == 0) ? false : true,
               editable: true,
               eventLimit: true, // Allow "more" link when too many events.
               events: drupalSettings.fullCalendarView,
-              eventOverlap: function () {
-              	if (drupalSettings.alloweventOverlap) {
-              	  return true;
-              	}
-              	else {
-              	  return false;
-              	}
-              },
+              eventOverlap: (drupalSettings.alloweventOverlap == 0) ? false : true,
               dayClick: dayClickCallback,
               eventRender: function (event, $el) {
                   // Popup tooltip.
