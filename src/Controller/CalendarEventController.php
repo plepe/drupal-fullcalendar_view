@@ -82,9 +82,12 @@ class CalendarEventController extends ControllerBase {
             // Single value field.
             else {
               // Datetime field.
-              if ($start_type === 'datetime' || $start_type === 'daterange') {
+              if (is_numeric($node->$start_field->value)) {
+                $node->$start_field->value = strtotime($start_date);
+              }
+              else {    
                 $length = strlen($node->$start_field->value);
-
+                
                 if ($length > 10) {
                   // UTC Date with time.
                   $node->$start_field->value = gmdate("Y-m-d\TH:i:s", strtotime($start_date));
@@ -92,9 +95,6 @@ class CalendarEventController extends ControllerBase {
                 else {
                   $node->$start_field->value = $start_date;
                 }
-              }
-              elseif ($start_type === 'timestamp') {
-                $node->$start_field->value = strtotime($start_date);
               }
             }
 
@@ -128,7 +128,7 @@ class CalendarEventController extends ControllerBase {
                   }
                 }
                 // Timestamp field.
-                elseif ($end_type === 'timestamp') {
+                elseif (is_numeric($node->$end_field[0]->value)) {
                   $node->$end_field[0]->value = strtotime($end_date);
                 }
               }
