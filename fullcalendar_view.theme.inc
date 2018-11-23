@@ -137,8 +137,19 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       $start_date = $current_entity->get($start_field)->getValue();
       // Calendar event end date.
       $end_date = empty($end_field) || !$current_entity->hasField($end_field) ? '' : $current_entity->get($end_field)->getValue();
-      // Description for events.
-      $des = empty($des_field) || !$current_entity->hasField($des_field) ? '' : $current_entity->get($des_field)->getValue();
+      // Description for events. For multiple content types, there might be more than one field specified.
+      if (!empty($des_field) && is_array($des_field)) {
+        foreach ($des_field as $des_field_name) {
+          if ($current_entity->hasField($des_field_name)) {
+            $des = $current_entity->get($des_field_name)->getValue();
+            // we just need only one description text. Once we got it, quit the loop.
+            break;
+          }
+        }
+      }
+      if (!isset($des)) {       
+        $des = '';
+      }
       if (is_array($des)) {
         $des = reset($des);
         if (isset($des['value'])) {

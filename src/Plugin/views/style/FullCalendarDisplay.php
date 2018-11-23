@@ -126,11 +126,12 @@ class FullCalendarDisplay extends StylePluginBase {
     // Field for description.
     $form['des'] = [
       '#title' => $this->t('Description Field'),
-      '#description' => t('Description for event tooltip. If select none, there will not be popup tooltip.'),
+      '#description' => t('Description for event tooltip. If select none, there will not be popup tooltip. For multiple content types, you can select multiple fields here.'),
       '#type' => 'select',
       '#options' => $field_names,
       '#empty_value' => '',
       '#default_value' => (!empty($this->options['des'])) ? $this->options['des'] : '',
+	  '#multiple' => TRUE,
     ];
     // Display settings.
     $form['display'] = [
