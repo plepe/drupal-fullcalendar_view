@@ -84,7 +84,8 @@ class FullCalendarDisplay extends StylePluginBase {
     $options['nav_links'] = ['default' => 1];
     $options['defaultLanguage'] = ['default' => 'en'];
     $options['languageSelector'] = ['default' => 0];
-	$options['alloweventOverlap'] = ['default' => 1];
+	  $options['alloweventOverlap'] = ['default' => 1];
+	  $options['updateConfirm'] = ['default' => 1];
     $options['createEventLink'] = ['default' => 0];
     return $options;
   }
@@ -166,6 +167,14 @@ class FullCalendarDisplay extends StylePluginBase {
       '#default_value' => (!isset($this->options['alloweventOverlap'])) ? 1 : $this->options['alloweventOverlap'],
       '#title' => $this->t('Allow calendar events to overlap'),
       '#description' => t('If this option is selected, calendar events are allowed to overlap (default).'),
+    ];
+    // Event update JS confirmation dialog.
+    $form['updateConfirm'] = [
+        '#type' => 'checkbox',
+        '#fieldset' => 'display',
+        '#default_value' => (!isset($this->options['updateConfirm'])) ? 1 : $this->options['updateConfirm'],
+        '#title' => $this->t('Event update confirmation pop-up dialog.'),
+        '#description' => t('If this option is selected, a confirmation dialog will pop-up after dragging and dropping an event.'),
     ];
     // Lanugage and Localization.
     $locale = [

@@ -61,7 +61,7 @@
                   if (event.allDay) {
                       event.end.subtract(1, 'days');
                   }
-                  if (!confirm(event.title + " end is now " + event.end.format() + ". Do you want to save the change?")) {
+                  if (drupalSettings.updateConfirm == 1 && !confirm(event.title + " end is now " + event.end.format() + ". Do you want to save the change?")) {
                       revertFunc();
                   }
                   else {
@@ -78,7 +78,7 @@
                               , end_field: drupalSettings.endField
                           }
                       ).done(function (data) {
-                          alert("Response: " + data);
+                          //alert("Response: " + data);
                       });
                   }
 
@@ -90,7 +90,7 @@
                   if (event.allDay && event.end) {
                       event.end.subtract(1, 'days');
                   }
-                  if (!confirm(msg)) {
+                  if (drupalSettings.updateConfirm == 1 && !confirm(msg)) {
                       revertFunc();
                   }
                   else {
@@ -107,7 +107,7 @@
                               , end_field: drupalSettings.endField
                           }
                       ).done(function (data) {
-                          alert("Response: " + data);
+                          //alert("Response: " + data);
                       });
                   }
 

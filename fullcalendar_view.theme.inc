@@ -321,6 +321,7 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       'defaultLang' => $default_lang,
       'languageSelector' => $options['languageSelector'],
       'alloweventOverlap' => $options['alloweventOverlap'],
+      'updateConfirm' => $options['updateConfirm'],
       'linkToEntity' => $link_to_entity,
       'eventContentType' => $event_content_type,
       'startField' => $start_field,
