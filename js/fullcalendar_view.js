@@ -154,10 +154,10 @@
             }
 
             $("#calendar").dblclick(function () {
-                if (slotDate && drupalSettings.eventContentType && drupalSettings.dblClickToCreate) {
+                if (slotDate && drupalSettings.eventBundleType && drupalSettings.dblClickToCreate && drupalSettings.addForm !== '') {
                     var date = slotDate.format();
                     // Open a new window to create a new event (content).
-                    window.open(drupalSettings.path.baseUrl + 'node/add/' + drupalSettings.eventContentType + '?start=' + date + '&start_field=' + drupalSettings.startField, '_blank');
+                    window.open(drupalSettings.path.baseUrl + drupalSettings.addForm + '?start=' + date + '&start_field=' + drupalSettings.startField, '_blank');
                 }
             });
       }

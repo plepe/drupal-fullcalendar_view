@@ -30,13 +30,33 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
   }
   // Current user.
   $user = $variables['user'];
-  // New event content type.
-  $event_content_type = $options['content_type'];
+  // New event bundle type.
+  $event_bundle_type = $options['bundle_type'];
+  $entity_type = $view->getBaseEntityType();
+  if ($entity_type->id() === 'node') {
+    $add_form = 'node/add/' . $event_bundle_type;
+  }
+  else {
+    $entity_links = $entity_type->get('links');
+    if (isset($entity_links['add-form'])) {
+      $add_form = str_replace('{' . $entity_type->id() . '}', $event_bundle_type, $entity_links['add-form']);
+    }
+    elseif (isset($entity_links['add-page'])) {
+      $add_form = str_replace('{' . $entity_type->id() . '}', $event_bundle_type, $entity_links['add-page']);
+    }
+  }
+  
+  // Can the user add a new event?
+  $dbl_click_to_create = FALSE;
+  if (!empty($user) && $user->hasPermission("create $event_bundle_type " . $entity_type->getLabel())) {
+    $dbl_click_to_create = TRUE;
+  }
   // Update options for twig.
   $variables['options'] = $options;
   // Hide the create event link from user who doesn't have the permission
   // or if this feature is turn off.
-  $variables['showAddEvent'] = (!empty($user) && $user->hasPermission("create $event_content_type content")) && $options['createEventLink'] ? TRUE : FALSE;
+  $variables['showAddEvent'] = $dbl_click_to_create
+    && $options['createEventLink'];
 
   // Field machine name of start date.
   $start_field = $options['start'];
@@ -54,8 +74,8 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
   $default_date = $options['defaultDate'];
   // Default Language.
   $default_lang = $options['defaultLanguage'];
-  // Color for content types.
-  $color_content = $options['color_contents'];
+  // Color for bundle types.
+  $color_content = $options['color_bundle'];
   // Color for taxonomies.
   $color_tax = $options['color_taxonomies'];
   // Date fields.
@@ -137,7 +157,7 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       $start_date = $current_entity->get($start_field)->getValue();
       // Calendar event end date.
       $end_date = empty($end_field) || !$current_entity->hasField($end_field) ? '' : $current_entity->get($end_field)->getValue();
-      // Description for events. For multiple content types, there might be more than one field specified.
+      // Description for events. For multiple bundle types, there might be more than one field specified.
       if (!empty($des_field) && is_array($des_field)) {
         foreach ($des_field as $des_field_name) {
           if ($current_entity->hasField($des_field_name)) {
@@ -302,12 +322,6 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       $entries[] = $entry;
     }
 
-    // Can the user add a new event?
-    $dbl_click_to_create = FALSE;
-    if ($user->hasPermission("create $event_content_type content")) {
-      $dbl_click_to_create = TRUE;
-    }
-
     // Load tooltip plugin.
     if (!empty($des_field)) {
       $variables['#attached']['library'][] = 'fullcalendar_view/tooltip';
@@ -323,12 +337,14 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       'alloweventOverlap' => $options['alloweventOverlap'],
       'updateConfirm' => $options['updateConfirm'],
       'linkToEntity' => $link_to_entity,
-      'eventContentType' => $event_content_type,
+      'eventBundleType' => $event_bundle_type,
       'startField' => $start_field,
       'endField' => $end_field,
       'rightButtons' => $right_buttons,
       'dblClickToCreate' => $dbl_click_to_create,
-	  'navLinks' => $options['nav_links'],
+	    'navLinks' => $options['nav_links'],
+      'entityID' => $entity_type->id(),
+      'addForm' => isset($add_form) ? $add_form : '',
     ];
   }
 }
