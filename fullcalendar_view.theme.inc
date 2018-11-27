@@ -51,6 +51,8 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
   if (!empty($user) && $user->hasPermission("create $event_bundle_type " . $entity_type->getLabel())) {
     $dbl_click_to_create = TRUE;
   }
+  // Pass entity type to twig template.
+  $variables['entity_id'] = $entity_type->id();
   // Update options for twig.
   $variables['options'] = $options;
   // Hide the create event link from user who doesn't have the permission
@@ -343,7 +345,7 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       'rightButtons' => $right_buttons,
       'dblClickToCreate' => $dbl_click_to_create,
 	    'navLinks' => $options['nav_links'],
-      'entityID' => $entity_type->id(),
+      'entityType' => $entity_type->id(),
       'addForm' => isset($add_form) ? $add_form : '',
     ];
   }

@@ -44,56 +44,57 @@ class CalendarEventController extends ControllerBase {
   public function updateEvent(Request $request) {
     $user = $this->currentUser();
     if (!empty($user)) {
-      $nid = $request->request->get('nid', '');
+      $eid = $request->request->get('eid', '');
+      $entity_type = $request->request->get('entity_type', '');
       $start_date = $request->request->get('start', '');
       $end_date = $request->request->get('end', '');
       $start_field = $request->request->get('start_field', '');
       $end_field = $request->request->get('end_field', '');
 
-      if (!empty($nid) && !empty($start_date) && !empty($start_field)) {
-        $node = $this->entityTypeManager()->getStorage('node')->load($nid);
+      if (!empty($eid) && !empty($start_date) && !empty($start_field) && !empty($entity_type)) {
+        $entity = $this->entityTypeManager()->getStorage($entity_type)->load($eid);
 
-        if (!empty($node) && $node->access('update')) {
-          if (isset($node->$start_field)) {
+        if (!empty($entity) && $entity->access('update')) {
+          if ($entity->hasField($start_field)) {
             // Field definitions.
-            $fields_def = $node->getFieldDefinition($start_field);
+            $fields_def = $entity->getFieldDefinition($start_field);
             $start_type = $fields_def->getType();
-            if (isset($node->$end_field) && !empty($end_date)) {
-              $fields_def = $node->getFieldDefinition($end_field);
+            if (isset($entity->$end_field) && !empty($end_date)) {
+              $fields_def = $entity->getFieldDefinition($end_field);
               $end_type = $fields_def->getType();
             }
 
             // Multiple value of start field.
-            if (is_array($node->$start_field)) {
+            if (is_array($entity->$start_field)) {
               if ($start_type === 'datetime' || $start_type === 'daterange') {
-                $length = strlen($node->$start_field[0]);
+                $length = strlen($entity->$start_field[0]);
 
                 if ($length > 10) {
                   // Only update the first value.
-                  $node->$start_field[0] = [
+                  $entity->$start_field[0] = [
                     'value' => gmdate("Y-m-d\TH:i:s", strtotime($start_date)),
                   ];
                 }
                 else {
-                  $node->$start_field[0] = ['value' => $start_date];
+                  $entity->$start_field[0] = ['value' => $start_date];
                 }
               }
             }
             // Single value field.
             else {
               // Datetime field.
-              if (is_numeric($node->$start_field->value)) {
-                $node->$start_field->value = strtotime($start_date);
+              if (is_numeric($entity->$start_field->value)) {
+                $entity->$start_field->value = strtotime($start_date);
               }
               else {    
-                $length = strlen($node->$start_field->value);
+                $length = strlen($entity->$start_field->value);
                 
                 if ($length > 10) {
                   // UTC Date with time.
-                  $node->$start_field->value = gmdate("Y-m-d\TH:i:s", strtotime($start_date));
+                  $entity->$start_field->value = gmdate("Y-m-d\TH:i:s", strtotime($start_date));
                 }
                 else {
-                  $node->$start_field->value = $start_date;
+                  $entity->$start_field->value = $start_date;
                 }
               }
             }
@@ -101,74 +102,74 @@ class CalendarEventController extends ControllerBase {
             // End date.
             if (isset($end_type)) {
               // Multiple value of end field.
-              if (is_array($node->$end_field)) {
+              if (is_array($entity->$end_field)) {
                 if ($end_type === 'datetime') {
-                  $length = strlen($node->$end_field[0]);
+                  $length = strlen($entity->$end_field[0]);
 
                   if ($length > 10) {
                     // Only update the first value.
-                    $node->$end_field[0] = [
+                    $entity->$end_field[0] = [
                       'value' => gmdate("Y-m-d\TH:i:s", strtotime($end_date)),
                     ];
                   }
                   else {
-                    $node->$end_field[0] = ['value' => $end_date];
+                    $entity->$end_field[0] = ['value' => $end_date];
                   }
                 }
                 // Daterange field.
                 elseif ($end_type === 'daterange') {
-                  $length = strlen($node->$end_field[0]->end_value);
+                  $length = strlen($entity->$end_field[0]->end_value);
 
                   if ($length > 10) {
                     // UTC Date with time.
-                    $node->$end_field[0]->end_value = gmdate("Y-m-d\TH:i:s", strtotime($end_date));
+                    $entity->$end_field[0]->end_value = gmdate("Y-m-d\TH:i:s", strtotime($end_date));
                   }
                   else {
-                    $node->$end_field[0]->end_value = $end_date;
+                    $entity->$end_field[0]->end_value = $end_date;
                   }
                 }
                 // Timestamp field.
-                elseif (is_numeric($node->$end_field[0]->value)) {
-                  $node->$end_field[0]->value = strtotime($end_date);
+                elseif (is_numeric($entity->$end_field[0]->value)) {
+                  $entity->$end_field[0]->value = strtotime($end_date);
                 }
               }
               // Single value field.
               else {
                 // Datetime field.
                 if ($end_type === 'datetime') {
-                  $length = strlen($node->$end_field->value);
+                  $length = strlen($entity->$end_field->value);
 
                   if ($length > 10) {
                     // UTC Date with time.
-                    $node->$end_field->value = gmdate("Y-m-d\TH:i:s", strtotime($end_date));
+                    $entity->$end_field->value = gmdate("Y-m-d\TH:i:s", strtotime($end_date));
                   }
                   else {
-                    $node->$end_field->value = $end_date;
+                    $entity->$end_field->value = $end_date;
                   }
                 }
                 // Daterange field.
                 elseif ($end_type === 'daterange') {
-                  $length = strlen($node->$end_field->end_value);
+                  $length = strlen($entity->$end_field->end_value);
 
                   if ($length > 10) {
                     // UTC Date with time.
-                    $node->$end_field->end_value = gmdate("Y-m-d\TH:i:s", strtotime($end_date));
+                    $entity->$end_field->end_value = gmdate("Y-m-d\TH:i:s", strtotime($end_date));
                   }
                   else {
-                    $node->$end_field->end_value = $end_date;
+                    $entity->$end_field->end_value = $end_date;
                   }
                 }
                 // Timestamp field.
                 elseif ($end_type === 'timestamp') {
-                  $node->$end_field->value = strtotime($end_date);
+                  $entity->$end_field->value = strtotime($end_date);
                 }
               }
             }
 
-            $node->save();
+            $entity->save();
             // Log the content changed.
-            $this->loggerFactory->get('content')->notice($node->getType() . ': updated ' . $node->getTitle());
-            return new Response($node->getTitle() . ' is updated to from ' . $start_date . ' to ' . $end_date);
+            $this->loggerFactory->get('content')->notice($entity->getType() . ': updated ' . $entity->getTitle());
+            return new Response($entity->getTitle() . ' is updated to from ' . $start_date . ' to ' . $end_date);
           }
 
         }
@@ -192,10 +193,11 @@ class CalendarEventController extends ControllerBase {
    *   Http Request object.
    *
    * @return array
-   *   A event node form render array
+   *   A event entity form render array
    */
   public function addEvent(Request $request) {
-    $type = $request->get('type', '');
+    $entity_id = $request->get('entity', '');
+    $type = $request->get('bundle', '');
     $start_field = $request->get('start_field', '');
     $end_field = $request->get('end_field', '');
     $form = [];
@@ -203,20 +205,20 @@ class CalendarEventController extends ControllerBase {
     if (!empty($type)) {
       $user = $this->currentUser();
       // Check the user permission.
-      if (!empty($user) && $user->hasPermission("create $type content")) {
+      if (!empty($user) && $user->hasPermission("create $type " . $entity_id)) {
         $data = [
           'type' => $type,
         ];
-        // Create a new event node for this form.
-        $node = $this->entityTypeManager()
-          ->getStorage('node')
+        // Create a new event entity for this form.
+        $entity = $this->entityTypeManager()
+        ->getStorage($entity_id)
           ->create($data);
 
-        if (!empty($node)) {
-          // Node form.
-          $form = $this->entityFormBuilder()->getForm($node);
-          // Field definitions of this node.
-          $field_def = $node->getFieldDefinitions();
+        if (!empty($entity)) {
+          // Add form.
+          $form = $this->entityFormBuilder()->getForm($entity);
+          // Field definitions of this entity.
+          $field_def = $entity->getFieldDefinitions();
           // Hide those fields we don't need for this form.
           foreach ($form as $name => &$element) {
             switch ($name) {

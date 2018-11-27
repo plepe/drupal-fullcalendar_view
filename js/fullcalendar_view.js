@@ -71,7 +71,8 @@
                       jQuery.post(
                     		  drupalSettings.path.baseUrl + 'fullcalendar-view-event-update'
                           , {
-                              nid: event.id
+                              eid: event.id
+                              , entity_type: drupalSettings.entityType
                               , start: event.start.format()
                               , end: (event.end) ? event.end.format() : ''
                               , start_field: drupalSettings.startField
@@ -100,7 +101,8 @@
                       jQuery.post(
                     		  drupalSettings.path.baseUrl + 'fullcalendar-view-event-update'
                           , {
-                              nid: event.id
+                              eid: event.id
+                              , entity_type: drupalSettings.entityType
                               , start: event.start.format()
                               , end: (event.end) ? event.end.format() : ''
                               , start_field: drupalSettings.startField
