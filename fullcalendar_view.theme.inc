@@ -87,7 +87,8 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
   $timezone = !empty($start_field_option['settings']['timezone_override']) ?
     $start_field_option['settings']['timezone_override'] : drupal_get_user_timezone();
   // Open a new window for details of an event.
-  $link_to_entity = $fields['title']->options['settings']['link_to_entity'];
+  $title_field = (empty($options['title']) || $options['title'] == 'title') ? 'title' : $options['title'];
+  $link_to_entity = $fields[$title_field]->options['settings']['link_to_entity'];
   // Right side buttons.
   $right_buttons = 'month';
   foreach ($options['right_buttons'] as $key => $value) {
@@ -180,6 +181,16 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
             $des = $des['value'];
           }
         }
+        // Event title.
+        if (empty($options['title']) || $options['title'] == 'title') {
+          $title = $current_entity->label();
+        }
+        elseif ($current_entity->hasField($options['title'])) {
+          $title = $current_entity->get($options['title'])->value;
+        }
+        else {
+          $title = 'Invalid event title';
+        }
       }
       else {
         // Description for events. For multiple bundle types, there might be more than one field specified.
@@ -202,10 +213,17 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
             $des = $des['value'];
           }
         }
+        // Event title.
+        if (empty($options['title']) || $options['title'] == 'title') {
+          $title = $fields['title']->advancedRender($row);
+        }
+        elseif ($current_entity->hasField($options['title']))  {
+          $title = $fields[$options['title']]->advancedRender($row);
+        }
+        else {
+          $title = 'Invalid event title';
+        }
      }
-
-      // Event title.
-      $title = $current_entity->label();
       $entry = [
         'title' => $title,
         'description' => $des,

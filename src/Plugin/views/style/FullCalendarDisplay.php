@@ -66,6 +66,7 @@ class FullCalendarDisplay extends StylePluginBase {
     $options['start'] = ['default' => ''];
     $options['end'] = ['default' => ''];
     $options['des'] = ['default' => ''];
+    $options['title'] = ['default' => ''];
     $options['use_entity_fields'] = ['default' => TRUE];
     $options['business_start'] = ['default' => ''];
     $options['business_end'] = ['default' => ''];
@@ -125,6 +126,13 @@ class FullCalendarDisplay extends StylePluginBase {
       '#options' => $field_names,
       '#empty_value' => '',
       '#default_value' => (!empty($this->options['end'])) ? $this->options['end'] : '',
+    ];
+    // Field name of title
+    $form['title'] = [
+        '#title' => $this->t('Title Field'),
+        '#type' => 'select',
+        '#options' => $field_names,
+        '#default_value' => (!empty($this->options['title'])) ? $this->options['title'] : '',
     ];
     // Field for description.
     $form['des'] = [

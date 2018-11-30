@@ -22,6 +22,8 @@
               eventOverlap: (drupalSettings.alloweventOverlap == 0) ? false : true,
               dayClick: dayClickCallback,
               eventRender: function (event, $el) {
+            	  // Event title with HTML markup.
+            	  $el.find('span.fc-title').html($el.find('span.fc-title').text());
                   // Popup tooltip.
                   if (event.description) {
                       if ($el.fullCalendarTooltip !== "undefined") {
@@ -61,7 +63,9 @@
                   if (event.allDay) {
                       event.end.subtract(1, 'days');
                   }
-                  if (drupalSettings.updateConfirm == 1 && !confirm(event.title + " end is now " + event.end.format() + ". Do you want to save the change?")) {
+                  // Event title.
+                  var title = $($.parseHTML(event.title)).text();
+                  if (drupalSettings.updateConfirm == 1 && !confirm(title + " end is now " + event.end.format() + ". Do you want to save the change?")) {
                       revertFunc();
                   }
                   else {
@@ -85,7 +89,9 @@
 
               },
               eventDrop: function (event, delta, revertFunc) {
-                  var msg = event.title + " was updated to " + event.start.format() + ". Are you sure about this change?";
+            	  // Event title.
+            	  var title = $($.parseHTML(event.title)).text();
+                  var msg = title + " was updated to " + event.start.format() + ". Are you sure about this change?";
                     // As designed, the end date is inclusive for all day event,
                   // which is not what we want. So we need one day subtract.
                   if (event.allDay && event.end) {
