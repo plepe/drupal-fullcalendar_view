@@ -66,6 +66,7 @@ class FullCalendarDisplay extends StylePluginBase {
     $options['start'] = ['default' => ''];
     $options['end'] = ['default' => ''];
     $options['des'] = ['default' => ''];
+    $options['use_entity_fields'] = ['default' => TRUE];
     $options['business_start'] = ['default' => ''];
     $options['business_end'] = ['default' => ''];
     $options['bundle_type'] = ['default' => ''];
@@ -140,6 +141,13 @@ class FullCalendarDisplay extends StylePluginBase {
       '#type' => 'details',
       '#title' => t('Display'),
       '#description' => t('Calendar display settings.'),
+    ];
+    $form['use_entity_fields'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Use entity fields'),
+      '#description' => $this->t('Use entity fields for rendering rather than the raw view fields. This is checked by default to prevent legacy views from breaking. However, it will prevent using views rewriting and does not support non-standard date fields (fields other than timestamp, datetime and daterange).'),
+      '#fieldset' => 'display',
+      '#default_value' => $this->options['use_entity_fields'],
     ];
     // Right side buttons.
     $form['right_buttons'] = [

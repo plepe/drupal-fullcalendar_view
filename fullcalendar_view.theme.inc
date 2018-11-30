@@ -45,7 +45,7 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       $add_form = str_replace('{' . $entity_type->id() . '}', $event_bundle_type, $entity_links['add-page']);
     }
   }
-  
+
   // Can the user add a new event?
   $dbl_click_to_create = FALSE;
   if (!empty($user) && $user->hasPermission("create $event_bundle_type " . $entity_type->getLabel())) {
@@ -159,25 +159,51 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       $start_date = $current_entity->get($start_field)->getValue();
       // Calendar event end date.
       $end_date = empty($end_field) || !$current_entity->hasField($end_field) ? '' : $current_entity->get($end_field)->getValue();
-      // Description for events. For multiple bundle types, there might be more than one field specified.
-      if (!empty($des_field) && is_array($des_field)) {
-        foreach ($des_field as $des_field_name) {
-          if ($current_entity->hasField($des_field_name)) {
-            $des = $current_entity->get($des_field_name)->getValue();
-            // we just need only one description text. Once we got it, quit the loop.
-            break;
+      // Apart from start date and end date field, other fields might be rewritten by the field settgins of the view.
+      if ($options['use_entity_fields']) {
+        // Description for events. For multiple bundle types, there might be more than one field specified.
+        if (!empty($des_field) && is_array($des_field)) {
+          foreach ($des_field as $des_field_name) {
+            if ($current_entity->hasField($des_field_name)) {
+              $des = $current_entity->get($des_field_name)->getValue();
+              // we just need only one description text. Once we got it, quit the loop.
+              break;
+            }
+          }
+        }
+        if (!isset($des)) {
+          $des = '';
+        }
+        if (is_array($des)) {
+          $des = reset($des);
+          if (isset($des['value'])) {
+            $des = $des['value'];
           }
         }
       }
-      if (!isset($des)) {       
-        $des = '';
-      }
-      if (is_array($des)) {
-        $des = reset($des);
-        if (isset($des['value'])) {
-          $des = $des['value'];
+      else {
+        // Description for events. For multiple bundle types, there might be more than one field specified.
+        if (!empty($des_field) && is_array($des_field)) {
+          foreach ($des_field as $des_field_name) {
+            if ($row->_entity->hasField($des_field_name)) {
+              $des_raw = $fields[$des_field_name]->advancedRender($row);
+              $des = empty($des_raw) ? '' : $des_raw;
+              // we just need only one description text. Once we got it, quit the loop.
+              break;
+            }
+          }
         }
-      }
+        if (!isset($des)) {
+          $des = '';
+        }
+        if (is_array($des)) {
+          $des = reset($des);
+          if (isset($des['value'])) {
+            $des = $des['value'];
+          }
+        }
+     }
+
       // Event title.
       $title = $current_entity->label();
       $entry = [
@@ -245,7 +271,6 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       }
       // Cope with end date in the same way as start date above.
       if (!empty($end_date)) {
-
         if ($end_field_option['type'] === 'timestamp') {
           $end_date = reset($end_date)['value'];
           $end_date = intval($end_date);
