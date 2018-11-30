@@ -88,7 +88,7 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
     $start_field_option['settings']['timezone_override'] : drupal_get_user_timezone();
   // Open a new window for details of an event.
   $title_field = (empty($options['title']) || $options['title'] == 'title') ? 'title' : $options['title'];
-  $link_to_entity = $fields[$title_field]->options['settings']['link_to_entity'];
+  $link_to_entity = isset($fields[$title_field]->options['settings']['link_to_entity']) ? $fields[$title_field]->options['settings']['link_to_entity'] : false;
   // Right side buttons.
   $right_buttons = 'month';
   foreach ($options['right_buttons'] as $key => $value) {
