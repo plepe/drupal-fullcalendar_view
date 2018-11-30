@@ -103,6 +103,8 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
     $timezone_service = \Drupal::service('fullcalendar_view.timezone_conversion_service');
     // Save view results into entries array.
     foreach ($view->result as $row) {
+      // Set the row_index property used by advancedRender function.
+      $view->row_index = $row->index;
       // Days of a week for a recurring event.
       $dow = NULL;
       // Days of a month for a recurring event.
@@ -366,6 +368,9 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       }
       $entries[] = $entry;
     }
+    
+    // Remove the row_index property as we don't it anymore.
+    unset($view->row_index);
 
     // Load tooltip plugin.
     if (!empty($des_field)) {
