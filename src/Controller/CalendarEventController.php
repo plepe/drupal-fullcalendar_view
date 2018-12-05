@@ -202,10 +202,11 @@ class CalendarEventController extends ControllerBase {
     $end_field = $request->get('end_field', '');
     $form = [];
 
-    if (!empty($type)) {
+    if (!empty($type) && !empty($entity_id)) {
+      $entity_label = $this->entityTypeManager()->getDefinition($entity_id)->getLabel();
       $user = $this->currentUser();
       // Check the user permission.
-      if (!empty($user) && $user->hasPermission("create $type " . $entity_id)) {
+      if (!empty($user) && $user->hasPermission(strtolower("create $type " . $entity_label))) {
         $data = [
           'type' => $type,
         ];

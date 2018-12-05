@@ -48,7 +48,7 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
 
   // Can the user add a new event?
   $dbl_click_to_create = FALSE;
-  if (!empty($user) && $user->hasPermission("create $event_bundle_type " . $entity_type->getLabel())) {
+  if (!empty($user) && $user->hasPermission(strtolower("create $event_bundle_type " . $entity_type->getLabel()))) {
     $dbl_click_to_create = TRUE;
   }
   // Pass entity type to twig template.
