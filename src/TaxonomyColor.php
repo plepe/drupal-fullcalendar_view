@@ -2,7 +2,7 @@
 
 namespace Drupal\fullcalendar_view;
 
-use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
@@ -16,7 +16,7 @@ class TaxonomyColor {
   /**
    * Constructor.
    */
-  public function __construct(EntityTypeManager $entityTypeManager) {
+  public function __construct(EntityTypeManagerInterface $entityTypeManager) {
     $this->entityTypeManager = $entityTypeManager;
   }
 
