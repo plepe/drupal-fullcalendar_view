@@ -3,6 +3,7 @@
 namespace Drupal\fullcalendar_view\Controller;
 
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,13 +16,23 @@ use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 class CalendarEventController extends ControllerBase {
 
   /**
+   * CSRF Token.
+   *
+   * @var \Drupal\Core\Access\CsrfTokenGenerator
+   */
+  private $csrfToken;
+
+  /**
    * Construct the Controller.
    *
    * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $loggerFactory
    *   Logger factory object.
+   * @param \Drupal\Core\Access\CsrfTokenGenerator $csrfToken
+   *   CSRF token factory object.
    */
-  public function __construct(LoggerChannelFactoryInterface $loggerFactory) {
+  public function __construct(LoggerChannelFactoryInterface $loggerFactory, CsrfTokenGenerator $csrfToken) {
     $this->loggerFactory = $loggerFactory;
+    $this->csrfToken = $csrfToken;
   }
 
   /**
@@ -35,7 +46,8 @@ class CalendarEventController extends ControllerBase {
    */
   public static function create(ContainerInterface $container) {
     $loggerFactory = $container->get('logger.factory');
-    return new static($loggerFactory);
+    $csrfToken = $container->get('csrf_token');
+    return new static($loggerFactory, $csrfToken);
   }
 
   /**
@@ -44,6 +56,11 @@ class CalendarEventController extends ControllerBase {
   public function updateEvent(Request $request) {
     $user = $this->currentUser();
     if (!empty($user)) {
+      $csrf_token = $request->request->get('token');
+      if (!$this->csrfToken->validate($csrf_token, $user->id())) {
+        return new Response($this->t('Access denied!'));
+      }
+
       $eid = $request->request->get('eid', '');
       $entity_type = $request->request->get('entity_type', '');
       $start_date = $request->request->get('start', '');
@@ -86,9 +103,9 @@ class CalendarEventController extends ControllerBase {
               if (is_numeric($entity->$start_field->value)) {
                 $entity->$start_field->value = strtotime($start_date);
               }
-              else {    
+              else {
                 $length = strlen($entity->$start_field->value);
-                
+
                 if ($length > 10) {
                   // UTC Date with time.
                   $entity->$start_field->value = gmdate("Y-m-d\TH:i:s", strtotime($start_date));
@@ -168,21 +185,28 @@ class CalendarEventController extends ControllerBase {
 
             $entity->save();
             // Log the content changed.
-            $this->loggerFactory->get('content')->notice($entity->getType() . ': updated ' . $entity->getTitle());
-            return new Response($entity->getTitle() . ' is updated to from ' . $start_date . ' to ' . $end_date);
+            $this->loggerFactory->get($entity_type)->notice('%entity_type: updated %title', [
+              '%entity_type' => $entity->getType(),
+              '%title' => $entity->getTitle(),
+            ]);
+            return new Response($this->t('%title is updated to from %start to %end', [
+              '%title' => $entity->getTitle(),
+              '%start' => $start_date,
+              '%end' => $end_date,
+            ]));
           }
 
         }
         else {
-          return new Response('Access denied!');
+          return new Response($this->t('Access denied!'));
         }
       }
       else {
-        return new Response('Parameter Missing.');
+        return new Response($this->t('Parameter Missing.'));
       }
     }
     else {
-      return new Response('Invalid User!');
+      return new Response($this->t('Invalid User!'));
     }
   }
 
@@ -212,7 +236,7 @@ class CalendarEventController extends ControllerBase {
         ];
         // Create a new event entity for this form.
         $entity = $this->entityTypeManager()
-        ->getStorage($entity_id)
+          ->getStorage($entity_id)
           ->create($data);
 
         if (!empty($entity)) {

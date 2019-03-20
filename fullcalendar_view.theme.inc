@@ -30,6 +30,11 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
   }
   // Current user.
   $user = $variables['user'];
+  // CSRF token.
+  $token = '';
+  if (!$user->isAnonymous()) {
+    $token = \Drupal::csrfToken()->get($user->id());
+  }
   // New event bundle type.
   $event_bundle_type = $options['bundle_type'];
   $entity_type = $view->getBaseEntityType();
@@ -88,7 +93,7 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
     $start_field_option['settings']['timezone_override'] : drupal_get_user_timezone();
   // Open a new window for details of an event.
   $title_field = (empty($options['title']) || $options['title'] == 'title') ? 'title' : $options['title'];
-  $link_to_entity = isset($fields[$title_field]->options['settings']['link_to_entity']) ? $fields[$title_field]->options['settings']['link_to_entity'] : false;
+  $link_to_entity = isset($fields[$title_field]->options['settings']['link_to_entity']) ? $fields[$title_field]->options['settings']['link_to_entity'] : FALSE;
   // Right side buttons.
   $right_buttons = 'month';
   foreach ($options['right_buttons'] as $key => $value) {
@@ -162,14 +167,18 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       $start_date = $current_entity->get($start_field)->getValue();
       // Calendar event end date.
       $end_date = empty($end_field) || !$current_entity->hasField($end_field) ? '' : $current_entity->get($end_field)->getValue();
-      // Apart from start date and end date field, other fields might be rewritten by the field settgins of the view.
+      // Apart from start date and end date field,
+      // other fields might be rewritten by
+      // the field settgins of the view.
       if ($options['use_entity_fields']) {
-        // Description for events. For multiple bundle types, there might be more than one field specified.
+        // Description for events. For multiple bundle types,
+        // there might be more than one field specified.
         if (!empty($des_field) && is_array($des_field)) {
           foreach ($des_field as $des_field_name) {
             if ($current_entity->hasField($des_field_name)) {
               $des = $current_entity->get($des_field_name)->getValue();
-              // we just need only one description text. Once we got it, quit the loop.
+              // We just need only one description text.
+              // Once we got it, quit the loop.
               break;
             }
           }
@@ -195,13 +204,15 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
         }
       }
       else {
-        // Description for events. For multiple bundle types, there might be more than one field specified.
+        // Description for events. For multiple bundle types,
+        // there might be more than one field specified.
         if (!empty($des_field) && is_array($des_field)) {
           foreach ($des_field as $des_field_name) {
             if ($row->_entity->hasField($des_field_name)) {
               $des_raw = $fields[$des_field_name]->advancedRender($row);
               $des = empty($des_raw) ? '' : $des_raw;
-              // we just need only one description text. Once we got it, quit the loop.
+              // We just need only one description text.
+              // Once we got it, quit the loop.
               break;
             }
           }
@@ -219,13 +230,13 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
         if (empty($options['title']) || $options['title'] == 'title') {
           $title = $fields['title']->advancedRender($row);
         }
-        elseif ($current_entity->hasField($options['title']))  {
+        elseif ($current_entity->hasField($options['title'])) {
           $title = $fields[$options['title']]->advancedRender($row);
         }
         else {
           $title = 'Invalid event title';
         }
-     }
+      }
       $entry = [
         'title' => $title,
         'description' => $des,
@@ -368,7 +379,7 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       }
       $entries[] = $entry;
     }
-    
+
     // Remove the row_index property as we don't it anymore.
     unset($view->row_index);
 
@@ -392,9 +403,10 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       'endField' => $end_field,
       'rightButtons' => $right_buttons,
       'dblClickToCreate' => $dbl_click_to_create,
-	    'navLinks' => $options['nav_links'],
+      'navLinks' => $options['nav_links'],
       'entityType' => $entity_type->id(),
       'addForm' => isset($add_form) ? $add_form : '',
+      'token' => $token,
     ];
   }
 }

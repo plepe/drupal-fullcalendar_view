@@ -86,8 +86,8 @@ class FullCalendarDisplay extends StylePluginBase {
     $options['nav_links'] = ['default' => 1];
     $options['defaultLanguage'] = ['default' => 'en'];
     $options['languageSelector'] = ['default' => 0];
-	  $options['alloweventOverlap'] = ['default' => 1];
-	  $options['updateConfirm'] = ['default' => 1];
+    $options['alloweventOverlap'] = ['default' => 1];
+    $options['updateConfirm'] = ['default' => 1];
     $options['createEventLink'] = ['default' => 0];
     return $options;
   }
@@ -127,12 +127,12 @@ class FullCalendarDisplay extends StylePluginBase {
       '#empty_value' => '',
       '#default_value' => (!empty($this->options['end'])) ? $this->options['end'] : '',
     ];
-    // Field name of title
+    // Field name of title.
     $form['title'] = [
-        '#title' => $this->t('Title Field'),
-        '#type' => 'select',
-        '#options' => $field_names,
-        '#default_value' => (!empty($this->options['title'])) ? $this->options['title'] : '',
+      '#title' => $this->t('Title Field'),
+      '#type' => 'select',
+      '#options' => $field_names,
+      '#default_value' => (!empty($this->options['title'])) ? $this->options['title'] : '',
     ];
     // Field for description.
     $form['des'] = [
@@ -142,7 +142,7 @@ class FullCalendarDisplay extends StylePluginBase {
       '#options' => $field_names,
       '#empty_value' => '',
       '#default_value' => (!empty($this->options['des'])) ? $this->options['des'] : '',
-	  '#multiple' => TRUE,
+      '#multiple' => TRUE,
     ];
     // Display settings.
     $form['display'] = [
@@ -187,11 +187,11 @@ class FullCalendarDisplay extends StylePluginBase {
     ];
     // Event update JS confirmation dialog.
     $form['updateConfirm'] = [
-        '#type' => 'checkbox',
-        '#fieldset' => 'display',
-        '#default_value' => (!isset($this->options['updateConfirm'])) ? 1 : $this->options['updateConfirm'],
-        '#title' => $this->t('Event update confirmation pop-up dialog.'),
-        '#description' => t('If this option is selected, a confirmation dialog will pop-up after dragging and dropping an event.'),
+      '#type' => 'checkbox',
+      '#fieldset' => 'display',
+      '#default_value' => (!isset($this->options['updateConfirm'])) ? 1 : $this->options['updateConfirm'],
+      '#title' => $this->t('Event update confirmation pop-up dialog.'),
+      '#description' => t('If this option is selected, a confirmation dialog will pop-up after dragging and dropping an event.'),
     ];
     // Lanugage and Localization.
     $locale = [
