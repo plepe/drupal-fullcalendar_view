@@ -78,7 +78,19 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
   // Field machine name of taxonomy field.
   $tax_field = $options['tax_field'];
   // Default date of the calendar.
-  $default_date = $options['defaultDate'];
+  switch ($options['default_date_source']) {
+    case 'now':
+      $default_date = date('Y-m-d');
+      break;
+
+    case 'fixed':
+      $default_date = $options['defaultDate'];
+      break;
+
+    case 'first':
+      // Don't do anything, we'll set it below.
+      break;
+  }
   // Default Language.
   $default_lang = $options['defaultLanguage'];
   // Color for bundle types.
@@ -260,6 +272,13 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
         // A user who doesn't have the permission can't edit an event.
         if (!$current_entity->access('update')) {
           $entry['editable'] = FALSE;
+        }
+
+        // If we don't yet know the default_date (we're configured to use the
+        // date from the first row, and we haven't set it yet), do so now.
+        if (!isset($default_date)) {
+          // Only use the first 10 digits since we only care about the date.
+          $default_date = substr($start_date, 0, 10);
         }
 
         $all_day = (strlen($start_date) < 11) ? TRUE : FALSE;

@@ -62,6 +62,7 @@ class FullCalendarDisplay extends StylePluginBase {
    */
   protected function defineOptions() {
     $options = parent::defineOptions();
+    $options['default_date_source'] = ['default' => 'now'];
     $options['defaultDate'] = ['default' => ''];
     $options['start'] = ['default' => ''];
     $options['end'] = ['default' => ''];
@@ -102,12 +103,28 @@ class FullCalendarDisplay extends StylePluginBase {
     if (isset($form['grouping'])) {
       unset($form['grouping']);
     }
+    $form['default_date_source'] = [
+      '#type' => 'radios',
+      '#options' => [
+        'now' => t('Current date'),
+        'first' => t('Date of first view result'),
+        'fixed' => t('Fixed value'),
+      ],
+      '#title' => t('Default date source'),
+      '#default_value' => (isset($this->options['default_date_source'])) ? $this->options['default_date_source'] : '',
+      '#description' => t('Source of the initial date displayed when the calendar first loads.'),
+    ];
     // Default date of the calendar.
     $form['defaultDate'] = [
       '#type' => 'date',
-      '#title' => t('Default Date'),
+      '#title' => t('Default date'),
       '#default_value' => (isset($this->options['defaultDate'])) ? $this->options['defaultDate'] : '',
-      '#description' => t('The initial date displayed when the calendar first loads. If this option has not been specified, the current date is chosen as default.'),
+      '#description' => t('Fixed initial date displayed when the calendar first loads.'),
+      '#states' => [
+        'visible' => [
+          [':input[name="style_options[default_date_source]"]' => ['value' => 'fixed']],
+        ],
+      ],
     ];
     // All selected fields.
     $field_names = $this->displayHandler->getFieldLabels();
