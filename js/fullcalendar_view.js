@@ -73,9 +73,14 @@
               }
             },
             eventResize(event, delta, revertFunc) {
-              // As designed, the end date is inclusive for all day event,
-              // which is not what we want. So we need one day subtract.
-              if (event.allDay) {
+              // The end day of an event is exclusive.
+              // For example, the end of 2018-09-03
+              // will appear to 2018-09-02 in the callendar.
+              // So we need one day subtract
+              // to ensure the day stored in Drupal
+              // is the same as when it appears in
+              // the calendar.
+              if (event.end && event.end.format("HH:mm:ss") === "00:00:00") {
                 event.end.subtract(1, "days");
               }
               // Event title.
@@ -115,9 +120,14 @@
               // Event title.
               const title = $($.parseHTML(event.title)).text();
               const msg = `${title} was updated to ${event.start.format()}. Are you sure about this change?`;
-              // As designed, the end date is inclusive for all day event,
-              // which is not what we want. So we need one day subtract.
-              if (event.allDay && event.end) {
+              // The end day of an event is exclusive.
+              // For example, the end of 2018-09-03
+              // will appear to 2018-09-02 in the callendar.
+              // So we need one day subtract
+              // to ensure the day stored in Drupal
+              // is the same as when it appears in
+              // the calendar.
+              if (event.end && event.end.format("HH:mm:ss") === "00:00:00") {
                 event.end.subtract(1, "days");
               }
               if (drupalSettings.updateConfirm === 1 && !confirm(msg)) {
