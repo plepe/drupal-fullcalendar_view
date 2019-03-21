@@ -284,9 +284,6 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
         $all_day = (strlen($start_date) < 11) ? TRUE : FALSE;
 
         if ($all_day) {
-          // By default, Drupal store date time date in UTC timezone.
-          // So we need to convert it into user timezone.
-          $start = $timezone_service->utcToLocal($start_date, $timezone, 'Y-m-d');
           // Recurring event.
           if (!empty($dow) || !empty($dom)) {
             if (empty($options['business_start'])) {
@@ -296,10 +293,10 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
               $business_start = new DrupalDateTime($options['business_start']);
             }
             $entry['start'] = $business_start->format('H:i');
-            $range['start'] = $start;
+            $range['start'] = $start_date;
           }
           else {
-            $entry['start'] = $start;
+            $entry['start'] = $start_date;
           }
         }
         else {
@@ -340,9 +337,10 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
         if (!empty($end_date)) {
           $all_day = (strlen($end_date) < 11) ? TRUE : FALSE;
           if ($all_day) {
-            // As designed, the end date is inclusive for all day event,
+            $end = new DrupalDateTime($end_date);
+            // The end date is inclusive for a all day event,
             // which is not what we want. So we need one day offset.
-            $end = $timezone_service->utcToLocal($end_date, $timezone, 'Y-m-d', '+1 day');
+            $end->modify('+1 day');
             // Recurring event.
             if (!empty($dow) || !empty($dom)) {
               if (!empty($options['business_end'])) {
@@ -352,10 +350,10 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
                 $business_end = new DrupalDateTime('2018-02-24T18:00:00');
               }
               $entry['end'] = $business_end->format('H:i');
-              $range['end'] = $end;
+              $range['end'] = $end->format('Y-m-d');
             }
             else {
-              $entry['end'] = $end;
+              $entry['end'] = $end->format('Y-m-d');
             }
           }
           else {
