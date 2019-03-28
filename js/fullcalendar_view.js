@@ -5,7 +5,7 @@
 
 (function($, Drupal) {
   Drupal.behaviors.fullcalendarView = {
-    attach(context, settings) {
+    attach: function(context, settings) {
       $("body", context)
         .once("absCustomBehavior")
         .each(function() {
@@ -30,7 +30,7 @@
             events: drupalSettings.fullCalendarView,
             eventOverlap: drupalSettings.alloweventOverlap !== 0,
             dayClick: dayClickCallback,
-            eventRender(event, $el) {
+            eventRender: function(event, $el) {
               // Event title with HTML markup.
               $el.find("span.fc-title").html($el.find("span.fc-title").text());
               // Popup tooltip.
@@ -45,7 +45,7 @@
                   event.ranges.filter(function(range) {
                     if (event.dom) {
                       let isTheDay = false;
-                      const [dom] = event.dom;
+                      const dom = event.dom;
                       for (let i = 0; i < dom.length; i++) {
                         if (dom[i] === event.start.format("D")) {
                           isTheDay = true;
@@ -72,7 +72,7 @@
                 ); // If it isn't in one of the ranges, don't render it (by returning false)
               }
             },
-            eventResize(event, delta, revertFunc) {
+            eventResize: function(event, delta, revertFunc) {
               // The end day of an event is exclusive.
               // For example, the end of 2018-09-03
               // will appear to 2018-09-02 in the callendar.
@@ -88,7 +88,10 @@
               if (
                 drupalSettings.updateConfirm === 1 &&
                 !confirm(
-                  `${title} end is now ${event.end.format()}. Do you want to save the change?`
+                  title +
+                    " end is now " +
+                    event.end.format() +
+                    ". Do you want to save the change?"
                 )
               ) {
                 revertFunc();
@@ -98,9 +101,8 @@
                  */
                 jQuery
                   .post(
-                    `${
-                      drupalSettings.path.baseUrl
-                    }fullcalendar-view-event-update`,
+                    drupalSettings.path.baseUrl +
+                      "fullcalendar-view-event-update",
                     {
                       eid: event.id,
                       entity_type: drupalSettings.entityType,
@@ -116,10 +118,14 @@
                   });
               }
             },
-            eventDrop(event, delta, revertFunc) {
+            eventDrop: function(event, delta, revertFunc) {
               // Event title.
               const title = $($.parseHTML(event.title)).text();
-              const msg = `${title} was updated to ${event.start.format()}. Are you sure about this change?`;
+              const msg =
+                title +
+                " was updated to " +
+                event.start.format() +
+                ". Are you sure about this change?";
               // The end day of an event is exclusive.
               // For example, the end of 2018-09-03
               // will appear to 2018-09-02 in the callendar.
@@ -138,9 +144,8 @@
                  */
                 jQuery
                   .post(
-                    `${
-                      drupalSettings.path.baseUrl
-                    }fullcalendar-view-event-update`,
+                    drupalSettings.path.baseUrl +
+                      "fullcalendar-view-event-update",
                     {
                       eid: event.id,
                       entity_type: drupalSettings.entityType,
@@ -156,7 +161,7 @@
                   });
               }
             },
-            eventClick(calEvent, jsEvent, view) {
+            eventClick: function(calEvent, jsEvent, view) {
               slotDate = null;
               if (drupalSettings.linkToEntity) {
                 // Open a new window to show the details of the event.
@@ -200,10 +205,12 @@
               const date = slotDate.format();
               // Open a new window to create a new event (content).
               window.open(
-                `${drupalSettings.path.baseUrl +
-                  drupalSettings.addForm}?start=${date}&start_field=${
-                  drupalSettings.startField
-                }`,
+                drupalSettings.path.baseUrl +
+                  drupalSettings.addForm +
+                  "?start=" +
+                  date +
+                  "&start_field=" +
+                  drupalSettings.startField,
                 "_blank"
               );
             }
