@@ -6,7 +6,7 @@
 (function($, Drupal) {
   Drupal.behaviors.fullcalendarView = {
     attach: function(context, settings) {
-      $("body", context)
+      $("#calendar", context)
         .once("absCustomBehavior")
         .each(function() {
           // Date entry clicked.
