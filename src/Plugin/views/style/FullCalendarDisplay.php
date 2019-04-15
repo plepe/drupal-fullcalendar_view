@@ -190,16 +190,16 @@ class FullCalendarDisplay extends StylePluginBase {
     // Default view.
     // Todo: filter out disabled view from options.
     $form['default_view'] = [
-        '#type' => 'radios',
-        '#fieldset' => 'display',
-        '#options' => [
-            'month' => $this->t('Month'),
-            'agendaWeek' => $this->t('Week'),
-            'agendaDay' => $this->t('Day'),
-            'listYear' => $this->t('List'),
-        ],
-        '#default_value' => (empty($this->options['default_view'])) ? 'month' : $this->options['default_view'],
-        '#title' => $this->t('Default view'),
+      '#type' => 'radios',
+      '#fieldset' => 'display',
+      '#options' => [
+        'month' => $this->t('Month'),
+        'agendaWeek' => $this->t('Week'),
+        'agendaDay' => $this->t('Day'),
+        'listYear' => $this->t('List'),
+      ],
+      '#default_value' => (empty($this->options['default_view'])) ? 'month' : $this->options['default_view'],
+      '#title' => $this->t('Default view'),
     ];
     // Nav Links.
     $form['nav_links'] = [
