@@ -22,6 +22,7 @@
               right: drupalSettings.rightButtons
             },
             defaultDate: drupalSettings.defaultDate,
+            defaultView: drupalSettings.defaultView,
             locale: drupalSettings.defaultLang,
             // Can click day/week names to navigate views.
             navLinks: drupalSettings.navLinks !== 0,

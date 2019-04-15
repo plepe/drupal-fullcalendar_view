@@ -426,6 +426,7 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       'startField' => $start_field,
       'endField' => $end_field,
       'rightButtons' => $right_buttons,
+      'defaultView' => $options['default_view'],
       'dblClickToCreate' => $dbl_click_to_create,
       'navLinks' => $options['nav_links'],
       'entityType' => $entity_type->id(),
