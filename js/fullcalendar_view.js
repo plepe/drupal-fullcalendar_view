@@ -6,7 +6,7 @@
 (function($, Drupal) {
   Drupal.behaviors.fullcalendarView = {
     attach: function(context, settings) {
-      $("#calendar", context)
+      $('.js-drupal-fullcalendar', context)
         .once("absCustomBehavior")
         .each(function() {
           // Date entry clicked.
@@ -15,7 +15,7 @@
           function dayClickCallback(date) {
             slotDate = date;
           }
-          $("#calendar").fullCalendar({
+          $(".js-drupal-fullcalendar").fullCalendar({
             header: {
               left: "prev,next today",
               center: "title",
@@ -189,14 +189,14 @@
             // When the selected option changes, dynamically change the calendar option.
             $("#locale-selector").on("change", function() {
               if (this.value) {
-                $("#calendar").fullCalendar("option", "locale", this.value);
+                $(".js-drupal-fullcalendar").fullCalendar("option", "locale", this.value);
               }
             });
           } else {
             $(".locale-selector").hide();
           }
 
-          $("#calendar").dblclick(function() {
+          $(".js-drupal-fullcalendar").dblclick(function() {
             if (
               slotDate &&
               drupalSettings.eventBundleType &&
