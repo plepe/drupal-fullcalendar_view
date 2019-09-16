@@ -113,6 +113,8 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
   elseif (isset($fields[$title_field]->options['settings']['link'])) {
     $link_to_entity = $fields[$title_field]->options['settings']['link'];
   }
+  // Set the first day setting.
+  $first_day = isset($options['firstDay']) ? $options['firstDay'] : 0;
   // Right side buttons.
   $right_buttons = 'month';
   foreach ($options['right_buttons'] as $key => $value) {
@@ -415,6 +417,7 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
     $variables['#attached']['library'][] = 'fullcalendar_view/fullcalendar';
     // Pass data to js file.
     $variables['#attached']['drupalSettings'] = [
+      'firstDay' => $first_day,
       'fullCalendarView' => $entries,
       'defaultDate' => empty($default_date) ? date('Y-m-d') : $default_date,
       'defaultLang' => $default_lang,

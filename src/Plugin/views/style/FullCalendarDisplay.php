@@ -201,6 +201,22 @@ class FullCalendarDisplay extends StylePluginBase {
       '#default_value' => (empty($this->options['default_view'])) ? 'month' : $this->options['default_view'],
       '#title' => $this->t('Default view'),
     ];
+    // First day.
+    $form['firstDay'] = [
+      '#type' => 'radios',
+      '#fieldset' => 'display',
+      '#options' => [
+        '0' => $this->t('Sunday'),
+        '1' => $this->t('Monday'),
+        '2' => $this->t('Tuesday'),
+        '3' => $this->t('Wednesday'),
+        '4' => $this->t('Thursday'),
+        '5' => $this->t('Friday'),
+        '6' => $this->t('Saturday'),
+      ],
+      '#default_value' => (empty($this->options['firstDay'])) ? '0' : $this->options['firstDay'],
+      '#title' => $this->t('First Day'),
+    ];
     // Nav Links.
     $form['nav_links'] = [
       '#type' => 'checkbox',
