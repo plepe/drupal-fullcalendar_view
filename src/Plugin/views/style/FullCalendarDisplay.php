@@ -91,6 +91,7 @@ class FullCalendarDisplay extends StylePluginBase {
     $options['alloweventOverlap'] = ['default' => 1];
     $options['updateConfirm'] = ['default' => 1];
     $options['createEventLink'] = ['default' => 0];
+    $options['openEntityInNewTab'] = ['default' => 1];
     return $options;
   }
 
@@ -336,6 +337,13 @@ class FullCalendarDisplay extends StylePluginBase {
       '#default_value' => (empty($this->options['createEventLink'])) ? 0 : $this->options['createEventLink'],
       '#title' => $this->t('Create a new event via the Off-Canvas dialog.'),
       '#description' => t('If this option is selected, there wiil be an Add Event link below the calendar that provides the ability to create an event In-Place.'),
+    ];
+    // Open details in new window.
+    $form['openEntityInNewTab'] = [
+      '#type' => 'checkbox',
+      '#fieldset' => 'display',
+      '#default_value' => !isset($this->options['openEntityInNewTab']) ? 1 : $this->options['openEntityInNewTab'],
+      '#title' => $this->t('Open entities (calendar items) into new tabs'),
     ];
     // Legend colors.
     $form['colors'] = [

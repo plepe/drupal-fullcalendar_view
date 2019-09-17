@@ -435,6 +435,7 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       'entityType' => $entity_type->id(),
       'addForm' => isset($add_form) ? $add_form : '',
       'token' => $token,
+      'openEntityInNewTab' => $options['openEntityInNewTab'],
     ];
   }
 }

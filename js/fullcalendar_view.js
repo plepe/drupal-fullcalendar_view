@@ -168,8 +168,15 @@
               if (drupalSettings.linkToEntity) {
                 // Open a new window to show the details of the event.
                 if (calEvent.url) {
-                  window.open(calEvent.url);
-                  return false;
+                  if (drupalSettings.openEntityInNewTab) {
+                    // Open a new window to show the details of the event.
+                   window.open(calEvent.url);
+                   return false;
+                  }
+                  else {
+                    // Open in same window
+                    return true;
+                  }
                 }
               }
 
