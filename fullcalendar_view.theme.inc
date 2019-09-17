@@ -52,8 +52,10 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
   }
 
   // Can the user add a new event?
+  $entity_manager = \Drupal::entityTypeManager();
+  $access_handler = $entity_manager->getAccessControlHandler($entity_type->id());
   $dbl_click_to_create = FALSE;
-  if (!empty($user) && $user->hasPermission(strtolower("create $event_bundle_type " . $entity_type->getLabel()))) {
+  if ($access_handler->createAccess($event_bundle_type)) {
     $dbl_click_to_create = TRUE;
   }
   // Pass entity type to twig template.

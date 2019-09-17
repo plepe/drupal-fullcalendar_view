@@ -220,23 +220,22 @@ class CalendarEventController extends ControllerBase {
    *   A event entity form render array
    */
   public function addEvent(Request $request) {
-    $entity_id = $request->get('entity', '');
-    $type = $request->get('bundle', '');
+    $entity_type_id = $request->get('entity', '');
+    $bundle = $request->get('bundle', '');
     $start_field = $request->get('start_field', '');
     $end_field = $request->get('end_field', '');
     $form = [];
 
-    if (!empty($type) && !empty($entity_id)) {
-      $entity_label = $this->entityTypeManager()->getDefinition($entity_id)->getLabel();
-      $user = $this->currentUser();
+    if (!empty($bundle) && !empty($entity_type_id)) {
+      $access_control_handler = $this->entityTypeManager()->getAccessControlHandler($entity_type_id);
       // Check the user permission.
-      if (!empty($user) && $user->hasPermission(strtolower("create $type " . $entity_label))) {
+      if ($access_control_handler->createAccess($bundle)) {
         $data = [
-          'type' => $type,
+          'type' => $bundle,
         ];
         // Create a new event entity for this form.
         $entity = $this->entityTypeManager()
-          ->getStorage($entity_id)
+        ->getStorage($entity_type_id)
           ->create($data);
 
         if (!empty($entity)) {
