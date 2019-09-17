@@ -27,7 +27,7 @@
             locale: drupalSettings.defaultLang,
             // Can click day/week names to navigate views.
             navLinks: drupalSettings.navLinks !== 0,
-            editable: true,
+            editable: drupalSettings.updateAllowed !== 0,
             eventLimit: true, // Allow "more" link when too many events.
             events: drupalSettings.fullCalendarView,
             eventOverlap: drupalSettings.alloweventOverlap !== 0,
