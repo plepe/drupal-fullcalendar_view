@@ -234,9 +234,9 @@ class FullCalendarDisplay extends StylePluginBase {
       '#type' => 'textfield',
       '#title' => t('Time Format settings for month view'),
       '#default_value' => (isset($this->options['timeFormat'])) ? $this->options['timeFormat'] : 'H(:mm)',
-      '#description' => t('See the <a href="@url" target="_blank">Fullcalendar documentation</a> and <a href="@url2" target="_blank">MomentJS’s formatting characters</a> for available formatting options. <br />Leave it blank to default format.', array(
-        '@url' => 'https://fullcalendar.io/docs/v3/timeFormat',
-        '@url' => 'http://momentjs.com/docs/#/displaying/format/',
+      '#description' => t('See the <a href="@fullcalendar_doc" target="_blank">Fullcalendar documentation</a> and <a href="@momentjs_doc" target="_blank">MomentJS’s formatting characters</a> for available formatting options. <br />Leave it blank to default format.', array(
+        '@fullcalendar_doc' => 'https://fullcalendar.io/docs/v3/timeFormat',
+        '@momentjs_doc' => 'http://momentjs.com/docs/#/displaying/format/',
       )),
       '#size' => 20,
     ];
