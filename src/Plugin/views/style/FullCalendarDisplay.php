@@ -86,6 +86,7 @@ class FullCalendarDisplay extends StylePluginBase {
     ];
     $options['default_view'] = ['default' => 'month'];
     $options['nav_links'] = ['default' => 1];
+    $options['timeFormat'] = ['default' => 'H(:mm)'];
     $options['defaultLanguage'] = ['default' => 'en'];
     $options['languageSelector'] = ['default' => 0];
     $options['alloweventOverlap'] = ['default' => 1];
@@ -227,6 +228,18 @@ class FullCalendarDisplay extends StylePluginBase {
       '#title' => $this->t('Day/Week are links'),
       '#description' => t('If this option is selected, day/week names will be linked to navigation views.'),
     ];
+    // Time format
+    $form['timeFormat'] = [
+      '#fieldset' => 'display',
+      '#type' => 'textfield',
+      '#title' => t('Time Format settings for month view'),
+      '#default_value' => (isset($this->options['timeFormat'])) ? $this->options['timeFormat'] : 'H(:mm)',
+      '#description' => t('See the <a href="@url" target="_blank">Fullcalendar documentation</a> and <a href="@url2" target="_blank">MomentJS’s formatting characters</a> for available formatting options. <br />Leave it blank to default format.', array(
+        '@url' => 'https://fullcalendar.io/docs/v3/timeFormat',
+        '@url' => 'http://momentjs.com/docs/#/displaying/format/',
+      )),
+      '#size' => 20,
+    ];
     // Allow/disallow event overlap.
     $form['alloweventOverlap'] = [
       '#type' => 'checkbox',
@@ -251,7 +264,7 @@ class FullCalendarDisplay extends StylePluginBase {
       '#title' => $this->t('Event update confirmation pop-up dialog.'),
       '#description' => t('If this option is selected, a confirmation dialog will pop-up after dragging and dropping an event.'),
     ];
-    // Lanugage and Localization.
+    // Language and Localization.
     $locale = [
       'en' => 'English',
       'af' => 'Afrikaans',

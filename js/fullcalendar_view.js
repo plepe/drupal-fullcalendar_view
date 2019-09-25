@@ -25,6 +25,7 @@
             firstDay: drupalSettings.firstDay,
             defaultView: drupalSettings.defaultView,
             locale: drupalSettings.defaultLang,
+            timeFormat: drupalSettings.timeFormat,
             // Can click day/week names to navigate views.
             navLinks: drupalSettings.navLinks !== 0,
             editable: drupalSettings.updateAllowed !== 0,

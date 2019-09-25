@@ -66,7 +66,8 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
   // or if this feature is turn off.
   $variables['showAddEvent'] = $dbl_click_to_create
     && $options['createEventLink'];
-
+  // Time format
+  $timeFormat = $options['timeFormat'];
   // Field machine name of start date.
   $start_field = $options['start'];
   // Start date field is critical.
@@ -439,6 +440,7 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       'addForm' => isset($add_form) ? $add_form : '',
       'token' => $token,
       'openEntityInNewTab' => $options['openEntityInNewTab'],
+      'timeFormat' => $timeFormat,
     ];
   }
 }
