@@ -6,6 +6,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\fullcalendar_view\TaxonomyColor;
 use Drupal\core\form\FormStateInterface;
 use Drupal\views\Plugin\views\style\StylePluginBase;
+use Drupal\Component\Utility\Xss;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\Core\Datetime\DrupalDateTime;
@@ -235,10 +236,10 @@ class FullCalendarDisplay extends StylePluginBase {
       '#fieldset' => 'display',
       '#type' => 'textfield',
       '#title' => $this->t('Time Format settings for month view'),
-      '#default_value' => (isset($this->options['timeFormat'])) ? $this->options['timeFormat'] : 'H(:mm)',
-      '#description' => $this->t('See the @fullcalendar_doc and @momentjs_doc for available formatting options. <br />Leave it blank to default format.', array(
-        '@fullcalendar_doc' => Link::fromTextAndUrl($this->t('Fullcalendar documentation'), Url::fromUri('https://fullcalendar.io/docs/v3/timeFormat', array('attributes' => array('target' => '_blank'))))->toString(),
-        '@momentjs_doc' => Link::fromTextAndUrl($this->t('MomentJS’s formatting characters'), Url::fromUri('http://momentjs.com/docs/#/displaying/format/', array('attributes' => array('target' => '_blank'))))->toString(),
+      '#default_value' => (isset($this->options['timeFormat'])) ? $this->options['timeFormat'] : 'HH:mm',
+      '#description' => $this->t('See the %fullcalendar_doc and %momentjs_doc for available formatting options. <br />Leave it blank to default format.', array(
+        '%fullcalendar_doc' => Link::fromTextAndUrl($this->t('Fullcalendar documentation'), Url::fromUri('https://fullcalendar.io/docs/v3/timeFormat', array('attributes' => array('target' => '_blank'))))->toString(),
+        '%momentjs_doc' => Link::fromTextAndUrl($this->t('MomentJS’s formatting characters'), Url::fromUri('http://momentjs.com/docs/#/displaying/format/', array('attributes' => array('target' => '_blank'))))->toString(),
       )),
       '#size' => 20,
     ];
@@ -525,6 +526,9 @@ class FullCalendarDisplay extends StylePluginBase {
     if (isset($options['business_end'])) {
       $options['business_end'] = $options['business_end']->format(DATETIME_DATETIME_STORAGE_FORMAT);
     }
+    
+    // Sanitize user input.
+    $options['timeFormat'] = Xss::filter($options['timeFormat']);
 
     parent::submitOptionsForm($form, $form_state);
   }
