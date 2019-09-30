@@ -17,7 +17,7 @@
           }
           $(".js-drupal-fullcalendar").fullCalendar({
             header: {
-              left: "prev,next today",
+              left: drupalSettings.leftButtons,
               center: "title",
               right: drupalSettings.rightButtons
             },

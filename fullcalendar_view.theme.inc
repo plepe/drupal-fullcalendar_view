@@ -118,6 +118,8 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
   }
   // Set the first day setting.
   $first_day = isset($options['firstDay']) ? $options['firstDay'] : 0;
+  // Left side buttons.
+  $left_buttons = 'prev,next today';
   // Right side buttons.
   $right_buttons = 'month';
   foreach ($options['right_buttons'] as $key => $value) {
@@ -432,6 +434,7 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       'eventBundleType' => $event_bundle_type,
       'startField' => $start_field,
       'endField' => $end_field,
+      'leftButtons' => $left_buttons,
       'rightButtons' => $right_buttons,
       'defaultView' => isset($options['default_view']) ? $options['default_view'] : 'month',
       'dblClickToCreate' => $dbl_click_to_create,
