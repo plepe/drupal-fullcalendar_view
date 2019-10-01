@@ -420,6 +420,9 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
     // @see https://momentjs.com/docs/#/displaying/format/
     $title_format = NULL;
 
+    // Control the column header, as used in the week/agenda display.
+    $column_header_format = NULL;
+
     // Load tooltip plugin.
     if (!empty($des_field)) {
       $variables['#attached']['library'][] = 'fullcalendar_view/tooltip';
@@ -437,6 +440,7 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       'updateAllowed' => $options['updateAllowed'],
       'updateConfirm' => $options['updateConfirm'],
       'linkToEntity' => $link_to_entity,
+      'columnHeaderFormat' => $column_header_format,
       'eventBundleType' => $event_bundle_type,
       'startField' => $start_field,
       'endField' => $end_field,

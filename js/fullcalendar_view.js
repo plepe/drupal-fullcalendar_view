@@ -29,6 +29,7 @@
             timeFormat: drupalSettings.timeFormat,
             // Can click day/week names to navigate views.
             navLinks: drupalSettings.navLinks !== 0,
+            columnHeaderFormat: drupalSettings.columnHeaderFormat,
             editable: drupalSettings.updateAllowed !== 0,
             eventLimit: true, // Allow "more" link when too many events.
             events: drupalSettings.fullCalendarView,
