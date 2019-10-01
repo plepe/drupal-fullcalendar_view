@@ -21,6 +21,7 @@
               center: "title",
               right: drupalSettings.rightButtons
             },
+            titleFormat: drupalSettings.titleFormat,
             defaultDate: drupalSettings.defaultDate,
             firstDay: drupalSettings.firstDay,
             defaultView: drupalSettings.defaultView,

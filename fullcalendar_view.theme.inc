@@ -414,6 +414,12 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
     // Remove the row_index property as we don't it anymore.
     unset($view->row_index);
 
+    // Title format.
+    // @see https://fullcalendar.io/docs/v3/titleFormat
+    // @see https://fullcalendar.io/docs/v3/date-formatting-string
+    // @see https://momentjs.com/docs/#/displaying/format/
+    $title_format = NULL;
+
     // Load tooltip plugin.
     if (!empty($des_field)) {
       $variables['#attached']['library'][] = 'fullcalendar_view/tooltip';
@@ -444,6 +450,7 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       'token' => $token,
       'openEntityInNewTab' => $options['openEntityInNewTab'],
       'timeFormat' => $timeFormat,
+      'titleFormat' => $title_format,
     ];
   }
 }
