@@ -48,6 +48,15 @@
               if (event.ranges) {
                 return (
                   event.ranges.filter(function(range) {
+                    // Eclude dates from renge if exists.
+                    if (range.excluding_dates) {
+                      for (let i = 0; i < range.excluding_dates.length; i++) {
+                        if (event.start.isSame(moment.utc(range.excluding_dates[i], "YYYY-MM-DD"), 'day')) {
+                          return false;
+                        }
+                      }
+                    }
+
                     if (event.dom) {
                       let isTheDay = false;
                       const dom = event.dom;

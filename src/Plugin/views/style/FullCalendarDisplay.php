@@ -486,6 +486,15 @@ class FullCalendarDisplay extends StylePluginBase {
         '#date_time_element' => 'time',
         '#date_time_format' => 'H:i',
       ];
+      // Field name of excluding dates.
+      $form['excluding_dates'] = [
+        '#title' => $this->t('Excluding dates Field'),
+        '#description' => $this->t('Choose field date with excluding dates.'),
+        '#type' => 'select',
+        '#fieldset' => 'recurring',
+        '#options' => $field_names,
+        '#default_value' => (!empty($this->options['excluding_dates'])) ? $this->options['excluding_dates'] : '',
+      ];
     }
     // New event bundle type.
     $form['bundle_type'] = [
