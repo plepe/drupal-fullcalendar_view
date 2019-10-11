@@ -221,6 +221,7 @@
               slotDate &&
               drupalSettings.eventBundleType &&
               drupalSettings.dblClickToCreate &&
+              drupalSettings.updateAllowed &&
               drupalSettings.addForm !== ""
             ) {
               const date = slotDate.format();
