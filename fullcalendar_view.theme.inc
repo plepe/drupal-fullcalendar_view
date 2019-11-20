@@ -472,6 +472,7 @@ function template_preprocess_views_view_fullcalendar(array &$variables) {
       'alloweventOverlap' => $options['alloweventOverlap'],
       'updateAllowed' => $options['updateAllowed'],
       'updateConfirm' => $options['updateConfirm'],
+      'dialogWindow' => $options['dialogWindow'],
       'linkToEntity' => $link_to_entity,
       'columnHeaderFormat' => $column_header_format,
       'eventBundleType' => $event_bundle_type,

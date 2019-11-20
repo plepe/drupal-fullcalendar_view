@@ -95,6 +95,7 @@ class FullCalendarDisplay extends StylePluginBase {
     $options['alloweventOverlap'] = ['default' => 1];
     $options['updateAllowed'] = ['default' => 1];
     $options['updateConfirm'] = ['default' => 1];
+    $options['dialogWindow'] = ['default' => 0];
     $options['createEventLink'] = ['default' => 0];
     $options['openEntityInNewTab'] = ['default' => 1];
     return $options;
@@ -354,6 +355,13 @@ class FullCalendarDisplay extends StylePluginBase {
       '#fieldset' => 'display',
       '#default_value' => (empty($this->options['languageSelector'])) ? 0 : $this->options['languageSelector'],
       '#title' => $this->t('Allow client to select language.'),
+    ];
+    $form['dialogWindow'] = [
+      '#type' => 'checkbox',
+      '#fieldset' => 'display',
+      '#default_value' => (empty($this->options['dialogWindow'])) ? 0 : $this->options['dialogWindow'],
+      '#title' => $this->t('Open event links in dialog window.'),
+      '#description' => $this->t('If this option is selected, event links in the calendar will open in a dialog window.'),
     ];
     // Create new event link.
     $form['createEventLink'] = [

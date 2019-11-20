@@ -178,6 +178,19 @@
             eventClick: function(calEvent, jsEvent, view) {
               slotDate = null;
               if (drupalSettings.linkToEntity) {
+                // Open a time slot details in a dialog
+                if (drupalSettings.dialogWindow) {
+                  var modalLink = $('<a id="fullcalendar-view-dialog"></a>');
+                  modalLink.addClass('use-ajax');
+                  modalLink.attr('href', calEvent.url);
+                  modalLink.attr('data-dialog-type', 'dialog');
+                  modalLink.attr('data-dialog-options', '{"draggable":true,"autoResize":false,"title":"' + calEvent.title + '"}');
+                  modalLink.appendTo($('body'));
+
+                  Drupal.attachBehaviors();
+                  modalLink.trigger('click').remove();
+                  return false;
+                }
                 // Open a new window to show the details of the event.
                 if (calEvent.url) {
                   if (drupalSettings.openEntityInNewTab) {
