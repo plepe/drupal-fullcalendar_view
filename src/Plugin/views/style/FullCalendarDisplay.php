@@ -270,6 +270,7 @@ class FullCalendarDisplay extends StylePluginBase {
     ];
     // Language and Localization.
     $locale = [
+      'current_lang' => $this->t('Current active language on the page'),
       'en' => 'English',
       'af' => 'Afrikaans',
       'ar-dz' => 'Arabic - Algeria',
