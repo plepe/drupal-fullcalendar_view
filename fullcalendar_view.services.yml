@@ -7,3 +7,7 @@ services:
   fullcalendar_view.taxonomy_color:
     class: Drupal\fullcalendar_view\TaxonomyColor
     arguments: ['@entity_type.manager']
+    
+  # View preprocess service
+  fullcalendar_view.view_preprocess:
+    class: Drupal\fullcalendar_view\FullcalendarViewPreprocess
