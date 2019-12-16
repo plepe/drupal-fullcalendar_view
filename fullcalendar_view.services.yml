@@ -11,3 +11,8 @@ services:
   # View preprocess service
   fullcalendar_view.view_preprocess:
     class: Drupal\fullcalendar_view\FullcalendarViewPreprocess
+    
+  # View processor plugin
+  plugin.manager.fullcalendar_view_processor:
+    class: Drupal\fullcalendar_view\Plugin\FullcalendarViewProcessorManager
+    parent: default_plugin_manager
