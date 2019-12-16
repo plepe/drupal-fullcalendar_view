@@ -7,6 +7,7 @@ use Drupal\Core\Datetime\DrupalDateTime;
 class FullcalendarViewPreprocess {
   
   /**
+   * Process the view variable array.
    * 
    * @param array $variables
    *   Template variables.
@@ -236,7 +237,7 @@ class FullcalendarViewPreprocess {
           // there might be more than one field specified.
           if (!empty($des_field) && is_array($des_field)) {
             foreach ($des_field as $des_field_name) {
-              if ($row->_entity->hasField($des_field_name)) {
+              if (isset($fields[$des_field_name])) {
                 $des_raw = $fields[$des_field_name]->advancedRender($row);
                 $des = empty($des_raw) ? '' : $des_raw;
                 // We just need only one description text.
