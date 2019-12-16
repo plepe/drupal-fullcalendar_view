@@ -237,7 +237,8 @@ class FullcalendarViewPreprocess {
           // there might be more than one field specified.
           if (!empty($des_field) && is_array($des_field)) {
             foreach ($des_field as $des_field_name) {
-              if (isset($fields[$des_field_name])) {
+              if (isset($fields[$des_field_name]) 
+                  && method_exists($fields[$des_field_name], 'advancedRender')) {
                 $des_raw = $fields[$des_field_name]->advancedRender($row);
                 $des = empty($des_raw) ? '' : $des_raw;
                 // We just need only one description text.
