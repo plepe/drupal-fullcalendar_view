@@ -108,7 +108,7 @@ class FullcalendarViewPreprocess {
     $exc_field_option = empty($exc_field) ? NULL : $fields[$exc_field]->options;
     // Custom timezone or user timezone.
     $timezone = !empty($start_field_option['settings']['timezone_override']) ?
-    $start_field_option['settings']['timezone_override'] : drupal_get_user_timezone();
+    $start_field_option['settings']['timezone_override'] : date_default_timezone_get();
     // Open a new window for details of an event.
     $title_field = (empty($options['title']) || $options['title'] == 'title') ? 'title' : $options['title'];
     // Calendar entries linked to entity.
