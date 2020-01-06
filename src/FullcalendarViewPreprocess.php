@@ -236,6 +236,15 @@ class FullcalendarViewPreprocess {
           // Description for events. For multiple bundle types,
           // there might be more than one field specified.
           if (!empty($des_field) && is_array($des_field)) {
+            // Render all other fields to so they can be used in rewrite.
+            foreach ($fields as $field) {
+              if (method_exists($field, 'advancedRender')) {
+                $field->advancedRender($row);
+              }
+            }
+            // We need to render the description field again,
+            // in case a replacement pattern for other field.
+            // For exmaple, {{field name}}.
             foreach ($des_field as $des_field_name) {
               if (isset($fields[$des_field_name]) 
                   && method_exists($fields[$des_field_name], 'advancedRender')) {
