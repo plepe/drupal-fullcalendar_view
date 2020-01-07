@@ -2,6 +2,7 @@
 
 namespace Drupal\fullcalendar_view;
 
+use Drupal\Component\Utility\Xss;
 use Drupal\Core\Datetime\DrupalDateTime;
 
 class FullcalendarViewPreprocess {
@@ -277,7 +278,7 @@ class FullcalendarViewPreprocess {
           }
         }
         $entry = [
-          'title' => $title,
+          'title' =>  Xss::filter($title),
           'description' => $des,
           'id' => $entity_id,
           'url' => $current_entity->toUrl()->toString(),

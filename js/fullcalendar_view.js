@@ -37,7 +37,7 @@
             dayClick: dayClickCallback,
             eventRender: function(event, $el) {
               // Event title with HTML markup.
-              $el.find("span.fc-title").html($el.find("span.fc-title").text());
+              $el.find(".fc-title, .fc-list-item-title").html(event.title);
               // Popup tooltip.
               if (event.description) {
                 if ($el.fullCalendarTooltip !== "undefined") {
