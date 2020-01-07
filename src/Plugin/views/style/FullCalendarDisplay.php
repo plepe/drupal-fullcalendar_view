@@ -385,56 +385,60 @@ class FullCalendarDisplay extends StylePluginBase {
       '#title' => $this->t('Legend Colors'),
       '#description' => $this->t('Set color value of legends for each content type or each taxonomy.'),
     ];
-    // All vocabularies.
-    $cabNames = taxonomy_vocabulary_get_names();
-    // Taxonomy reference field.
-    $tax_fields = [];
-    // Find out all taxonomy reference fields of this View.
-    foreach ($field_names as $field_name => $lable) {
-      $field_conf = FieldStorageConfig::loadByName($entity_type, $field_name);
-      if (empty($field_conf)) {
-        continue;
+    
+    $moduleHandler = \Drupal::service('module_handler');
+    if ($moduleHandler->moduleExists('calendar_recurring_event')) {
+      // All vocabularies.
+      $cabNames = taxonomy_vocabulary_get_names();
+      // Taxonomy reference field.
+      $tax_fields = [];
+      // Find out all taxonomy reference fields of this View.
+      foreach ($field_names as $field_name => $lable) {
+        $field_conf = FieldStorageConfig::loadByName($entity_type, $field_name);
+        if (empty($field_conf)) {
+          continue;
+        }
+        if ($field_conf->getType() == 'entity_reference') {
+          $tax_fields[$field_name] = $lable;
+        }
       }
-      if ($field_conf->getType() == 'entity_reference') {
-        $tax_fields[$field_name] = $lable;
-      }
+      // Field name of event taxonomy.
+      $form['tax_field'] = [
+        '#title' => $this->t('Event Taxonomy Field'),
+        '#description' => $this->t('In order to specify colors for event taxonomies, you must select a taxonomy reference field for the View.'),
+        '#type' => 'select',
+        '#options' => $tax_fields,
+        '#empty_value' => '',
+        '#disabled' => empty($tax_fields),
+        '#fieldset' => 'colors',
+        '#default_value' => (!empty($this->options['tax_field'])) ? $this->options['tax_field'] : '',
+      ];
+      // Color for vocabularies.
+      $form['vocabularies'] = [
+        '#title' => $this->t('Vocabularies'),
+        '#type' => 'select',
+        '#options' => $cabNames,
+        '#empty_value' => '',
+        '#fieldset' => 'colors',
+        '#description' => $this->t('Specify which vocabulary is using for calendar event color. If the vocabulary selected is not the one that the taxonomy field belonging to, the color setting would be ignored.'),
+        '#default_value' => (!empty($this->options['vocabularies'])) ? $this->options['vocabularies'] : '',
+        '#states' => [
+          // Only show this field when the 'tax_field' is selected.
+          'invisible' => [
+            [':input[name="style_options[tax_field]"]' => ['value' => '']],
+          ],
+        ],
+        '#ajax' => [
+          'callback' => 'Drupal\fullcalendar_view\Plugin\views\style\FullCalendarDisplay::taxonomyColorCallback',
+          'event' => 'change',
+          'wrapper' => 'color-taxonomies-div',
+          'progress' => [
+            'type' => 'throbber',
+            'message' => $this->t('Verifying entry...'),
+          ],
+        ],
+      ];
     }
-    // Field name of event taxonomy.
-    $form['tax_field'] = [
-      '#title' => $this->t('Event Taxonomy Field'),
-      '#description' => $this->t('In order to specify colors for event taxonomies, you must select a taxonomy reference field for the View.'),
-      '#type' => 'select',
-      '#options' => $tax_fields,
-      '#empty_value' => '',
-      '#disabled' => empty($tax_fields),
-      '#fieldset' => 'colors',
-      '#default_value' => (!empty($this->options['tax_field'])) ? $this->options['tax_field'] : '',
-    ];
-    // Color for vocabularies.
-    $form['vocabularies'] = [
-      '#title' => $this->t('Vocabularies'),
-      '#type' => 'select',
-      '#options' => $cabNames,
-      '#empty_value' => '',
-      '#fieldset' => 'colors',
-      '#description' => $this->t('Specify which vocabulary is using for calendar event color. If the vocabulary selected is not the one that the taxonomy field belonging to, the color setting would be ignored.'),
-      '#default_value' => (!empty($this->options['vocabularies'])) ? $this->options['vocabularies'] : '',
-      '#states' => [
-        // Only show this field when the 'tax_field' is selected.
-        'invisible' => [
-          [':input[name="style_options[tax_field]"]' => ['value' => '']],
-        ],
-      ],
-      '#ajax' => [
-        'callback' => 'Drupal\fullcalendar_view\Plugin\views\style\FullCalendarDisplay::taxonomyColorCallback',
-        'event' => 'change',
-        'wrapper' => 'color-taxonomies-div',
-        'progress' => [
-          'type' => 'throbber',
-          'message' => $this->t('Verifying entry...'),
-        ],
-      ],
-    ];
 
     if (!isset($form_state->getUserInput()['style_options'])) {
       // Taxonomy color input boxes.
@@ -461,7 +465,7 @@ class FullCalendarDisplay extends StylePluginBase {
         '#type' => 'color',
       ];
     }
-    $moduleHandler = \Drupal::service('module_handler');
+    
     if ($moduleHandler->moduleExists('calendar_recurring_event')) {
       // Recurring event.
       $form['recurring'] = [
