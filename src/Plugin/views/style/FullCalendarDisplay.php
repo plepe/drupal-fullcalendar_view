@@ -387,7 +387,7 @@ class FullCalendarDisplay extends StylePluginBase {
     ];
     
     $moduleHandler = \Drupal::service('module_handler');
-    if ($moduleHandler->moduleExists('calendar_recurring_event')) {
+    if ($moduleHandler->moduleExists('taxonomy')) {
       // All vocabularies.
       $cabNames = taxonomy_vocabulary_get_names();
       // Taxonomy reference field.
