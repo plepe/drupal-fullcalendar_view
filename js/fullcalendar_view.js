@@ -177,6 +177,12 @@
             },
             eventClick: function(calEvent, jsEvent, view) {
               slotDate = null;
+
+              var dataDialogOptionsDetails = {};
+              dataDialogOptionsDetails.draggable = true;
+              dataDialogOptionsDetails.autoResize = false;
+              dataDialogOptionsDetails.title = calEvent.title.replace(/(<([^>]+)>)/ig,"");
+
               if (drupalSettings.linkToEntity) {
                 // Open a time slot details in a dialog
                 if (drupalSettings.dialogWindow) {
@@ -184,11 +190,18 @@
                   modalLink.addClass('use-ajax');
                   modalLink.attr('href', calEvent.url);
                   modalLink.attr('data-dialog-type', 'dialog');
-                  modalLink.attr('data-dialog-options', '{"draggable":true,"autoResize":false,"title":"' + calEvent.title + '"}');
+                  modalLink.attr('data-dialog-options', JSON.stringify(dataDialogOptionsDetails));
                   modalLink.appendTo($('body'));
 
                   Drupal.attachBehaviors();
                   modalLink.trigger('click').remove();
+                  // The entry element object.
+                  let $thisEntry = $(this);
+                  if (typeof $thisEntry.qtip === "function") {
+                    // Hide the pop tip.
+                    $thisEntry.qtip("hide");
+                  }
+
                   return false;
                 }
                 // Open a new window to show the details of the event.

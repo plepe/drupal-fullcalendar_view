@@ -362,7 +362,7 @@ class FullCalendarDisplay extends StylePluginBase {
       '#fieldset' => 'display',
       '#default_value' => (empty($this->options['dialogWindow'])) ? 0 : $this->options['dialogWindow'],
       '#title' => $this->t('Open event links in dialog window.'),
-      '#description' => $this->t('If this option is selected, event links in the calendar will open in a dialog window.'),
+      '#description' => $this->t('If this option is selected and the title field is linked to entity, event links in the calendar will open in a dialog window.'),
     ];
     // Create new event link.
     $form['createEventLink'] = [
