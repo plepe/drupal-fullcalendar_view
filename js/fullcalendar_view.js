@@ -177,16 +177,15 @@
             },
             eventClick: function(calEvent, jsEvent, view) {
               slotDate = null;
-
-              var dataDialogOptionsDetails = {};
-              dataDialogOptionsDetails.draggable = true;
-              dataDialogOptionsDetails.autoResize = false;
-              dataDialogOptionsDetails.title = calEvent.title.replace(/(<([^>]+)>)/ig,"");
-
               if (drupalSettings.linkToEntity) {
                 // Open a time slot details in a dialog
                 if (drupalSettings.dialogWindow) {
+                  let dataDialogOptionsDetails = {};
                   var modalLink = $('<a id="fullcalendar-view-dialog"></a>');
+                  dataDialogOptionsDetails.draggable = true;
+                  dataDialogOptionsDetails.autoResize = false;
+                  dataDialogOptionsDetails.title = calEvent.title.replace(/(<([^>]+)>)/ig,"");
+
                   modalLink.addClass('use-ajax');
                   modalLink.attr('href', calEvent.url);
                   modalLink.attr('data-dialog-type', 'dialog');
