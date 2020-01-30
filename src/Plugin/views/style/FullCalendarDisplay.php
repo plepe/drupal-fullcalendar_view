@@ -5,6 +5,7 @@ namespace Drupal\fullcalendar_view\Plugin\views\style;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\fullcalendar_view\TaxonomyColor;
 use Drupal\core\form\FormStateInterface;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\views\Plugin\views\style\StylePluginBase;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Link;
@@ -543,10 +544,10 @@ class FullCalendarDisplay extends StylePluginBase {
     }
     // Datetime fields in Drupal 8 are stored as strings.
     if (isset($options['business_start'])) {
-      $options['business_start'] = $options['business_start']->format(DATETIME_DATETIME_STORAGE_FORMAT);
+      $options['business_start'] = $options['business_start']->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT );
     }
     if (isset($options['business_end'])) {
-      $options['business_end'] = $options['business_end']->format(DATETIME_DATETIME_STORAGE_FORMAT);
+      $options['business_end'] = $options['business_end']->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT );
     }
     
     // Sanitize user input.
