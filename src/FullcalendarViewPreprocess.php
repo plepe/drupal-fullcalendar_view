@@ -199,7 +199,7 @@ class FullcalendarViewPreprocess {
         $end_date = empty($end_field) || !$current_entity->hasField($end_field) ? '' : $current_entity->get($end_field)->getValue();
         // Apart from start date and end date field,
         // other fields might be rewritten by
-        // the field settgins of the view.
+        // the field setting of the view.
         if ($options['use_entity_fields']) {
           // Description for events. For multiple bundle types,
           // there might be more than one field specified.
@@ -245,7 +245,7 @@ class FullcalendarViewPreprocess {
             }
             // We need to render the description field again,
             // in case a replacement pattern for other field.
-            // For exmaple, {{field name}}.
+            // For example, {{field name}}.
             foreach ($des_field as $des_field_name) {
               if (isset($fields[$des_field_name]) 
                   && method_exists($fields[$des_field_name], 'advancedRender')) {
@@ -479,7 +479,7 @@ class FullcalendarViewPreprocess {
         'defaultDate' => empty($default_date) ? date('Y-m-d') : $default_date,
         'defaultLang' => $default_lang,
         'languageSelector' => $options['languageSelector'],
-        'alloweventOverlap' => $options['alloweventOverlap'],
+        'allowEventOverlap' => $options['allowEventOverlap'],
         'updateAllowed' => $options['updateAllowed'],
         'updateConfirm' => $options['updateConfirm'],
         'dialogWindow' => $options['dialogWindow'],

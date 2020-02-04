@@ -224,7 +224,6 @@ class CalendarEventController extends ControllerBase {
     $bundle = $request->get('bundle', '');
     $start_field = $request->get('start_field', '');
     $end_field = $request->get('end_field', '');
-    $form = [];
 
     if (!empty($bundle) && !empty($entity_type_id)) {
       $access_control_handler = $this->entityTypeManager()->getAccessControlHandler($entity_type_id);

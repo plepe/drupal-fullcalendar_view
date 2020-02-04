@@ -64,4 +64,4 @@ Features:
  * Recurring (Repeated) event
  * Supports Multilingual
  * Off-Canvas editing
- * Popup Tooltip for event descrption
+ * Popup Tooltip for event's description

@@ -33,7 +33,7 @@
             editable: drupalSettings.updateAllowed !== 0,
             eventLimit: true, // Allow "more" link when too many events.
             events: drupalSettings.fullCalendarView,
-            eventOverlap: drupalSettings.alloweventOverlap !== 0,
+            eventOverlap: drupalSettings.allowEventOverlap !== 0,
             dayClick: dayClickCallback,
             eventRender: function(event, $el) {
               // Event title with HTML markup.
@@ -48,7 +48,7 @@
               if (event.ranges) {
                 return (
                   event.ranges.filter(function(range) {
-                    // Eclude dates from renge if exists.
+                    // Exclude dates from range if exists.
                     if (range.excluding_dates) {
                       for (let i = 0; i < range.excluding_dates.length; i++) {
                         if (event.start.isSame(moment.utc(range.excluding_dates[i], "YYYY-MM-DD"), 'day')) {
@@ -89,7 +89,7 @@
             eventResize: function(event, delta, revertFunc) {
               // The end day of an event is exclusive.
               // For example, the end of 2018-09-03
-              // will appear to 2018-09-02 in the callendar.
+              // will appear to 2018-09-02 in the calendar.
               // So we need one day subtract
               // to ensure the day stored in Drupal
               // is the same as when it appears in
@@ -142,7 +142,7 @@
                 ". Are you sure about this change?";
               // The end day of an event is exclusive.
               // For example, the end of 2018-09-03
-              // will appear to 2018-09-02 in the callendar.
+              // will appear to 2018-09-02 in the calendar.
               // So we need one day subtract
               // to ensure the day stored in Drupal
               // is the same as when it appears in

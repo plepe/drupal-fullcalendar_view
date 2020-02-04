@@ -19,8 +19,8 @@ tooltip:
   version: 1.0
   css:
     theme:
-      css/jquery.qtip.min.css: {}
+      css/jquery.qtip.min.css: { minified: true }
       
   js:
-    js/jquery.qtip.min.js: {}
+    js/jquery.qtip.min.js: { minified: true }
     js/tooltip-plugin.js: {}
