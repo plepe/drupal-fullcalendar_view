@@ -294,8 +294,17 @@ class FullcalendarViewPreprocess {
             $start_date = date(DATE_ATOM, $start_date);
           }
           elseif (strpos($start_field_option['type'], 'datetime') === FALSE && strpos($start_field_option['type'], 'daterange') === FALSE) {
-            // This field is not a valid date time field.
-            continue;
+            $valid = FALSE;
+            // checking supported field types form plugin defintions
+            foreach($variables['fullcalendar_fieldtypes'] as $fieldtype) {
+              if (strpos($start_field_option['type'], $fieldtype) === 0) {
+                $valid = TRUE;
+              }
+            }
+            if (!$valid) {
+              // This field is not a valid date time field.
+              continue;
+            }
           }
           // A user who doesn't have the permission can't edit an event.
           if (!$current_entity->access('update')) {
