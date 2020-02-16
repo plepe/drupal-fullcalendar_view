@@ -270,7 +270,7 @@ class FullcalendarViewPreprocess {
           if (empty($options['title']) || $options['title'] == 'title') {
             $title = $fields['title']->advancedRender($row);
           }
-          elseif ($current_entity->hasField($options['title'])) {
+          elseif (!empty($fields[$options['title']])) {
             $title = $fields[$options['title']]->advancedRender($row);
           }
           else {
