@@ -51,20 +51,15 @@ function fullcalendar_view_form_node_form_alter(&$form, FormStateInterface $form
 function fullcalendar_view_library_info_alter(array &$libraries, $module) {
   if ('fullcalendar_view' == $module) {
     // Use CDN instead of all local missing libraries.
-    // moment js.
-    $cdn_library = _fullcalendar_view_use_cdn($libraries, 'libraries.moment', 'js');
-    if ($cdn_library) {
-      $libraries['libraries.moment']['js'] = $cdn_library;
-    }
     // Fullcalendar default theme.
-    $cdn_library = _hierarchy_manager_use_cdn($libraries, 'libraries.fullcalendar-theme', 'css');
+    $cdn_library = _fullcalendar_view_use_cdn($libraries, 'libraries.fullcalendar-theme', 'css');
     if ($cdn_library) {
       $libraries['libraries.fullcalendar-theme']['css']['component'] = $cdn_library;
     }
-    // Fullcalendar core js.
-    $cdn_library = _hierarchy_manager_use_cdn($libraries, 'libraries.fullcalendar-core', 'js');
+    // Fullcalendar js.
+    $cdn_library = _fullcalendar_view_use_cdn($libraries, 'libraries.fullcalendar', 'js');
     if ($cdn_library) {
-      $libraries['libraries.fullcalendar-core']['js'] = $cdn_library;
+      $libraries['libraries.fullcalendar']['js'] = $cdn_library;
     }
   }
 }
@@ -106,7 +101,10 @@ function _fullcalendar_view_use_cdn(array $libraries, $library_name, $type, $rep
         if (!file_exists(DRUPAL_ROOT . $key) || $replace_local) {
           // The js file doesn't exist.
           // Replace it with remote cdn.
-          $library_array[$libraries[$library_name]['cdn'] . basename($key)] = $value;
+          $path = explode('/', $key);
+          $end = count($path);
+          $plugin_url = $path[$end - 2] . '@' . $libraries[$library_name]['version'] . '/' . $path[$end - 1];
+          $library_array[$libraries[$library_name]['cdn'] . $plugin_url] = $value;
           $updated = TRUE;
         }
         else {
