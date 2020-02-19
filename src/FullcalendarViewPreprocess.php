@@ -4,6 +4,7 @@ namespace Drupal\fullcalendar_view;
 
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Datetime\DrupalDateTime;
+use Drupal\Core\Language\LanguageInterface;
 
 class FullcalendarViewPreprocess {
   
@@ -13,21 +14,15 @@ class FullcalendarViewPreprocess {
    * @param array $variables
    *   Template variables.
    */
-  public function process(array &$variables) {
-    global $base_path;
-    
+  public function process(array &$variables) {   
     $view = $variables['view'];
     $style = $view->style_plugin;
     $options = $style->options;
     $fields = $view->field;
+    
     // Get current language.
     $language = \Drupal::languageManager()->getCurrentLanguage();
-    if ($language->isDefault()) {
-      $variables['language'] = $base_path;
-    }
-    else {
-      $variables['language'] = $base_path . $language->getId() . '/';
-    }
+    
     // Current user.
     $user = $variables['user'];
     // CSRF token.
@@ -99,6 +94,7 @@ class FullcalendarViewPreprocess {
     }
     // Default Language.
     $default_lang = $options['defaultLanguage'];
+    $default_lang = $options['defaultLanguage'] === 'current_lang' ? $this->fullcalendar_view_map_langcodes($language->getId()) : $options['defaultLanguage'];
     // Color for bundle types.
     $color_content = $options['color_bundle'];
     // Color for taxonomies.
@@ -197,91 +193,52 @@ class FullcalendarViewPreprocess {
         $start_date = $current_entity->get($start_field)->getValue();
         // Calendar event end date.
         $end_date = empty($end_field) || !$current_entity->hasField($end_field) ? '' : $current_entity->get($end_field)->getValue();
-        // Apart from start date and end date field,
-        // other fields might be rewritten by
-        // the field setting of the view.
-        if ($options['use_entity_fields']) {
-          // Description for events. For multiple bundle types,
-          // there might be more than one field specified.
-          if (!empty($des_field) && is_array($des_field)) {
-            foreach ($des_field as $des_field_name) {
-              if ($current_entity->hasField($des_field_name)) {
-                $des = $current_entity->get($des_field_name)->getValue();
-                // We just need only one description text.
-                // Once we got it, quit the loop.
-                break;
-              }
+        // Description for events. For multiple bundle types,
+        // there might be more than one field specified.
+        if (!empty($des_field) && is_array($des_field)) {
+          // Render all other fields to so they can be used in rewrite.
+          foreach ($fields as $field) {
+            if (method_exists($field, 'advancedRender')) {
+              $field->advancedRender($row);
             }
           }
-          if (!isset($des)) {
-            $des = '';
-          }
-          if (is_array($des)) {
-            $des = reset($des);
-            if (isset($des['value'])) {
-              $des = $des['value'];
+          // We need to render the description field again,
+          // in case a replacement pattern for other field.
+          // For exmaple, {{field name}}.
+          foreach ($des_field as $des_field_name) {
+            if (isset($fields[$des_field_name]) && method_exists($fields[$des_field_name], 'advancedRender')) {
+              $des_raw = $fields[$des_field_name]->advancedRender($row);
+              $des = empty($des_raw) ? '' : $des_raw;
+              // We just need only one description text.
+              // Once we got it, quit the loop.
+              break;
             }
-          }
-          // Event title.
-          if (empty($options['title']) || $options['title'] == 'title') {
-            $title = $current_entity->label();
-          }
-          elseif ($current_entity->hasField($options['title'])) {
-            $title = $current_entity->get($options['title'])->value;
-          }
-          else {
-            $title = 'Invalid event title';
           }
         }
+        if (!isset($des)) {
+          $des = '';
+        }
+        if (is_array($des)) {
+          $des = reset($des);
+          if (isset($des['value'])) {
+            $des = $des['value'];
+          }
+        }
+        // Event title.
+        if (empty($options['title']) || $options['title'] == 'title') {
+          $title = $fields['title']->advancedRender($row);
+        }
+        elseif (!empty($fields[$options['title']])) {
+          $title = $fields[$options['title']]->advancedRender($row);
+        }
         else {
-          // Description for events. For multiple bundle types,
-          // there might be more than one field specified.
-          if (!empty($des_field) && is_array($des_field)) {
-            // Render all other fields to so they can be used in rewrite.
-            foreach ($fields as $field) {
-              if (method_exists($field, 'advancedRender')) {
-                $field->advancedRender($row);
-              }
-            }
-            // We need to render the description field again,
-            // in case a replacement pattern for other field.
-            // For example, {{field name}}.
-            foreach ($des_field as $des_field_name) {
-              if (isset($fields[$des_field_name]) 
-                  && method_exists($fields[$des_field_name], 'advancedRender')) {
-                $des_raw = $fields[$des_field_name]->advancedRender($row);
-                $des = empty($des_raw) ? '' : $des_raw;
-                // We just need only one description text.
-                // Once we got it, quit the loop.
-                break;
-              }
-            }
-          }
-          if (!isset($des)) {
-            $des = '';
-          }
-          if (is_array($des)) {
-            $des = reset($des);
-            if (isset($des['value'])) {
-              $des = $des['value'];
-            }
-          }
-          // Event title.
-          if (empty($options['title']) || $options['title'] == 'title') {
-            $title = $fields['title']->advancedRender($row);
-          }
-          elseif (!empty($fields[$options['title']])) {
-            $title = $fields[$options['title']]->advancedRender($row);
-          }
-          else {
-            $title = 'Invalid event title';
-          }
+          $title = t('Invalid event title');
         }
         $entry = [
           'title' =>  Xss::filter($title),
           'description' => $des,
           'id' => $entity_id,
-          'url' => $current_entity->toUrl()->toString(),
+          'url' => $current_entity->toUrl('canonical', ['language' => $language])->toString(),
         ];
         
         if (!empty($start_date)) {
@@ -294,17 +251,8 @@ class FullcalendarViewPreprocess {
             $start_date = date(DATE_ATOM, $start_date);
           }
           elseif (strpos($start_field_option['type'], 'datetime') === FALSE && strpos($start_field_option['type'], 'daterange') === FALSE) {
-            $valid = FALSE;
-            // checking supported field types form plugin defintions
-            foreach($variables['fullcalendar_fieldtypes'] as $fieldtype) {
-              if (strpos($start_field_option['type'], $fieldtype) === 0) {
-                $valid = TRUE;
-              }
-            }
-            if (!$valid) {
-              // This field is not a valid date time field.
-              continue;
-            }
+            // This field is not a valid date time field.
+            continue;
           }
           // A user who doesn't have the permission can't edit an event.
           if (!$current_entity->access('update')) {
@@ -488,7 +436,7 @@ class FullcalendarViewPreprocess {
         'defaultDate' => empty($default_date) ? date('Y-m-d') : $default_date,
         'defaultLang' => $default_lang,
         'languageSelector' => $options['languageSelector'],
-        'allowEventOverlap' => $options['allowEventOverlap'],
+        'alloweventOverlap' => $options['alloweventOverlap'],
         'updateAllowed' => $options['updateAllowed'],
         'updateConfirm' => $options['updateConfirm'],
         'dialogWindow' => $options['dialogWindow'],
@@ -509,6 +457,30 @@ class FullcalendarViewPreprocess {
         'timeFormat' => $timeFormat,
         'titleFormat' => $title_format,
       ];
+    }
+  }
+  
+  /**
+   * Map Drupal language codes to those used by FullCalendar.
+   *
+   * @param string $langcode
+   *   Drupal language code.
+   *
+   * @return string
+   *   Returns the mapped langcode.
+   */
+  private function fullcalendar_view_map_langcodes($langcode) {
+    switch ($langcode) {
+      case "en-x-simple":
+        return "en";
+      case "pt-pt":
+        return "pt";
+      case "zh-hans":
+        return "zh-cn";
+      case "zh-hant":
+        return "zh-tw";
+      default:
+        return $langcode;
     }
   }
 }
