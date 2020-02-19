@@ -1,26 +1,59 @@
-fullcalendar:
-  version: 3.9.0
-  css:
-    theme:
-      https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.min.css: { type: external, minified: true }
- 
+# External libraries.
+libraries.moment:
+  remote: https://github.com/moment/moment/
+  version: '2.24.0'
+  license:
+    name: MIT
+    url: https://github.com/moment/moment/blob/develop/LICENSE
+    gpl-compatible: true
+  cdn:
+    https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/
   js:
-    js/moment.min.js: {}
-    https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/fullcalendar.min.js: { type: external, minified: true }
+    /libraries/moment/2.24.0/moment.min.js: {minified: true}
+
+libraries.fullcalendar-theme:
+  remote: https://fullcalendar.io/
+  version: '3.9.0'
+  license:
+    name: MIT
+    url: https://github.com/fullcalendar/fullcalendar/blob/master/LICENSE.txt
+    gpl-compatible: true
+  cdn:
+    https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/
+  css:
+    component:
+      /libraries/fullcalendar/3.9.0/fullcalendar.min.css: { minified: true }
+
+libraries.fullcalendar-core:
+  remote: https://fullcalendar.io/
+  version: '3.9.0'
+  license:
+    name: MIT
+    url: https://github.com/fullcalendar/fullcalendar/blob/master/LICENSE.txt
+    gpl-compatible: true
+  cdn:
+    https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.9.0/
+  js:
+    /libraries/fullcalendar/3.9.0/fullcalendar.min.js: { minified: true }   
+  dependencies:
+    - fullcalendar_view/libraries.moment
+    - fullcalendar_view/libraries.fullcalendar-theme
+
+fullcalendar:
+  js:
     js/locale-all.js: {}
-    js/fullcalendar_view.js: {}
-    
+    js/fullcalendar_view.js: {} 
   dependencies:
     - core/jquery
     - core/drupalSettings
     - core/drupal.dialog.ajax
+    - fullcalendar_view/libraries.fullcalendar-core
     
 tooltip:
   version: 1.0
   css:
     theme:
-      css/jquery.qtip.min.css: { minified: true }
-      
+      css/jquery.qtip.min.css: { minified: true }    
   js:
     js/jquery.qtip.min.js: { minified: true }
     js/tooltip-plugin.js: {}

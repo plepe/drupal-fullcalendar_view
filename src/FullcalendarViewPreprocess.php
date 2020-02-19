@@ -4,7 +4,6 @@ namespace Drupal\fullcalendar_view;
 
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\Core\Language\LanguageInterface;
 
 class FullcalendarViewPreprocess {
   
@@ -436,7 +435,7 @@ class FullcalendarViewPreprocess {
         'defaultDate' => empty($default_date) ? date('Y-m-d') : $default_date,
         'defaultLang' => $default_lang,
         'languageSelector' => $options['languageSelector'],
-        'alloweventOverlap' => $options['alloweventOverlap'],
+        'alloweventOverlap' => $options['allowEventOverlap'],
         'updateAllowed' => $options['updateAllowed'],
         'updateConfirm' => $options['updateConfirm'],
         'dialogWindow' => $options['dialogWindow'],
