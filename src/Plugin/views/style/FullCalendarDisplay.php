@@ -80,14 +80,9 @@ class FullCalendarDisplay extends StylePluginBase {
     $options['color_taxonomies'] = ['default' => []];
     $options['vocabularies'] = ['default' => ''];
     $options['right_buttons'] = [
-      'default' =>
-        [
-          'agendaWeek' => 'agendaWeek',
-          'agendaDay' => 'agendaDay',
-          'listYear' => 'listYear',
-        ],
+      'default' => 'dayGridMonth,timeGridWeek,timeGridDay,listYear',
     ];
-    $options['default_view'] = ['default' => 'month'];
+    $options['default_view'] = ['default' => 'dayGridMonth'];
     $options['nav_links'] = ['default' => 1];
     $options['timeFormat'] = ['default' => 'H(:mm)'];
     $options['defaultLanguage'] = ['default' => 'en'];
@@ -177,15 +172,14 @@ class FullCalendarDisplay extends StylePluginBase {
     ];
     // Right side buttons.
     $form['right_buttons'] = [
-      '#type' => 'checkboxes',
+      '#type' => 'textfield',
       '#fieldset' => 'display',
-      '#options' => [
-        'agendaWeek' => $this->t('Week'),
-        'agendaDay' => $this->t('Day'),
-        'listYear' => $this->t('List'),
-      ],
       '#default_value' => (empty($this->options['right_buttons'])) ? [] : $this->options['right_buttons'],
       '#title' => $this->t('Right side buttons'),
+      '#description' => $this->t('Right side buttons. Buttons are seperated by commas or space. See the %fullcalendar_doc for availabel buttons.',
+          [
+            '%fullcalendar_doc' => Link::fromTextAndUrl($this->t('Fullcalendar documentation'), Url::fromUri('https://fullcalendar.io/docs/header', array('attributes' => array('target' => '_blank'))))->toString(),      
+          ]),
     ];
     // Default view.
     // Todo: filter out disabled view from options.
@@ -193,9 +187,9 @@ class FullCalendarDisplay extends StylePluginBase {
       '#type' => 'radios',
       '#fieldset' => 'display',
       '#options' => [
-        'month' => $this->t('Month'),
+        'dayGridMonth' => $this->t('Month'),
         'agendaWeek' => $this->t('Week'),
-        'agendaDay' => $this->t('Day'),
+        'dayGridWeek' => $this->t('Day'),
         'listYear' => $this->t('List'),
       ],
       '#default_value' => (empty($this->options['default_view'])) ? 'month' : $this->options['default_view'],

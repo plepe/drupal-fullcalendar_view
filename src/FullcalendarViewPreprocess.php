@@ -116,16 +116,11 @@ class FullcalendarViewPreprocess {
       $link_to_entity = $fields[$title_field]->options['settings']['link'];
     }
     // Set the first day setting.
-    $first_day = isset($options['firstDay']) ? $options['firstDay'] : 0;
+    $first_day = isset($options['firstDay']) ? intval($options['firstDay']) : 0;
     // Left side buttons.
     $left_buttons = 'prev,next today';
     // Right side buttons.
-    $right_buttons = 'month';
-    foreach ($options['right_buttons'] as $key => $value) {
-      if ($value !== 0) {
-        $right_buttons .= ',' . $key;
-      }
-    }
+    $right_buttons = Xss::filter($options['right_buttons']);
     $entries = [];
     
     if (!empty($start_field)) {
@@ -413,12 +408,6 @@ class FullcalendarViewPreprocess {
       // Remove the row_index property as we don't it anymore.
       unset($view->row_index);
       
-      // Title format.
-      // @see https://fullcalendar.io/docs/v3/titleFormat
-      // @see https://fullcalendar.io/docs/v3/date-formatting-string
-      // @see https://momentjs.com/docs/#/displaying/format/
-      $title_format = NULL;
-      
       // Control the column header, as used in the week/agenda display.
       $column_header_format = NULL;
       
@@ -426,35 +415,43 @@ class FullcalendarViewPreprocess {
       if (!empty($des_field)) {
         $variables['#attached']['library'][] = 'fullcalendar_view/tooltip';
       }
+      $calendar_options = [
+        'plugins' => [ 'interaction', 'dayGrid', 'timeGrid', 'list' ],
+        'defaultView' => isset($options['default_view']) ? $options['default_view'] : 'dayGridMonth',
+        'defaultDate' => empty($default_date) ? date('Y-m-d') : $default_date,
+        'header' => [
+          'left' => $left_buttons,
+          'center' => 'title',
+          'right' => $right_buttons
+        ],
+        'timeFormat' => $timeFormat,
+        'firstDay' => $first_day,
+        'locale' => $default_lang,
+        'events' => $entries,
+        'navLinks' => $options['nav_links'] !== 0,
+        'columnHeaderFormat' => $column_header_format,
+        'editable' => $options['updateAllowed'] !== 0,
+        'eventLimit' => true, // Allow "more" link when too many events.
+        'eventOverlap' => $options['allowEventOverlap'] !== 0,
+      ];
+      
       // Load the fullcalendar js library.
       $variables['#attached']['library'][] = 'fullcalendar_view/fullcalendar';
       // Pass data to js file.
-      $variables['#attached']['drupalSettings'] = [
-        'firstDay' => $first_day,
-        'fullCalendarView' => $entries,
-        'defaultDate' => empty($default_date) ? date('Y-m-d') : $default_date,
-        'defaultLang' => $default_lang,
+      $variables['#attached']['drupalSettings'] = [      
         'languageSelector' => $options['languageSelector'],
-        'alloweventOverlap' => $options['allowEventOverlap'],
-        'updateAllowed' => $options['updateAllowed'],
         'updateConfirm' => $options['updateConfirm'],
         'dialogWindow' => $options['dialogWindow'],
         'linkToEntity' => $link_to_entity,
-        'columnHeaderFormat' => $column_header_format,
         'eventBundleType' => $event_bundle_type,
         'startField' => $start_field,
         'endField' => $end_field,
-        'leftButtons' => $left_buttons,
-        'rightButtons' => $right_buttons,
-        'defaultView' => isset($options['default_view']) ? $options['default_view'] : 'month',
         'dblClickToCreate' => $dbl_click_to_create,
-        'navLinks' => $options['nav_links'],
         'entityType' => $entity_type->id(),
         'addForm' => isset($add_form) ? $add_form : '',
         'token' => $token,
-        'openEntityInNewTab' => $options['openEntityInNewTab'],
-        'timeFormat' => $timeFormat,
-        'titleFormat' => $title_format,
+        'openEntityInNewTab' => $options['openEntityInNewTab'],       
+        'calendar_options' => json_encode($calendar_options),
       ];
     }
   }
