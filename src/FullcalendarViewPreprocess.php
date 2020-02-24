@@ -166,12 +166,8 @@ class FullcalendarViewPreprocess {
           foreach ($weekly as $day) {
             if (isset($day['value'])) {
               // Sunday is 0.
-              $dow[] = $day['value'] % 7;
+              $dow[] = ($day['value'] + 6) % 7;
             }
-          }
-          
-          if (!empty($dow)) {
-            $dow = '[' . implode(',', $dow) . ']';
           }
         }
         // Entity id.
@@ -232,7 +228,6 @@ class FullcalendarViewPreprocess {
           'title' =>  Xss::filter($title),
           'description' => $des,
           'id' => $entity_id,
-          'url' => $current_entity->toUrl('canonical', ['language' => $language])->toString(),
         ];
         
         if (!empty($start_date)) {
@@ -391,14 +386,24 @@ class FullcalendarViewPreprocess {
         }
         
         if (!empty($dom)) {
-          $entry['dom'] = $dom;
-          $entry['ranges'] = [$range];
+          $rrule = [
+            'freq' => 'monthly',
+            'byweekday' => $dom,
+            'dtstart' => $range['start'],
+            'until' => $range['end'],
+          ];
+          $entry['rrule'] = $rrule;
           // Recurring event is not editable.
           $entry['editable'] = FALSE;
         }
         elseif (!empty($dow)) {
-          $entry['dow'] = $dow;
-          $entry['ranges'] = [$range];
+          $rrule = [
+            'freq' => 'weekly',
+            'byweekday' => $dow,
+            'dtstart' => $range['start'],
+            'until' => $range['end'],
+          ];
+          $entry['rrule'] = $rrule;
           // Recurring event is not editable.
           $entry['editable'] = FALSE;
         }
@@ -410,13 +415,17 @@ class FullcalendarViewPreprocess {
       
       // Control the column header, as used in the week/agenda display.
       $column_header_format = NULL;
-      
+      $moduleHandler = \Drupal::service('module_handler');
+      // Load the rrule library if the recurring event module is enabled.
+      if ($moduleHandler->moduleExists('calendar_recurring_event')){
+        $variables['#attached']['library'][] = 'calendar_recurring_event/libraries.rrule';
+      }
       // Load tooltip plugin.
       if (!empty($des_field)) {
         $variables['#attached']['library'][] = 'fullcalendar_view/tooltip';
       }
       $calendar_options = [
-        'plugins' => [ 'interaction', 'dayGrid', 'timeGrid', 'list' ],
+        'plugins' => [ 'interaction', 'dayGrid', 'timeGrid', 'list', 'rrule' ],
         'defaultView' => isset($options['default_view']) ? $options['default_view'] : 'dayGridMonth',
         'defaultDate' => empty($default_date) ? date('Y-m-d') : $default_date,
         'header' => [

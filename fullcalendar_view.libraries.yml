@@ -29,6 +29,7 @@ libraries.fullcalendar:
     /libraries/fullcalendar/interaction/main.min.js: { minified: true } 
     /libraries/fullcalendar/timegrid/main.min.js: { minified: true }
     /libraries/fullcalendar/list/main.min.js: { minified: true }
+    /libraries/fullcalendar/rrule/main.min.js: { minified: true }
   dependencies:
     - fullcalendar_view/libraries.fullcalendar-theme
 
