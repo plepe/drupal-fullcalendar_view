@@ -166,7 +166,7 @@ class FullcalendarViewPreprocess {
           foreach ($weekly as $day) {
             if (isset($day['value'])) {
               // Sunday is 0.
-              $dow[] = ($day['value'] + 6) % 7;
+              $dow[] = $day['value'];
             }
           }
         }
@@ -277,7 +277,7 @@ class FullcalendarViewPreprocess {
             // Recurring event.
             if (!empty($dow) || !empty($dom)) {
               $format = 'H:i';
-              $range['start'] = $timezone_service->utcToLocal($start_date, $timezone, 'Y-m-d');
+              $range['start'] = $timezone_service->utcToLocal($start_date, $timezone, 'Ymd');
             }
             else {
               $format = DATE_ATOM;
@@ -312,9 +312,6 @@ class FullcalendarViewPreprocess {
             $all_day = (strlen($end_date) < 11) ? TRUE : FALSE;
             if ($all_day) {
               $end = new DrupalDateTime($end_date);
-              // The end date is inclusive for a all day event,
-              // which is not what we want. So we need one day offset.
-              $end->modify('+1 day');
               // Recurring event.
               if (!empty($dow) || !empty($dom)) {
                 if (!empty($options['business_end'])) {
@@ -324,17 +321,17 @@ class FullcalendarViewPreprocess {
                   $business_end = new DrupalDateTime('2018-02-24T18:00:00');
                 }
                 $entry['end'] = $business_end->format('H:i');
-                $range['end'] = $end->format('Y-m-d');
+                $range['end'] = $end->format('Ymd');
               }
               else {
-                $entry['end'] = $end->format('Y-m-d');
+                $entry['end'] = $end->format('Ymd');
               }
             }
             else {
               // Recurring event.
               if (!empty($dow) || !empty($dom)) {
                 $format = 'H:i';
-                $range['end'] = $timezone_service->utcToLocal($end_date, $timezone, 'Y-m-d', '+1 day');
+                $range['end'] = $timezone_service->utcToLocal($end_date, $timezone, 'Ymd');
               }
               else {
                 $format = DATE_ATOM;
@@ -370,13 +367,13 @@ class FullcalendarViewPreprocess {
                 // Drupal store date and time date in UTC timezone.
                 // We need to convert it into local time zone.
                 if (strlen($date_item) > 10) {
-                  $date_item = $timezone_service->utcToLocal($date_item, $timezone, 'Y-m-d');
+                  $date_item = $timezone_service->utcToLocal($date_item, $timezone, 'Ymd');
                 }
               }
               
               // Only use the first 10 digits since we only care about the date.
               if (!empty($date_item)) {
-                $exc_dates_array[] = substr($date_item, 0, 10);
+                $exc_dates_array[] = substr($date_item, 0, 8);
               }
             }
           }
@@ -386,24 +383,59 @@ class FullcalendarViewPreprocess {
         }
         
         if (!empty($dom)) {
-          $rrule = [
+          $rrule_options = [
             'freq' => 'monthly',
             'byweekday' => $dom,
             'dtstart' => $range['start'],
             'until' => $range['end'],
           ];
-          $entry['rrule'] = $rrule;
+          $entry['rrule'] = $rrule_options;
           // Recurring event is not editable.
           $entry['editable'] = FALSE;
         }
         elseif (!empty($dow)) {
-          $rrule = [
-            'freq' => 'weekly',
-            'byweekday' => $dow,
-            'dtstart' => $range['start'],
-            'until' => $range['end'],
-          ];
-          $entry['rrule'] = $rrule;
+          $week_day = '';
+          for ($i = 0; $i < count($dow); $i++) {
+            switch ($dow[$i]) {
+              case 1: 
+                $by_day = 'MO';
+                break;
+              case 2:
+                $by_day = 'TU';
+                break;
+              case 3:
+                $by_day = 'WE';
+                break;
+              case 4:
+                $by_day = 'TH';
+                break;
+              case 5:
+                $by_day = 'FR';
+              case 6:
+                $by_day = 'SA';
+                break;
+              default:
+                $by_day = 'SU';
+            }
+            
+            if ($i < count($dow) - 1) {
+              $week_day .= $by_day . ',';
+            }
+            else {
+              $week_day .= $by_day;
+            }
+          }
+          $ex_dates = '';
+          foreach ($range['excluding_dates'] as $ex_date) {
+            $ex_dates .= "\nEXDATE:" . $ex_date;
+          }
+          $rrule_options = 'DTSTART:' . $range['start'] .
+              $ex_dates .
+              "\nRRULE:" .
+              'FREQ=WEEKLY;' .
+              'BYDAY=' . $week_day . ';' . 
+              'UNTIL=' . $range['end'];
+          $entry['rrule'] = $rrule_options;
           // Recurring event is not editable.
           $entry['editable'] = FALSE;
         }
