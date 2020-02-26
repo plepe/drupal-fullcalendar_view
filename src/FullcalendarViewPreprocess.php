@@ -357,6 +357,7 @@ class FullcalendarViewPreprocess {
         if ((!empty($dom) || !empty($dow)) && !empty($exc_field) && !empty($exc_field_option)) {
           $exc_dates = $current_entity->hasField($exc_field) ? $current_entity->get($exc_field)->getValue() : '';
           $exc_dates_array = [];
+          $ex_dates = '';
           foreach ($exc_dates as $exc_date) {
             if (!empty($exc_date['value'])) {
               if ($exc_field_option['type'] === 'timestamp') {
@@ -371,7 +372,7 @@ class FullcalendarViewPreprocess {
                 }
               }
               
-              // Only use the first 10 digits since we only care about the date.
+              // Only use the first 8 digits since we only care about the date.
               if (!empty($date_item)) {
                 $exc_dates_array[] = substr($date_item, 0, 8);
               }
@@ -379,22 +380,30 @@ class FullcalendarViewPreprocess {
           }
           if (!empty($exc_dates_array)) {
             $range['excluding_dates'] = $exc_dates_array;
+            foreach ($range['excluding_dates'] as $ex_date) {
+              $ex_dates .= "\nEXDATE:" . $ex_date;
+            }
           }
         }
-        
+        // Monthly recurring events.
         if (!empty($dom)) {
-          $rrule_options = [
-            'freq' => 'monthly',
-            'byweekday' => $dom,
-            'dtstart' => $range['start'],
-            'until' => $range['end'],
-          ];
+          $month_day = implode(',', $dom);
+          $rrule_options = 'DTSTART:' . $range['start'] .
+          $ex_dates .
+          "\nRRULE:" .
+          'FREQ=MONTHLY;' .
+          'BYMONTHDAY=' . $month_day . ';' .
+          'UNTIL=' . $range['end'];
+
           $entry['rrule'] = $rrule_options;
           // Recurring event is not editable.
           $entry['editable'] = FALSE;
         }
+        // Weekly recurring events.
         elseif (!empty($dow)) {
           $week_day = '';
+          // The week day is interger. We need to convert them
+          // into string.
           for ($i = 0; $i < count($dow); $i++) {
             switch ($dow[$i]) {
               case 1: 
@@ -424,10 +433,6 @@ class FullcalendarViewPreprocess {
             else {
               $week_day .= $by_day;
             }
-          }
-          $ex_dates = '';
-          foreach ($range['excluding_dates'] as $ex_date) {
-            $ex_dates .= "\nEXDATE:" . $ex_date;
           }
           $rrule_options = 'DTSTART:' . $range['start'] .
               $ex_dates .
