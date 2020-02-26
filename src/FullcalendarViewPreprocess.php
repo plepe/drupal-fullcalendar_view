@@ -225,7 +225,7 @@ class FullcalendarViewPreprocess {
           $title = t('Invalid event title');
         }
         $entry = [
-          'title' =>  Xss::filter($title),
+          'title' =>  Xss::filterAdmin($title),
           'description' => $des,
           'id' => $entity_id,
         ];
