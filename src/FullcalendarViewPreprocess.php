@@ -277,7 +277,7 @@ class FullcalendarViewPreprocess {
             // Recurring event.
             if (!empty($dow) || !empty($dom)) {
               $format = 'H:i';
-              $range['start'] = $timezone_service->utcToLocal($start_date, $timezone, 'Ymd');
+              $range['start'] = $timezone_service->utcToLocal($start_date, $timezone, DATE_ATOM);
             }
             else {
               $format = DATE_ATOM;
@@ -318,20 +318,28 @@ class FullcalendarViewPreprocess {
                   $business_end = new DrupalDateTime($options['business_end']);
                 }
                 else {
-                  $business_end = new DrupalDateTime('2018-02-24T18:00:00');
+                  $business_end = new DrupalDateTime();
                 }
-                $entry['end'] = $business_end->format('H:i');
+                $entry['end'] = $business_end->format('H:i:s');
                 $range['end'] = $end->format('Ymd');
+                // for specifying the end time of each instance
+                $entry['duration'] = $business_end->format('H:i:s');
               }
               else {
-                $entry['end'] = $end->format('Ymd');
+                // The end date is inclusive for a all day event,
+                // which is not what we want. So we need one day offset.
+                $end->modify('+1 day');
+                $entry['end'] = $end->format('Y-m-d');
+                $entry['allDay'] = true;
               }
             }
             else {
               // Recurring event.
               if (!empty($dow) || !empty($dom)) {
                 $format = 'H:i';
-                $range['end'] = $timezone_service->utcToLocal($end_date, $timezone, 'Ymd');
+                $range['end'] = $timezone_service->utcToLocal($end_date, $timezone, DATE_ATOM);
+                // for specifying the end time of each instance
+                $entry['duration'] = substr($range['end'], 11, 8);
               }
               else {
                 $format = DATE_ATOM;
@@ -343,7 +351,7 @@ class FullcalendarViewPreprocess {
         }
         else {
           // Without end date field, this event can't be resized.
-          $entry['durationEditable'] = FALSE;
+          $entry['eventDurationEditable'] = FALSE;
         }
         // Set the color for this event.
         if (isset($event_type) && isset($color_tax[$event_type])) {
@@ -462,7 +470,7 @@ class FullcalendarViewPreprocess {
         $variables['#attached']['library'][] = 'fullcalendar_view/tooltip';
       }
       $calendar_options = [
-        'plugins' => [ 'interaction', 'dayGrid', 'timeGrid', 'list', 'rrule' ],
+        'plugins' => [ 'moment','interaction', 'dayGrid', 'timeGrid', 'list', 'rrule' ],
         'defaultView' => isset($options['default_view']) ? $options['default_view'] : 'dayGridMonth',
         'defaultDate' => empty($default_date) ? date('Y-m-d') : $default_date,
         'header' => [
