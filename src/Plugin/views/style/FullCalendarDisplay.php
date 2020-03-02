@@ -72,8 +72,8 @@ class FullCalendarDisplay extends StylePluginBase {
     $options['end'] = ['default' => ''];
     $options['des'] = ['default' => ''];
     $options['title'] = ['default' => ''];
-    $options['business_start'] = ['default' => ''];
-    $options['business_end'] = ['default' => ''];
+    $options['duration'] = ['default' => ''];
+    $options['rrule'] = ['default' => ''];
     $options['bundle_type'] = ['default' => ''];
     $options['tax_field'] = ['default' => ''];
     $options['color_bundle'] = ['default' => []];
@@ -81,6 +81,9 @@ class FullCalendarDisplay extends StylePluginBase {
     $options['vocabularies'] = ['default' => ''];
     $options['right_buttons'] = [
       'default' => 'dayGridMonth,timeGridWeek,timeGridDay,listYear',
+    ];
+    $options['left_buttons'] = [
+      'default' => 'prev,next today',
     ];
     $options['default_view'] = ['default' => 'dayGridMonth'];
     $options['nav_links'] = ['default' => 1];
@@ -147,6 +150,14 @@ class FullCalendarDisplay extends StylePluginBase {
       '#empty_value' => '',
       '#default_value' => (!empty($this->options['end'])) ? $this->options['end'] : '',
     ];
+    // Field name of rrules.
+    $form['duration'] = [
+      '#title' => $this->t('Event duration field.'),
+      '#description' => $this->t('The field value should be a string in the format hh:mm:ss.sss, hh:mm:sss or hh:mm. For example, "05:00" signifies 5 hours.'),
+      '#type' => 'select',
+      '#options' => $field_names,
+      '#default_value' => (!empty($this->options['duration'])) ? $this->options['duration'] : '',
+    ];
     // Field name of title.
     $form['title'] = [
       '#title' => $this->t('Title Field'),
@@ -179,6 +190,17 @@ class FullCalendarDisplay extends StylePluginBase {
       '#description' => $this->t('Right side buttons. Buttons are seperated by commas or space. See the %fullcalendar_doc for availabel buttons.',
           [
             '%fullcalendar_doc' => Link::fromTextAndUrl($this->t('Fullcalendar documentation'), Url::fromUri('https://fullcalendar.io/docs/header', array('attributes' => array('target' => '_blank'))))->toString(),      
+          ]),
+    ];
+    // Left side buttons.
+    $form['left_buttons'] = [
+      '#type' => 'textfield',
+      '#fieldset' => 'display',
+      '#default_value' => (empty($this->options['left_buttons'])) ? [] : $this->options['left_buttons'],
+      '#title' => $this->t('Left side buttons'),
+      '#description' => $this->t('Left side buttons. Buttons are seperated by commas or space. See the %fullcalendar_doc for availabel buttons.',
+          [
+            '%fullcalendar_doc' => Link::fromTextAndUrl($this->t('Fullcalendar documentation'), Url::fromUri('https://fullcalendar.io/docs/header', array('attributes' => array('target' => '_blank'))))->toString(),
           ]),
     ];
     // Default view.
@@ -453,49 +475,26 @@ class FullCalendarDisplay extends StylePluginBase {
       ];
     }
     
-    if ($moduleHandler->moduleExists('calendar_recurring_event')) {
-      // Recurring event.
-      $form['recurring'] = [
-        '#type' => 'details',
-        '#title' => $this->t('Recurring event settings'),
-          // '#description' =>  $this->t('Settings for recurring event.'),.
-      ];
-      // Recurring business start time.
-      $form['business_start'] = [
-        '#type' => 'datetime',
-        '#title' => $this->t('Business start time'),
-        '#description' => $this->t('The time of a day when a recurring all day event starts. The recurring events whose start date include hour and minute will use their respective start time instead.'),
-        '#fieldset' => 'recurring',
-        '#default_value' => empty($this->options['business_start']) ? new DrupalDateTime('2018-02-24T08:00:00') : new DrupalDateTime($this->options['business_start']),
-      // Hide date element.
-        '#date_date_element' => 'none',
-      // You can use text element here as well.
-        '#date_time_element' => 'time',
-        '#date_time_format' => 'H:i',
-      ];
-      // Recurring business end time.
-      $form['business_end'] = [
-        '#type' => 'datetime',
-        '#title' => $this->t('Business end time'),
-        '#description' => $this->t('The time of a day when a recurring event ends. The recurring events whose end date include hour and minute will use their respective end time instead.'),
-        '#fieldset' => 'recurring',
-        '#default_value' => empty($this->options['business_end']) ? new DrupalDateTime('2018-02-24T18:00:00') : new DrupalDateTime($this->options['business_end']),
-      // Hide date element.
-        '#date_date_element' => 'none',
-      // You can use text element here as well.
-        '#date_time_element' => 'time',
-        '#date_time_format' => 'H:i',
-      ];
-      // Field name of excluding dates.
-      $form['excluding_dates'] = [
-        '#title' => $this->t('Excluding dates Field'),
-        '#description' => $this->t('Choose field date with excluding dates.'),
-        '#type' => 'select',
-        '#fieldset' => 'recurring',
-        '#options' => $field_names,
-        '#default_value' => (!empty($this->options['excluding_dates'])) ? $this->options['excluding_dates'] : '',
-      ];
-    }
+    // Recurring event.
+    $form['recurring'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Recurring event settings'),
+        // '#description' =>  $this->t('Settings for recurring event.'),.
+    ];
+    // Field name of rrules.
+    $form['rrule'] = [
+      '#title' => $this->t('RRule Field for recurring events.'),
+      '#description' => $this->t('You can generate an valid rrule string via <a href=":tool-url" target="_blank">the online toole</a><br><a href=":doc-url" target="_blank">See the documentation</a> for more about RRule.',
+          [
+            ':tool-url' => 'https://jakubroztocil.github.io/rrule/',
+            ':doc-url' => 'https://github.com/jakubroztocil/rrule'
+          ]),
+      '#type' => 'select',
+      '#fieldset' => 'recurring',
+      '#options' => $field_names,
+      '#default_value' => (!empty($this->options['rrule'])) ? $this->options['rrule'] : '',
+    ];
+      
     // New event bundle type.
     $form['bundle_type'] = [
       '#title' => $this->t('Event bundle (Content) type'),
@@ -527,13 +526,6 @@ class FullCalendarDisplay extends StylePluginBase {
       if (!empty($color)) {
         $options['color_taxonomies'][$id] = $color;
       }
-    }
-    // Datetime fields in Drupal 8 are stored as strings.
-    if (isset($options['business_start'])) {
-      $options['business_start'] = $options['business_start']->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT );
-    }
-    if (isset($options['business_end'])) {
-      $options['business_end'] = $options['business_end']->format(DateTimeItemInterface::DATETIME_STORAGE_FORMAT );
     }
     
     // Sanitize user input.

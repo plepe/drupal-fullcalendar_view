@@ -1,4 +1,16 @@
 # External libraries.
+libraries.rrule:
+  remote: https://github.com/jakubroztocil/rrule
+  version: '2.6.4'
+  license:
+    name: python-dateutil
+    url: https://github.com/jakubroztocil/rrule/blob/master/LICENCE
+    gpl-compatible: true
+  cdn:
+    https://cdn.jsdelivr.net/npm/rrule@2.6.4/dist/es5/rrule.min.js
+  js:
+    /libraries/rrule/2.6.4/rrule.min.js: { minified: true }
+
 libraries.fullcalendar-theme:
   remote: https://fullcalendar.io/
   version: '4.4.0'
@@ -10,7 +22,10 @@ libraries.fullcalendar-theme:
     https://unpkg.com/@fullcalendar/
   css:
     component:
-      /libraries/fullcalendar/core/main.min.css: { minified: true } 
+      /libraries/fullcalendar/core/main.min.css: { minified: true }
+      /libraries/fullcalendar/daygrid/main.min.css: { minified: true }
+      /libraries/fullcalendar/timegrid/main.min.css: { minified: true }
+      /libraries/fullcalendar/list/main.min.css: { minified: true }
 
 libraries.fullcalendar:
   remote: https://fullcalendar.io/
@@ -32,6 +47,7 @@ libraries.fullcalendar:
     /libraries/fullcalendar/rrule/main.min.js: { minified: true }
   dependencies:
     - fullcalendar_view/libraries.fullcalendar-theme
+    - fullcalendar_view/libraries.rrule
 
 tooltip:
   version: 1.0

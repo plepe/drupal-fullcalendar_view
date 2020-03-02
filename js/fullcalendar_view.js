@@ -7,28 +7,60 @@
   Drupal.behaviors.fullcalendarView = {
     attach: function(context, settings) {
       var calendarObjs = [];
+      var initialLocaleCode = 'en';
+      var localeSelectorEl = document.getElementById('locale-selector');
+      
+      // Create all calendars.
       $('.js-drupal-fullcalendar', context)
         .once("fullcalendarCustomBehavior")
         .each(function() {
           
           var calendarEl = document.getElementsByClassName("js-drupal-fullcalendar");
           let calendarOptions = JSON.parse(drupalSettings.calendar_options);
+          // Date entry clicked.
+          var slotDate;
           // Bind the render event handler.
           calendarOptions.eventRender = eventRender;
           // Bind the resize event handler.
           calendarOptions.eventResize = eventResize;
+          // Bind the day click handler.
+          calendarOptions.dateClick = dayClickCallback;
+          // Bind the event click handler.
+          calendarOptions.eventClick = eventClick;
+          
           // Define calendar elemetns.
           if (calendarEl) { 
             for (let i = 0; i < calendarEl.length; i++) {
               var calendar = new FullCalendar.Calendar(calendarEl[i], calendarOptions); 
               // Render the calendar.
               calendar.render();
+              if (drupalSettings.languageSelector) {
+                // build the locale selector's options
+                calendar.getAvailableLocaleCodes().forEach(function(localeCode) {
+                  var optionEl = document.createElement('option');
+                  optionEl.value = localeCode;
+                  optionEl.selected = localeCode == calendarOptions.locale;
+                  optionEl.innerText = localeCode;
+                  localeSelectorEl.appendChild(optionEl);
+                });
+                // when the selected option changes, dynamically change the calendar option
+                localeSelectorEl.addEventListener('change', function() {
+                  if (this.value) {
+                    calendar.setOption('locale', this.value);
+                  }
+                });
+              }
+              else {
+                $(".locale-selector").hide();
+              }
               // Put into the calendar array.
               calendarObjs[i] = calendar;
-            }
-            
+            }         
           }
         });
+      
+      
+
       /**
        * Event render handler
        */
@@ -107,6 +139,61 @@
             });
         }
       }
+      
+      // Day entry click call back function.
+      function dayClickCallback(info) {
+        slotDate = info.dateStr;
+      }
+      
+      // Event click call back function.
+      function eventClick(info) {
+        slotDate = null;
+        info.jsEvent.preventDefault();
+        if (drupalSettings.linkToEntity) {
+          // Open a time slot details in a dialog
+          if (drupalSettings.dialogWindow) {
+            let dataDialogOptionsDetails = {};
+            let thisEvent = info.event;
+            var modalLink = $('<a id="fullcalendar-view-dialog"></a>');
+            dataDialogOptionsDetails.draggable = true;
+            dataDialogOptionsDetails.autoResize = false;
+            dataDialogOptionsDetails.title = thisEvent.title.replace(/(<([^>]+)>)/ig,"");
+
+            modalLink.addClass('use-ajax');
+            modalLink.attr('href', thisEvent.url);
+            modalLink.attr('data-dialog-type', 'dialog');
+            modalLink.attr('data-dialog-options', JSON.stringify(dataDialogOptionsDetails));
+            modalLink.appendTo($('body'));
+
+            Drupal.attachBehaviors();
+            modalLink.trigger('click').remove();
+            // The entry element object.
+            let $thisEntry = $(this);
+            if (typeof $thisEntry.qtip === "function") {
+              // Hide the pop tip.
+              $thisEntry.qtip("hide");
+            }
+
+            return false;
+          }
+          // Open a new window to show the details of the event.
+          if (thisEvent.url) {
+            if (drupalSettings.openEntityInNewTab) {
+              // Open a new window to show the details of the event.
+             window.open(thisEvent.url);
+             return false;
+            }
+            else {
+              // Open in same window
+              return true;
+            }
+          }
+        }
+
+        return false;
+      }
+
+
     }
   };
 })(jQuery, Drupal);

@@ -74,8 +74,10 @@ class FullcalendarViewPreprocess {
     $des_field = $options['des'];
     // Field machine name of taxonomy field.
     $tax_field = $options['tax_field'];
+    // Field machine name of event duration.
+    $duration_field = isset($options['duration']) ? $options['duration'] : NULL;
     // Field machine name of excluding dates field.
-    $exc_field = isset($options['excluding_dates']) ? $options['excluding_dates'] : NULL;
+    $rrule_field = isset($options['rrule']) ? $options['rrule'] : NULL;
     
     // Default date of the calendar.
     switch ($options['default_date_source']) {
@@ -87,12 +89,10 @@ class FullcalendarViewPreprocess {
         $default_date = $options['defaultDate'];
         break;
         
-      case 'first':
+      default:
         // Don't do anything, we'll set it below.
-        break;
     }
     // Default Language.
-    $default_lang = $options['defaultLanguage'];
     $default_lang = $options['defaultLanguage'] === 'current_lang' ? $this->fullcalendar_view_map_langcodes($language->getId()) : $options['defaultLanguage'];
     // Color for bundle types.
     $color_content = $options['color_bundle'];
@@ -101,11 +101,10 @@ class FullcalendarViewPreprocess {
     // Date fields.
     $start_field_option = $fields[$start_field]->options;
     $end_field_option = empty($end_field) ? NULL : $fields[$end_field]->options;
-    $exc_field_option = empty($exc_field) ? NULL : $fields[$exc_field]->options;
     // Custom timezone or user timezone.
     $timezone = !empty($start_field_option['settings']['timezone_override']) ?
     $start_field_option['settings']['timezone_override'] : date_default_timezone_get();
-    // Open a new window for details of an event.
+    // Title field machine name.
     $title_field = (empty($options['title']) || $options['title'] == 'title') ? 'title' : $options['title'];
     // Calendar entries linked to entity.
     $link_to_entity = FALSE;
@@ -118,7 +117,7 @@ class FullcalendarViewPreprocess {
     // Set the first day setting.
     $first_day = isset($options['firstDay']) ? intval($options['firstDay']) : 0;
     // Left side buttons.
-    $left_buttons = 'prev,next today';
+    $left_buttons = Xss::filter($options['left_buttons']);
     // Right side buttons.
     $right_buttons = Xss::filter($options['right_buttons']);
     $entries = [];
@@ -130,45 +129,11 @@ class FullcalendarViewPreprocess {
       foreach ($view->result as $row) {
         // Set the row_index property used by advancedRender function.
         $view->row_index = $row->index;
-        // Days of a week for a recurring event.
-        $dow = NULL;
-        // Days of a month for a recurring event.
-        $dom = NULL;
-        $monthly = NULL;
-        $weekly = NULL;
-        // Recurring range.
-        $range = NULL;
         // Result entity of current row.
         $current_entity = $row->_entity;
         // Start field is vital, if it doesn't exist then ignore this entity.
         if (!$current_entity->hasField($start_field)) {
           continue;
-        }
-        // Monthly recurring.
-        if ($current_entity->hasField('field_monthly_event')) {
-          $monthly = $current_entity->get('field_monthly_event')->getValue();
-        }
-        // If the monthly recurring is set, the weekly recurring will be ignored.
-        if (!empty($monthly)) {
-          $dom = [];
-          foreach ($monthly as $day) {
-            if (!empty($day['value'])) {
-              $dom[] = $day['value'];
-            }
-          }
-        }
-        // Weekly recurring.
-        elseif ($current_entity->hasField('field_weekly_event')) {
-          $weekly = $current_entity->get('field_weekly_event')->getValue();
-        }
-        if (!empty($weekly)) {
-          $dow = [];
-          foreach ($weekly as $day) {
-            if (isset($day['value'])) {
-              // Sunday is 0.
-              $dow[] = $day['value'];
-            }
-          }
         }
         // Entity id.
         $entity_id = $current_entity->id();
@@ -196,7 +161,8 @@ class FullcalendarViewPreprocess {
           // in case a replacement pattern for other field.
           // For exmaple, {{field name}}.
           foreach ($des_field as $des_field_name) {
-            if (isset($fields[$des_field_name]) && method_exists($fields[$des_field_name], 'advancedRender')) {
+            if (isset($fields[$des_field_name])
+                && method_exists($fields[$des_field_name], 'advancedRender')) {
               $des_raw = $fields[$des_field_name]->advancedRender($row);
               $des = empty($des_raw) ? '' : $des_raw;
               // We just need only one description text.
@@ -226,23 +192,45 @@ class FullcalendarViewPreprocess {
         }
         $entry = [
           'title' =>  Xss::filterAdmin($title),
-          'description' => $des,
+          'description' => Xss::filterAdmin($des),
           'id' => $entity_id,
+          'url' => $current_entity->toUrl()->toString(),
         ];
-        
+        // Event duration.
+        if (!empty($duration_field) && !empty($fields[$duration_field])) {
+          $entry['duration'] = $fields[$duration_field]->advancedRender($row);
+        }
         if (!empty($start_date)) {
           // There might be more than one value for a field,
           // but we only need the first one and ignore others.
-          $start_date = reset($start_date)['value'];
+          $start_date = $start_date[0]['value'];
           // Examine the field type.
           if ($start_field_option['type'] === 'timestamp') {
             $start_date = intval($start_date);
             $start_date = date(DATE_ATOM, $start_date);
           }
-          elseif (strpos($start_field_option['type'], 'datetime') === FALSE && strpos($start_field_option['type'], 'daterange') === FALSE) {
-            // This field is not a valid date time field.
-            continue;
+          elseif (strpos($start_field_option['type'], 'datetime') === FALSE
+              && strpos($start_field_option['type'], 'daterange') === FALSE) {
+                if (empty($variables['fullcalendar_fieldtypes'])) {
+                  // This field is not a valid date time field.
+                  continue;
+                }
+                else {
+                  $valid = FALSE;
+                  // checking supported field types form plugin defintions
+                  foreach($variables['fullcalendar_fieldtypes'] as $fieldtype) {
+                    if (strpos($start_field_option['type'], $fieldtype) === 0) {
+                      $valid = TRUE;
+                      break;
+                    }
+                  }
+                  if (!$valid) {
+                    // This field is not a valid date time field.
+                    continue;
+                  }
+                }
           }
+
           // A user who doesn't have the permission can't edit an event.
           if (!$current_entity->access('update')) {
             $entry['editable'] = FALSE;
@@ -258,42 +246,23 @@ class FullcalendarViewPreprocess {
           $all_day = (strlen($start_date) < 11) ? TRUE : FALSE;
           
           if ($all_day) {
-            // Recurring event.
-            if (!empty($dow) || !empty($dom)) {
-              if (empty($options['business_start'])) {
-                $business_start = new DrupalDateTime('2018-02-24T08:00:00');
-              }
-              else {
-                $business_start = new DrupalDateTime($options['business_start']);
-              }
-              $entry['start'] = $business_start->format('H:i');
-              $range['start'] = $start_date;
-            }
-            else {
-              $entry['start'] = $start_date;
-            }
+            $entry['start'] = $start_date;
+            $entry['allDay'] = true;
           }
           else {
-            // Recurring event.
-            if (!empty($dow) || !empty($dom)) {
-              $format = 'H:i';
-              $range['start'] = $timezone_service->utcToLocal($start_date, $timezone, DATE_ATOM);
-            }
-            else {
-              $format = DATE_ATOM;
-            }
-            // By default, Drupal store date time in UTC timezone.
+            // Drupal store date time in UTC timezone.
             // So we need to convert it into user timezone.
-            $entry['start'] = $timezone_service->utcToLocal($start_date, $timezone, $format);
+            $entry['start'] = $timezone_service->utcToLocal($start_date, $timezone, DATE_ATOM);
           }
         }
         else {
           continue;
         }
-        // Cope with end date in the same way as start date above.
+        
+        // Deal with the end date in the same way as start date above.
         if (!empty($end_date)) {
           if ($end_field_option['type'] === 'timestamp') {
-            $end_date = reset($end_date)['value'];
+            $end_date = $end_date[0]['value'];
             $end_date = intval($end_date);
             $end_date = date(DATE_ATOM, $end_date);
           }
@@ -305,47 +274,23 @@ class FullcalendarViewPreprocess {
             $end_date = '';
           }
           else {
-            $end_date = reset($end_date)['value'];
+            $end_date = $end_date[0]['value'];
           }
           
           if (!empty($end_date)) {
             $all_day = (strlen($end_date) < 11) ? TRUE : FALSE;
             if ($all_day) {
               $end = new DrupalDateTime($end_date);
-              // Recurring event.
-              if (!empty($dow) || !empty($dom)) {
-                if (!empty($options['business_end'])) {
-                  $business_end = new DrupalDateTime($options['business_end']);
-                }
-                else {
-                  $business_end = new DrupalDateTime();
-                }
-                $entry['end'] = $business_end->format('H:i:s');
-                $range['end'] = $end->format('Ymd');
-                // for specifying the end time of each instance
-                $entry['duration'] = $business_end->format('H:i:s');
-              }
-              else {
-                // The end date is inclusive for a all day event,
-                // which is not what we want. So we need one day offset.
-                $end->modify('+1 day');
-                $entry['end'] = $end->format('Y-m-d');
-                $entry['allDay'] = true;
-              }
+              // The end date is inclusive for a all day event,
+              // which is not what we want. So we need one day offset.
+              $end->modify('+1 day');
+              $entry['end'] = $end->format('Y-m-d');
+              $entry['allDay'] = true;
             }
             else {
-              // Recurring event.
-              if (!empty($dow) || !empty($dom)) {
-                $format = 'H:i';
-                $range['end'] = $timezone_service->utcToLocal($end_date, $timezone, DATE_ATOM);
-                // for specifying the end time of each instance
-                $entry['duration'] = substr($range['end'], 11, 8);
-              }
-              else {
-                $format = DATE_ATOM;
-              }
-              
-              $entry['end'] = $timezone_service->utcToLocal($end_date, $timezone, $format);
+              // Drupal store date time in UTC timezone.
+              // So we need to convert it into user timezone.
+              $entry['end'] = $timezone_service->utcToLocal($end_date, $timezone, DATE_ATOM);
             }
           }
         }
@@ -360,111 +305,21 @@ class FullcalendarViewPreprocess {
         elseif (isset($color_content[$entity_bundle])) {
           $entry['backgroundColor'] = $color_content[$entity_bundle];
         }
-        
-        // Collect excluding dates values for recurring event only.
-        if ((!empty($dom) || !empty($dow)) && !empty($exc_field) && !empty($exc_field_option)) {
-          $exc_dates = $current_entity->hasField($exc_field) ? $current_entity->get($exc_field)->getValue() : '';
-          $exc_dates_array = [];
-          $ex_dates = '';
-          foreach ($exc_dates as $exc_date) {
-            if (!empty($exc_date['value'])) {
-              if ($exc_field_option['type'] === 'timestamp') {
-                $date_item = date(DATE_ATOM, intval($exc_date['value']));
-              }
-              elseif (strpos($exc_field_option['type'], 'datetime') !== FALSE) {
-                $date_item = $exc_date['value'];
-                // Drupal store date and time date in UTC timezone.
-                // We need to convert it into local time zone.
-                if (strlen($date_item) > 10) {
-                  $date_item = $timezone_service->utcToLocal($date_item, $timezone, 'Ymd');
-                }
-              }
-              
-              // Only use the first 8 digits since we only care about the date.
-              if (!empty($date_item)) {
-                $exc_dates_array[] = substr($date_item, 0, 8);
-              }
-            }
-          }
-          if (!empty($exc_dates_array)) {
-            $range['excluding_dates'] = $exc_dates_array;
-            foreach ($range['excluding_dates'] as $ex_date) {
-              $ex_dates .= "\nEXDATE:" . $ex_date;
-            }
+        // Recurring event.
+        if (!empty($rrule_field)) {
+          $rrule = $current_entity->hasField($rrule_field) ? $current_entity->get($rrule_field)->getString() : '';
+          if (!empty($rrule)) {
+            $entry['rrule'] = Xss::filter($rrule);
+            // Recurring events are read-only.
+            $entry['editable'] = FALSE;
           }
         }
-        // Monthly recurring events.
-        if (!empty($dom)) {
-          $month_day = implode(',', $dom);
-          $rrule_options = 'DTSTART:' . $range['start'] .
-          $ex_dates .
-          "\nRRULE:" .
-          'FREQ=MONTHLY;' .
-          'BYMONTHDAY=' . $month_day . ';' .
-          'UNTIL=' . $range['end'];
-
-          $entry['rrule'] = $rrule_options;
-          // Recurring event is not editable.
-          $entry['editable'] = FALSE;
-        }
-        // Weekly recurring events.
-        elseif (!empty($dow)) {
-          $week_day = '';
-          // The week day is interger. We need to convert them
-          // into string.
-          for ($i = 0; $i < count($dow); $i++) {
-            switch ($dow[$i]) {
-              case 1: 
-                $by_day = 'MO';
-                break;
-              case 2:
-                $by_day = 'TU';
-                break;
-              case 3:
-                $by_day = 'WE';
-                break;
-              case 4:
-                $by_day = 'TH';
-                break;
-              case 5:
-                $by_day = 'FR';
-              case 6:
-                $by_day = 'SA';
-                break;
-              default:
-                $by_day = 'SU';
-            }
-            
-            if ($i < count($dow) - 1) {
-              $week_day .= $by_day . ',';
-            }
-            else {
-              $week_day .= $by_day;
-            }
-          }
-          $rrule_options = 'DTSTART:' . $range['start'] .
-              $ex_dates .
-              "\nRRULE:" .
-              'FREQ=WEEKLY;' .
-              'BYDAY=' . $week_day . ';' . 
-              'UNTIL=' . $range['end'];
-          $entry['rrule'] = $rrule_options;
-          // Recurring event is not editable.
-          $entry['editable'] = FALSE;
-        }
+        // Add this event into the array.
         $entries[] = $entry;
       }
       
       // Remove the row_index property as we don't it anymore.
       unset($view->row_index);
-      
-      // Control the column header, as used in the week/agenda display.
-      $column_header_format = NULL;
-      $moduleHandler = \Drupal::service('module_handler');
-      // Load the rrule library if the recurring event module is enabled.
-      if ($moduleHandler->moduleExists('calendar_recurring_event')){
-        $variables['#attached']['library'][] = 'calendar_recurring_event/libraries.rrule';
-      }
       // Load tooltip plugin.
       if (!empty($des_field)) {
         $variables['#attached']['library'][] = 'fullcalendar_view/tooltip';
@@ -483,7 +338,6 @@ class FullcalendarViewPreprocess {
         'locale' => $default_lang,
         'events' => $entries,
         'navLinks' => $options['nav_links'] !== 0,
-        'columnHeaderFormat' => $column_header_format,
         'editable' => $options['updateAllowed'] !== 0,
         'eventLimit' => true, // Allow "more" link when too many events.
         'eventOverlap' => $options['allowEventOverlap'] !== 0,
