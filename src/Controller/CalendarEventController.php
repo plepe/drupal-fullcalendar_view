@@ -20,7 +20,7 @@ class CalendarEventController extends ControllerBase {
    *
    * @var \Drupal\Core\Access\CsrfTokenGenerator
    */
-  private $csrfToken;
+  protected $csrfToken;
 
   /**
    * Construct the Controller.
