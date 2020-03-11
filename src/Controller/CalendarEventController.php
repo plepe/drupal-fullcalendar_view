@@ -84,16 +84,16 @@ class CalendarEventController extends ControllerBase {
             // Multiple value of start field.
             if (is_array($entity->$start_field)) {
               if ($start_type === 'datetime' || $start_type === 'daterange') {
-                $length = strlen($entity->$start_field[0]);
+                $length = strlen(($entity->$start_field)[0]);
 
                 if ($length > 10) {
                   // Only update the first value.
-                  $entity->$start_field[0] = [
+                  ($entity->$start_field)[0] = [
                     'value' => gmdate("Y-m-d\TH:i:s", strtotime($start_date)),
                   ];
                 }
                 else {
-                  $entity->$start_field[0] = ['value' => $start_date];
+                  ($entity->$start_field)[0] = ['value' => $start_date];
                 }
               }
             }
@@ -121,33 +121,33 @@ class CalendarEventController extends ControllerBase {
               // Multiple value of end field.
               if (is_array($entity->$end_field)) {
                 if ($end_type === 'datetime') {
-                  $length = strlen($entity->$end_field[0]);
+                  $length = strlen(($entity->$end_field)[0]);
 
                   if ($length > 10) {
                     // Only update the first value.
-                    $entity->$end_field[0] = [
+                    ($entity->$end_field)[0] = [
                       'value' => gmdate("Y-m-d\TH:i:s", strtotime($end_date)),
                     ];
                   }
                   else {
-                    $entity->$end_field[0] = ['value' => $end_date];
+                    ($entity->$end_field)[0] = ['value' => $end_date];
                   }
                 }
                 // Daterange field.
                 elseif ($end_type === 'daterange') {
-                  $length = strlen($entity->$end_field[0]->end_value);
+                  $length = strlen(($entity->$end_field)[0]->end_value);
 
                   if ($length > 10) {
                     // UTC Date with time.
-                    $entity->$end_field[0]->end_value = gmdate("Y-m-d\TH:i:s", strtotime($end_date));
+                    ($entity->$end_field)[0]->end_value = gmdate("Y-m-d\TH:i:s", strtotime($end_date));
                   }
                   else {
-                    $entity->$end_field[0]->end_value = $end_date;
+                    ($entity->$end_field)[0]->end_value = $end_date;
                   }
                 }
                 // Timestamp field.
-                elseif (is_numeric($entity->$end_field[0]->value)) {
-                  $entity->$end_field[0]->value = strtotime($end_date);
+                elseif (is_numeric(($entity->$end_field)[0]->value)) {
+                  ($entity->$end_field)[0]->value = strtotime($end_date);
                 }
               }
               // Single value field.
