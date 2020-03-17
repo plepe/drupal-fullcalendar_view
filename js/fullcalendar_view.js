@@ -27,6 +27,8 @@
           calendarOptions.dateClick = dayClickCallback;
           // Bind the event click handler.
           calendarOptions.eventClick = eventClick;
+          // Bind the drop event handler.
+          calendarOptions.eventDrop = eventDrop;
           
           // Define calendar elemetns.
           if (calendarEl) { 
@@ -191,6 +193,72 @@
         }
 
         return false;
+      }
+      
+      // Event drop call back function.
+      function eventDrop(info) {
+        const end = info.event.end;
+        const start = info.event.start;
+        let strEnd = '';
+        let strStart = '';
+        const formatSettings = {
+            month: '2-digit',
+            year: 'numeric',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            locale: 'sv-SE'
+          };
+        // define the end date string in 'YYYY-MM-DD' format.
+        if (end) {
+          // The end day of an event is exclusive.
+          // For example, the end of 2018-09-03
+          // will appear to 2018-09-02 in the calendar.
+          // So we need one day subtract
+          // to ensure the day stored in Drupal
+          // is the same as when it appears in
+          // the calendar.
+          end.setDate(end.getDate() - 1);
+          // String of the end date.
+          strEnd = FullCalendar.formatDate(end, formatSettings);
+        }
+        // define the start date string in 'YYYY-MM-DD' format.
+        if (start) {
+          strStart = FullCalendar.formatDate(start, formatSettings);
+        }
+        const title = info.event.title.replace(/(<([^>]+)>)/ig,"");;
+        const msg = Drupal.t('@title end is now @event_end. Do you want to save this change?', {
+          '@title': title,
+          '@event_end': strEnd
+        });
+
+        if (!confirm(msg)) {
+          info.revert();
+        }
+        else {
+          /**
+           * Perform ajax call for event update in database.
+           */
+          jQuery
+            .post(
+              drupalSettings.path.baseUrl +
+                "fullcalendar-view-event-update",
+              {
+                eid: info.event.id,
+                entity_type: drupalSettings.entityType,
+                start: strStart,
+                end: strEnd,
+                start_field: drupalSettings.startField,
+                end_field: drupalSettings.endField,
+                token: drupalSettings.token
+              }
+            )
+            .done(function(data) {
+              // alert("Response: " + data);
+            });
+
+        }
       }
 
 

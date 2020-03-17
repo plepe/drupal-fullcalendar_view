@@ -93,7 +93,7 @@ class CalendarEventController extends ControllerBase {
                   ];
                 }
                 else {
-                  ($entity->$start_field)[0] = ['value' => $start_date];
+                  ($entity->$start_field)[0] = ['value' => substr($start_date, 0, $length)];
                 }
               }
             }
@@ -111,7 +111,7 @@ class CalendarEventController extends ControllerBase {
                   $entity->$start_field->value = gmdate("Y-m-d\TH:i:s", strtotime($start_date));
                 }
                 else {
-                  $entity->$start_field->value = $start_date;
+                  $entity->$start_field->value = substr($start_date, 0, $length);
                 }
               }
             }
@@ -130,7 +130,7 @@ class CalendarEventController extends ControllerBase {
                     ];
                   }
                   else {
-                    ($entity->$end_field)[0] = ['value' => $end_date];
+                    ($entity->$end_field)[0] = ['value' => substr($end_date, 0, $length)];
                   }
                 }
                 // Daterange field.
@@ -142,7 +142,14 @@ class CalendarEventController extends ControllerBase {
                     ($entity->$end_field)[0]->end_value = gmdate("Y-m-d\TH:i:s", strtotime($end_date));
                   }
                   else {
-                    ($entity->$end_field)[0]->end_value = $end_date;
+                    if ($length == strlen($end_date))
+                    {
+                      ($entity->$end_field)[0]->end_value = $end_date;
+                    }
+                    else {
+                      ($entity->$end_field)[0]->end_value = substr($end_date, 0, $length);
+                    }
+                    
                   }
                 }
                 // Timestamp field.
@@ -161,7 +168,13 @@ class CalendarEventController extends ControllerBase {
                     $entity->$end_field->value = gmdate("Y-m-d\TH:i:s", strtotime($end_date));
                   }
                   else {
-                    $entity->$end_field->value = $end_date;
+                    if ($length == strlen($end_date))
+                    {
+                      $entity->$end_field->value = $end_date;
+                    }
+                    else {
+                      $entity->$end_field->value = substr($end_date, 0, $length);
+                    }
                   }
                 }
                 // Daterange field.
@@ -173,7 +186,13 @@ class CalendarEventController extends ControllerBase {
                     $entity->$end_field->end_value = gmdate("Y-m-d\TH:i:s", strtotime($end_date));
                   }
                   else {
-                    $entity->$end_field->end_value = $end_date;
+                    if ($length == strlen($end_date))
+                    {
+                      $entity->$end_field->end_value = $end_date;
+                    }
+                    else {
+                      $entity->$end_field->end_value = substr($end_date, 0, $length);
+                    }
                   }
                 }
                 // Timestamp field.
