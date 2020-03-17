@@ -70,7 +70,6 @@ class FullCalendarDisplay extends StylePluginBase {
     $options['defaultDate'] = ['default' => ''];
     $options['start'] = ['default' => ''];
     $options['end'] = ['default' => ''];
-    $options['des'] = ['default' => ''];
     $options['title'] = ['default' => ''];
     $options['duration'] = ['default' => ''];
     $options['rrule'] = ['default' => ''];
@@ -156,6 +155,7 @@ class FullCalendarDisplay extends StylePluginBase {
       '#description' => $this->t('The field value should be a string in the format hh:mm:ss.sss, hh:mm:sss or hh:mm. For example, "05:00" signifies 5 hours.'),
       '#type' => 'select',
       '#options' => $field_names,
+      '#empty_value' => '',
       '#default_value' => (!empty($this->options['duration'])) ? $this->options['duration'] : '',
     ];
     // Field name of title.
@@ -164,16 +164,6 @@ class FullCalendarDisplay extends StylePluginBase {
       '#type' => 'select',
       '#options' => $field_names,
       '#default_value' => (!empty($this->options['title'])) ? $this->options['title'] : '',
-    ];
-    // Field for description.
-    $form['des'] = [
-      '#title' => $this->t('Description Field'),
-      '#description' => $this->t('Description for event tooltip. If select none, there will not be popup tooltip. For multiple content types, you can select multiple fields here.'),
-      '#type' => 'select',
-      '#options' => $field_names,
-      '#empty_value' => '',
-      '#default_value' => (!empty($this->options['des'])) ? $this->options['des'] : '',
-      '#multiple' => TRUE,
     ];
     // Display settings.
     $form['display'] = [

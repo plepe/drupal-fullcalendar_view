@@ -70,8 +70,6 @@ class FullcalendarViewPreprocess {
     }
     // Field machine name of end date.
     $end_field = $options['end'];
-    // Field machine name for event description.
-    $des_field = $options['des'];
     // Field machine name of taxonomy field.
     $tax_field = $options['tax_field'];
     // Field machine name of event duration.
@@ -148,38 +146,6 @@ class FullcalendarViewPreprocess {
         $start_date = $current_entity->get($start_field)->getValue();
         // Calendar event end date.
         $end_date = empty($end_field) || !$current_entity->hasField($end_field) ? '' : $current_entity->get($end_field)->getValue();
-        // Description for events. For multiple bundle types,
-        // there might be more than one field specified.
-        if (!empty($des_field) && is_array($des_field)) {
-          // Render all other fields to so they can be used in rewrite.
-          foreach ($fields as $field) {
-            if (method_exists($field, 'advancedRender')) {
-              $field->advancedRender($row);
-            }
-          }
-          // We need to render the description field again,
-          // in case a replacement pattern for other field.
-          // For exmaple, {{field name}}.
-          foreach ($des_field as $des_field_name) {
-            if (isset($fields[$des_field_name])
-                && method_exists($fields[$des_field_name], 'advancedRender')) {
-              $des_raw = $fields[$des_field_name]->advancedRender($row);
-              $des = empty($des_raw) ? '' : $des_raw;
-              // We just need only one description text.
-              // Once we got it, quit the loop.
-              break;
-            }
-          }
-        }
-        if (!isset($des)) {
-          $des = '';
-        }
-        if (is_array($des)) {
-          $des = reset($des);
-          if (isset($des['value'])) {
-            $des = $des['value'];
-          }
-        }
         // Event title.
         if (empty($options['title']) || $options['title'] == 'title') {
           $title = $fields['title']->advancedRender($row);
@@ -192,7 +158,6 @@ class FullcalendarViewPreprocess {
         }
         $entry = [
           'title' =>  Xss::filterAdmin($title),
-          'description' => Xss::filterAdmin($des),
           'id' => $entity_id,
           'url' => $current_entity->toUrl()->toString(),
         ];
@@ -320,10 +285,7 @@ class FullcalendarViewPreprocess {
       
       // Remove the row_index property as we don't it anymore.
       unset($view->row_index);
-      // Load tooltip plugin.
-      if (!empty($des_field)) {
-        $variables['#attached']['library'][] = 'fullcalendar_view/tooltip';
-      }
+      // Fullcalendar options.
       $calendar_options = [
         'plugins' => [ 'moment','interaction', 'dayGrid', 'timeGrid', 'list', 'rrule' ],
         'defaultView' => isset($options['default_view']) ? $options['default_view'] : 'dayGridMonth',

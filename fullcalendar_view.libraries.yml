@@ -49,15 +49,6 @@ libraries.fullcalendar:
     - fullcalendar_view/libraries.fullcalendar-theme
     - fullcalendar_view/libraries.rrule
 
-tooltip:
-  version: 1.0
-  css:
-    theme:
-      css/jquery.qtip.min.css: { minified: true }    
-  js:
-    js/jquery.qtip.min.js: { minified: true }
-    js/tooltip-plugin.js: {}
-    
 # Feature libraries.
 fullcalendar:
   js:
