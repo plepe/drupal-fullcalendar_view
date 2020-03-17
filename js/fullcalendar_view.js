@@ -137,7 +137,10 @@
               }
             )
             .done(function(data) {
-              // alert("Response: " + data);
+              if (data !== '1') {
+                alert("Error: " + data);
+                info.revert();
+              }
             });
         }
       }
@@ -255,7 +258,10 @@
               }
             )
             .done(function(data) {
-              // alert("Response: " + data);
+              if (data !== '1') {
+                alert("Error: " + data);
+                info.revert();
+              }
             });
 
         }

@@ -208,11 +208,8 @@ class CalendarEventController extends ControllerBase {
               '%entity_type' => $entity->getType(),
               '%title' => $entity->getTitle(),
             ]);
-            return new Response($this->t('%title is updated to from %start to %end', [
-              '%title' => $entity->getTitle(),
-              '%start' => $start_date,
-              '%end' => $end_date,
-            ]));
+            // Returen 1 as success.
+            return new Response(1);
           }
 
         }
