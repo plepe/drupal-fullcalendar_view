@@ -147,7 +147,7 @@ class CalendarEventController extends ControllerBase {
                       ($entity->$end_field)[0]->end_value = $end_date;
                     }
                     else {
-                      ($entity->$end_field)[0]->end_value = substr($end_date, 0, $length);
+                      ($entity->$end_field)[0]->end_value = substr($end_date, 0, $length ? : strlen($end_date));
                     }
                     
                   }
@@ -173,7 +173,7 @@ class CalendarEventController extends ControllerBase {
                       $entity->$end_field->value = $end_date;
                     }
                     else {
-                      $entity->$end_field->value = substr($end_date, 0, $length);
+                      $entity->$end_field->value = substr($end_date, 0, $length ? : strlen($end_date));
                     }
                   }
                 }
@@ -191,7 +191,7 @@ class CalendarEventController extends ControllerBase {
                       $entity->$end_field->end_value = $end_date;
                     }
                     else {
-                      $entity->$end_field->end_value = substr($end_date, 0, $length);
+                      $entity->$end_field->end_value = substr($end_date, 0, $length ? : strlen($end_date));
                     }
                   }
                 }

@@ -9,6 +9,8 @@
       var calendarObjs = [];
       var initialLocaleCode = 'en';
       var localeSelectorEl = document.getElementById('locale-selector');
+      // Date entry clicked.
+      var slotDate;
       
       // Create all calendars.
       $('.js-drupal-fullcalendar', context)
@@ -17,8 +19,6 @@
           
           var calendarEl = document.getElementsByClassName("js-drupal-fullcalendar");
           let calendarOptions = JSON.parse(drupalSettings.calendar_options);
-          // Date entry clicked.
-          var slotDate;
           // Bind the render event handler.
           calendarOptions.eventRender = eventRender;
           // Bind the resize event handler.
@@ -36,6 +36,7 @@
               var calendar = new FullCalendar.Calendar(calendarEl[i], calendarOptions); 
               // Render the calendar.
               calendar.render();
+              // Language dropdown box.
               if (drupalSettings.languageSelector) {
                 // build the locale selector's options
                 calendar.getAvailableLocaleCodes().forEach(function(localeCode) {
@@ -57,7 +58,30 @@
               }
               // Put into the calendar array.
               calendarObjs[i] = calendar;
-            }         
+            }
+            
+            // Double click event.
+            $(".js-drupal-fullcalendar").dblclick(function() {
+              console.log(slotDate);
+              if (
+                  slotDate &&
+                  drupalSettings.eventBundleType &&
+                  drupalSettings.dblClickToCreate &&
+                  drupalSettings.addForm !== ""
+                ) {
+                  // Open a new window to create a new event (content).
+                  window.open(
+                    drupalSettings.path.baseUrl +
+                      drupalSettings.addForm +
+                      "?start=" +
+                      slotDate +
+                      "&start_field=" +
+                      drupalSettings.startField,
+                    "_blank"
+                  );
+                }
+
+            });
           }
         });
       
@@ -222,7 +246,9 @@
           // to ensure the day stored in Drupal
           // is the same as when it appears in
           // the calendar.
-          end.setDate(end.getDate() - 1);
+          if (end.getHours() == 0 && end.getMinutes() == 0 && end.getSeconds() == 0) {
+            end.setDate(end.getDate() - 1);
+          }
           // String of the end date.
           strEnd = FullCalendar.formatDate(end, formatSettings);
         }
