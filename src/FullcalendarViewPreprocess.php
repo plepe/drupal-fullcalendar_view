@@ -102,8 +102,6 @@ class FullcalendarViewPreprocess {
     // Custom timezone or user timezone.
     $timezone = !empty($start_field_option['settings']['timezone_override']) ?
     $start_field_option['settings']['timezone_override'] : date_default_timezone_get();
-    // Title field machine name.
-    $title_field = (empty($options['title']) || $options['title'] == 'title') ? 'title' : $options['title'];
 /*     // Calendar entries linked to entity.
     $link_to_entity = FALSE;
     if (isset($fields[$title_field]->options['settings']['link_to_entity'])) {
@@ -146,6 +144,12 @@ class FullcalendarViewPreprocess {
         $start_date = $current_entity->get($start_field)->getValue();
         // Calendar event end date.
         $end_date = empty($end_field) || !$current_entity->hasField($end_field) ? '' : $current_entity->get($end_field)->getValue();
+        // Render all other fields to so they can be used in rewrite.
+        foreach ($fields as $field) {
+          if (method_exists($field, 'advancedRender')) {
+            $field->advancedRender($row);
+          }
+        }
         // Event title.
         if (empty($options['title']) || $options['title'] == 'title') {
           $title = $fields['title']->advancedRender($row);
