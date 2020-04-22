@@ -147,15 +147,6 @@ class FullCalendarDisplay extends StylePluginBase {
       '#empty_value' => '',
       '#default_value' => (!empty($this->options['end'])) ? $this->options['end'] : '',
     ];
-    // Field name of rrules.
-    $form['duration'] = [
-      '#title' => $this->t('Event duration field.'),
-      '#description' => $this->t('The field value should be a string in the format hh:mm:ss.sss, hh:mm:sss or hh:mm. For example, "05:00" signifies 5 hours.'),
-      '#type' => 'select',
-      '#options' => $field_names,
-      '#empty_value' => '',
-      '#default_value' => (!empty($this->options['duration'])) ? $this->options['duration'] : '',
-    ];
     // Field name of title.
     $form['title'] = [
       '#title' => $this->t('Title Field'),
@@ -478,9 +469,27 @@ class FullCalendarDisplay extends StylePluginBase {
             ':doc-url' => 'https://github.com/jakubroztocil/rrule'
           ]),
       '#type' => 'select',
+      '#empty_value' => '',
       '#fieldset' => 'recurring',
       '#options' => $field_names,
       '#default_value' => (!empty($this->options['rrule'])) ? $this->options['rrule'] : '',
+    ];
+    // Field name of rrules.
+    $form['duration'] = [
+      '#fieldset' => 'recurring',
+      '#title' => $this->t('Event duration field.'),
+      '#description' => $this->t('For specifying the end time of each recurring event instance. The field value should be a string in the format hh:mm:ss.sss, hh:mm:sss or hh:mm. For example, "05:00" signifies 5 hours.'),
+      '#type' => 'select',
+      '#empty_value' => '',
+      '#options' => $field_names,
+      '#empty_value' => '',
+      '#default_value' => (!empty($this->options['duration'])) ? $this->options['duration'] : '',
+      '#states' => [
+        // Only show this field when the 'rrule' is specified.
+        'invisible' => [
+          [':input[name="style_options[rrule]"]' => ['value' => '']],
+        ],
+      ],
     ];
       
     // New event bundle type.

@@ -104,14 +104,14 @@ class FullcalendarViewPreprocess {
     $start_field_option['settings']['timezone_override'] : date_default_timezone_get();
     // Title field machine name.
     $title_field = (empty($options['title']) || $options['title'] == 'title') ? 'title' : $options['title'];
-    // Calendar entries linked to entity.
+/*     // Calendar entries linked to entity.
     $link_to_entity = FALSE;
     if (isset($fields[$title_field]->options['settings']['link_to_entity'])) {
       $link_to_entity = $fields[$title_field]->options['settings']['link_to_entity'];
     }
     elseif (isset($fields[$title_field]->options['settings']['link'])) {
       $link_to_entity = $fields[$title_field]->options['settings']['link'];
-    }
+    } */
     // Set the first day setting.
     $first_day = isset($options['firstDay']) ? intval($options['firstDay']) : 0;
     // Left side buttons.
@@ -156,10 +156,18 @@ class FullcalendarViewPreprocess {
         else {
           $title = t('Invalid event title');
         }
+        $link_url = strstr($title, 'href="');
+        if ($link_url) {
+          $link_url = substr($link_url, 6);
+          $link_url = strstr($link_url, '"', true);
+        }
+        else {
+          $link_url = '';
+        }
         $entry = [
           'title' =>  Xss::filterAdmin($title),
           'id' => $entity_id,
-          'url' => $current_entity->toUrl()->toString(),
+          'url' => $link_url,
         ];
         // Event duration.
         if (!empty($duration_field) && !empty($fields[$duration_field])) {
@@ -304,15 +312,31 @@ class FullcalendarViewPreprocess {
         'eventLimit' => true, // Allow "more" link when too many events.
         'eventOverlap' => $options['allowEventOverlap'] !== 0,
       ];
+      // Dialog options.
+      // Other modules can override following options by custom plugin.
+      // For reference of JSFrame options see:
+      // https://github.com/riversun/JSFrame.js/
+      $dialog_optoins = [
+        'left' => 40,
+        'top' => 60,
+        'width' => 640,
+        'height' => 480,
+        'movable' => true, //Enable to be moved by mouse
+        'resizable' => true, //Enable to be resized by mouse
+      ];
       
       // Load the fullcalendar js library.
       $variables['#attached']['library'][] = 'fullcalendar_view/fullcalendar';
+      if ($options['dialogWindow']) {
+        // Load the JS library for dialog.
+        $variables['#attached']['library'][] = 'fullcalendar_view/libraries.jsframe';
+      }
       // Pass data to js file.
       $variables['#attached']['drupalSettings'] = [      
         'languageSelector' => $options['languageSelector'],
         'updateConfirm' => $options['updateConfirm'],
         'dialogWindow' => $options['dialogWindow'],
-        'linkToEntity' => $link_to_entity,
+     //   'linkToEntity' => $link_to_entity,
         'eventBundleType' => $event_bundle_type,
         'startField' => $start_field,
         'endField' => $end_field,
@@ -322,6 +346,7 @@ class FullcalendarViewPreprocess {
         'token' => $token,
         'openEntityInNewTab' => $options['openEntityInNewTab'],       
         'calendar_options' => json_encode($calendar_options),
+        'dialog_options' => json_encode($dialog_optoins),
       ];
     }
   }

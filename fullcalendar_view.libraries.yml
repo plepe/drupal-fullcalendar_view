@@ -49,6 +49,18 @@ libraries.fullcalendar:
     - fullcalendar_view/libraries.fullcalendar-theme
     - fullcalendar_view/libraries.rrule
 
+libraries.jsframe:
+  remote: https://github.com/riversun/JSFrame.js
+  version: '1.5.16'
+  license:
+    name: MIT
+    url: https://github.com/riversun/JSFrame.js/blob/master/LICENSE
+    gpl-compatible: true
+  cdn:
+    https://cdn.jsdelivr.net/npm/jsframe.js@1.5.16/lib/jsframe.min.js
+  js:
+    /libraries/JSFrame/1.5.16/jsframe.min.js: { minified: true }
+
 # Feature libraries.
 fullcalendar:
   js:
