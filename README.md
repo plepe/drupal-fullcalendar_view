@@ -80,6 +80,7 @@ API:
  
  
      * View preprocess service (Drupal\fullcalendar_view\FullcalendarViewPreprocess)
+     
          This service implements the business logic of the calendar. Other module can decorate or override this service to define their own business logic.
      
      
@@ -94,6 +95,7 @@ API:
  
  
      * View processor plugin (FullcalendarViewProcessor)
+     
          This plugin type provides the capability to alter the view preprocess working with other modules.
          
          
@@ -102,43 +104,55 @@ API:
  
  
      * languageSelector
+     
          Allow client to select language, if it is 1.
          
-         
      * updateConfirm 
+     
          Event update confirmation pop-up dialog. If it is 1, a confirmation dialog will pop-up after dragging and dropping an event.
          
      * dialogWindow
+     
          Open event links in dialog window. If it is 1, event links in the calendar will open in a dialog window.
          
      * eventBundleType
+     
          The bundle (content) type of a new event.
          
      * startField
+     
          The machine name of start date field.
          
      * endField
+     
          The machine name of end date field.
          
      * dblClickToCreate
-         Allow to create a new event by double clicking.
+     
+         Allow to create a new event by double clicking, if it is 1.
          
      * entityType
+     
          Entity type.
          
      * addForm
+     
          URL of the new event form.
        
      * token
+     
          CSRF token.
          
      * openEntityInNewTab
+     
          Show an event details in a new window (tab).
          
      * calendar_options
+     
          The options of the Fullcalendar object.
          
      * dialog_options
+     
          The options of the pop-up dialog object.
          
 
