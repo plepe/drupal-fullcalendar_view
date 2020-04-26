@@ -336,20 +336,34 @@ class FullcalendarViewPreprocess {
         $variables['#attached']['library'][] = 'fullcalendar_view/libraries.jsframe';
       }
       // Pass data to js file.
-      $variables['#attached']['drupalSettings'] = [      
+      $variables['#attached']['drupalSettings'] = [
+        // Allow client to select language, if it is 1.
         'languageSelector' => $options['languageSelector'],
-        'updateConfirm' => $options['updateConfirm'],
+        // Event update confirmation pop-up dialog.
+        // If it is 1, a confirmation dialog will pop-up after dragging and dropping an event.
+        'updateConfirm' => $options['updateConfirm'], 
+        // Open event links in dialog window.
+        // If it is 1, event links in the calendar will open in a dialog window.
         'dialogWindow' => $options['dialogWindow'],
-     //   'linkToEntity' => $link_to_entity,
+        // The bundle (content) type of a new event.
         'eventBundleType' => $event_bundle_type,
+        // The machine name of start date field.
         'startField' => $start_field,
+        // The machine name of end date field.
         'endField' => $end_field,
+        // Allow to create a new event by double clicking.
         'dblClickToCreate' => $dbl_click_to_create,
+        // Entity type.
         'entityType' => $entity_type->id(),
+        // URL of the new event form.
         'addForm' => isset($add_form) ? $add_form : '',
+        // CSRF token.
         'token' => $token,
-        'openEntityInNewTab' => $options['openEntityInNewTab'],       
+        // Show an event details in a new window (tab).
+        'openEntityInNewTab' => $options['openEntityInNewTab'],  
+        // The options of the Fullcalendar object.
         'calendar_options' => json_encode($calendar_options),
+        // The options of the pop-up dialog object.
         'dialog_options' => json_encode($dialog_optoins),
       ];
     }
