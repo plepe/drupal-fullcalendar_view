@@ -63,7 +63,10 @@
       '@event_end': strEnd
     });
 
-    if (!confirm(msg)) {
+    if (
+        drupalSettings.updateConfirm === 1 &&
+        !confirm(msg)
+    ) {
       info.revert();
     }
     else {
@@ -187,7 +190,10 @@
       '@event_end': strEnd
     });
 
-    if (!confirm(msg)) {
+    if (
+        drupalSettings.updateConfirm === 1 &&
+        !confirm(msg)
+    ) {
       info.revert();
     }
     else {
