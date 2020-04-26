@@ -10,6 +10,8 @@
   var dialogIndex = 0;
   // Dialog objects.
   var dialogs = [];
+  // Date entry clicked.
+  var slotDate;
 
   /**
    * Event render handler
@@ -105,47 +107,45 @@
   function eventClick(info) {
     slotDate = null;
     info.jsEvent.preventDefault();
- //   if (drupalSettings.linkToEntity) {
-      // Open a time slot details in a dialog
-      if (drupalSettings.dialogWindow) {
-        let dataDialogOptionsDetails = {};
-        let thisEvent = info.event;
-        if (thisEvent.url == '') {
-          return false;
-        }
-        
-        const jsFrame = new JSFrame({
-          parentElement:document.body,//Set the parent element to which the jsFrame is attached here
-        });
-        // Position offset.
-        let posOffset = dialogIndex * 20;
-        // Dialog options.
-        let dialogOptions = JSON.parse(drupalSettings.dialog_options);
-        dialogOptions.left += posOffset;
-        dialogOptions.top += posOffset;
-        dialogOptions.title = thisEvent.title.replace(/(<([^>]+)>)/ig,"");
-        dialogOptions.url = thisEvent.url;
-        //Create window
-        dialogs[dialogIndex] = jsFrame.create(dialogOptions);
-        
-        dialogs[dialogIndex].show();
-        dialogIndex++;
-
+    // Show the event detail in a pop up dialog.
+    if (drupalSettings.dialogWindow) {
+      let dataDialogOptionsDetails = {};
+      let thisEvent = info.event;
+      if (thisEvent.url == '') {
         return false;
       }
-      // Open a new window to show the details of the event.
-      if (thisEvent.url) {
-        if (drupalSettings.openEntityInNewTab) {
-          // Open a new window to show the details of the event.
-         window.open(thisEvent.url);
-         return false;
-        }
-        else {
-          // Open in same window
-          return true;
-        }
+      
+      const jsFrame = new JSFrame({
+        parentElement:document.body,//Set the parent element to which the jsFrame is attached here
+      });
+      // Position offset.
+      let posOffset = dialogIndex * 20;
+      // Dialog options.
+      let dialogOptions = JSON.parse(drupalSettings.dialog_options);
+      dialogOptions.left += posOffset;
+      dialogOptions.top += posOffset;
+      dialogOptions.title = thisEvent.title.replace(/(<([^>]+)>)/ig,"");
+      dialogOptions.url = thisEvent.url;
+      //Create window
+      dialogs[dialogIndex] = jsFrame.create(dialogOptions);
+      
+      dialogs[dialogIndex].show();
+      dialogIndex++;
+
+      return false;
+    }
+    // Open a new window to show the details of the event.
+    if (thisEvent.url) {
+      if (drupalSettings.openEntityInNewTab) {
+        // Open a new window to show the details of the event.
+       window.open(thisEvent.url);
+       return false;
       }
-//    }
+      else {
+        // Open in same window
+        return true;
+      }
+    }
 
     return false;
   }
@@ -226,7 +226,7 @@
   
   Drupal.behaviors.fullcalendarView = {
     attach: function(context, settings) {
-      /*if (typeof calendarObjs === 'undefined') {
+      if (typeof calendarObjs === 'undefined') {
         return;
       }
       else {
@@ -236,11 +236,9 @@
           }
           return;
         }
-      }*/
+      }
       // Language select element.
       var localeSelectorEl = document.getElementById('locale-selector');
-      // Date entry clicked.
-      var slotDate;
           
       var calendarEl = document.getElementsByClassName("js-drupal-fullcalendar");
       let calendarOptions = JSON.parse(drupalSettings.calendar_options);
