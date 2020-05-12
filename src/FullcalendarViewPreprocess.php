@@ -320,7 +320,7 @@ class FullcalendarViewPreprocess {
       // Other modules can override following options by custom plugin.
       // For reference of JSFrame options see:
       // https://github.com/riversun/JSFrame.js/
-      $dialog_optoins = [
+      $dialog_options = [
         'left' => 40,
         'top' => 60,
         'width' => 640,
@@ -364,7 +364,7 @@ class FullcalendarViewPreprocess {
         // The options of the Fullcalendar object.
         'calendar_options' => json_encode($calendar_options),
         // The options of the pop-up dialog object.
-        'dialog_options' => json_encode($dialog_optoins),
+        'dialog_options' => json_encode($dialog_options),
       ];
     }
   }
