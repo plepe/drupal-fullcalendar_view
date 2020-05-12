@@ -168,7 +168,7 @@
       };
     // define the end date string in 'YYYY-MM-DD' format.
     if (end) {
-      // The end day of an event is exclusive.
+      // The end date of an all-day event is exclusive.
       // For example, the end of 2018-09-03
       // will appear to 2018-09-02 in the calendar.
       // So we need one day subtract
