@@ -107,10 +107,10 @@
   function eventClick(info) {
     slotDate = null;
     info.jsEvent.preventDefault();
+    let thisEvent = info.event;
     // Show the event detail in a pop up dialog.
     if (drupalSettings.dialogWindow) {
       let dataDialogOptionsDetails = {};
-      let thisEvent = info.event;
       if (thisEvent.url == '') {
         return false;
       }
