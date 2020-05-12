@@ -143,7 +143,8 @@
       }
       else {
         // Open in same window
-        return true;
+        window.location.href = thisEvent.url;
+        return false;
       }
     }
 
