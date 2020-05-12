@@ -40,18 +40,23 @@
         month: '2-digit',
         year: 'numeric',
         day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
         locale: 'sv-SE'
       };
     // define the end date string in 'YYYY-MM-DD' format.
     if (end) {
-      // The end day of an event is exclusive.
+      // The end date of an all-day event is exclusive.
       // For example, the end of 2018-09-03
       // will appear to 2018-09-02 in the calendar.
       // So we need one day subtract
       // to ensure the day stored in Drupal
       // is the same as when it appears in
       // the calendar.
-      end.setDate(end.getDate() - 1);
+      if (end.getHours() == 0 && end.getMinutes() == 0 && end.getSeconds() == 0) {
+        end.setDate(end.getDate() - 1);
+      }
       // String of the end date.
       strEnd = FullCalendar.formatDate(end, formatSettings);
     }
