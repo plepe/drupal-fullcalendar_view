@@ -4,7 +4,6 @@
  */
 
 (function($, Drupal) {
-  var calendarObjs = [];
   var initialLocaleCode = 'en';
   // Dialog index.
   var dialogIndex = 0;
@@ -230,24 +229,13 @@
     }
   }
   
+  // Todo: 
+  // Set up the weith for the behavior.
+  // Make sure it run after all others.
+  // @see https://www.drupal.org/project/drupal/issues/2367655
   Drupal.behaviors.fullcalendarView = {
     attach: function(context, settings) {
-      if (typeof calendarObjs === 'undefined') {
-        return;
-      }
-      else {
-        if (calendarObjs.length > 0) {
-          for (let i = 0; i < calendarObjs.length; i++) {
-            calendarObjs[i].render();
-          }
-          return;
-        }
-      }
-      // Language select element.
-      var localeSelectorEl = document.getElementById('locale-selector');
-          
-      var calendarEl = document.getElementsByClassName("js-drupal-fullcalendar");
-      let calendarOptions = JSON.parse(drupalSettings.calendar_options);
+      var calendarOptions = JSON.parse(drupalSettings.calendar_options);
       // Bind the render event handler.
       calendarOptions.eventRender = eventRender;
       // Bind the resize event handler.
@@ -259,63 +247,77 @@
       // Bind the drop event handler.
       calendarOptions.eventDrop = eventDrop;
       
-      // Define calendar elemetns.
-      if (calendarEl) { 
-        for (let i = 0; i < calendarEl.length; i++) {
-          var calendar = new FullCalendar.Calendar(calendarEl[i], calendarOptions); 
-          // Render the calendar.
-          calendar.render();
-          // Language dropdown box.
-          if (drupalSettings.languageSelector) {
-            // build the locale selector's options
-            calendar.getAvailableLocaleCodes().forEach(function(localeCode) {
-              var optionEl = document.createElement('option');
-              optionEl.value = localeCode;
-              optionEl.selected = localeCode == calendarOptions.locale;
-              optionEl.innerText = localeCode;
-              localeSelectorEl.appendChild(optionEl);
-            });
-            // when the selected option changes, dynamically change the calendar option
-            localeSelectorEl.addEventListener('change', function() {
-              if (this.value) {
-                calendar.setOption('locale', this.value);
-              }
-            });
-          }
-          else {
-            $(".locale-selector").hide();
-          }
-          // Put into the calendar array.
-          calendarObjs[i] = calendar;
-        }
-        
-        // Double click event.
-        $(".js-drupal-fullcalendar").dblclick(function() {
-          // New event window can be open if following conditions match.
-          // * The new event content type are specified.
-          // * Allow to create a new event by double click.
-          // * User has the permission to create a new event.
-          // * The add form for the new event type is known.
-          if (
-              slotDate &&
-              drupalSettings.eventBundleType &&
-              drupalSettings.dblClickToCreate &&
-              drupalSettings.addForm !== ""
-            ) {
-              // Open a new window to create a new event (content).
-              window.open(
-                drupalSettings.path.baseUrl +
-                  drupalSettings.addForm +
-                  "?start=" +
-                  slotDate +
-                  "&start_field=" +
-                  drupalSettings.startField,
-                "_blank"
-              );
+      // If the BigPipe module is enabled,
+      // We need to rebuild the Calendar during Drupal.behavior loops,
+      // In case the DOM has changed.
+      // @see https://www.drupal.org/project/fullcalendar_view/issues/3136764
+      if (drupalSettings.calendar  && settings.bigPipePlaceholderIds) {
+        // Rebuild the calendar.
+        drupalSettings.calendar.destroy();
+        drupalSettings.calendar.render();
+      }
+      else {
+        $('.js-drupal-fullcalendar', context)
+        .once("fullCalendarBehavior")
+        .each(function(index) {
+          // Language select element.
+          var localeSelectorEl = document.getElementById('locale-selector');
+              
+          var calendarEl = this;
+          // Initial the calendar.
+          if (calendarEl) { 
+            drupalSettings.calendar = new FullCalendar.Calendar(calendarEl, calendarOptions); 
+            drupalSettings.calendar.render();
+            // Language dropdown box.
+            if (drupalSettings.languageSelector) {
+              // build the locale selector's options
+              drupalSettings.calendar.getAvailableLocaleCodes().forEach(function(localeCode) {
+                var optionEl = document.createElement('option');
+                optionEl.value = localeCode;
+                optionEl.selected = localeCode == calendarOptions.locale;
+                optionEl.innerText = localeCode;
+                localeSelectorEl.appendChild(optionEl);
+              });
+              // when the selected option changes, dynamically change the calendar option
+              localeSelectorEl.addEventListener('change', function() {
+                if (this.value) {
+                  drupalSettings.calendar.setOption('locale', this.value);
+                }
+              });
             }
+            else {
+              localeSelectorEl.style.display = "none";
+            }
+            
+            // Double click event.
+            calendarEl.addEventListener('dblclick' , function(e) {
+              // New event window can be open if following conditions match.
+              // * The new event content type are specified.
+              // * Allow to create a new event by double click.
+              // * User has the permission to create a new event.
+              // * The add form for the new event type is known.
+              if (
+                  slotDate &&
+                  drupalSettings.eventBundleType &&
+                  drupalSettings.dblClickToCreate &&
+                  drupalSettings.addForm !== ""
+                ) {
+                  // Open a new window to create a new event (content).
+                  window.open(
+                    drupalSettings.path.baseUrl +
+                      drupalSettings.addForm +
+                      "?start=" +
+                      slotDate +
+                      "&start_field=" +
+                      drupalSettings.startField,
+                    "_blank"
+                  );
+                }
 
+            });
+          }
         });
-      } 
+      }
     }
   };
 })(jQuery, Drupal);
