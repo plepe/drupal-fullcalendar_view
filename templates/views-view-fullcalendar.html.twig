@@ -8,6 +8,9 @@
  *   - defaultDate: Default date of the calendar
  *   - start: Field name of start date
  *   - end: Field name of end date
+ *   - view_index: View index
+ *   - showAddEvent: Show add event button
+ *   - entity_id: The Entity type machine name
  *
  * @see template_preprocess_views_view_fullcalendar()
  *
@@ -20,7 +23,7 @@
   ]
 %}
 <div{{ attributes.addClass(classes) }}>
-  <div class="js-drupal-fullcalendar"></div>
+  <div class="js-drupal-fullcalendar" calendar-view-index="{{ view_index }}"></div>
   <div id="bottom-buttons fc-button-group">
     {% if showAddEvent %}
     <div class="fullcalendar-bottom-btn add-event-btn">
@@ -30,7 +33,7 @@
     {% endif %}
     <div class="fullcalendar-bottom-btn locale-selector">
       <label for="locale-selector">{{ 'Select Language:'|t }}</label>
-      <select id='locale-selector'></select>
+      <select id='locale-selector-{{ view_index }}' calendar-view-index="{{ view_index }}"></select>
     </div>
   </div>
 </div>

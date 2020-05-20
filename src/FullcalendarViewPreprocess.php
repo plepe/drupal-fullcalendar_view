@@ -7,6 +7,7 @@ use Drupal\Core\Datetime\DrupalDateTime;
 
 class FullcalendarViewPreprocess {
   
+  protected  static $viewIndex = 0;
   /**
    * Process the view variable array.
    * 
@@ -14,7 +15,10 @@ class FullcalendarViewPreprocess {
    *   Template variables.
    */
   public function process(array &$variables) {   
+    /* @var \Drupal\views\ViewExecutable $view */
     $view = $variables['view'];
+    // View index.
+    $view_index = self::$viewIndex++;
     $style = $view->style_plugin;
     $options = $style->options;
     $fields = $view->field;
@@ -29,6 +33,7 @@ class FullcalendarViewPreprocess {
     if (!$user->isAnonymous()) {
       $token = \Drupal::csrfToken()->get($user->id());
     }
+    // 
     // New event bundle type.
     $event_bundle_type = $options['bundle_type'];
     $entity_type = $view->getBaseEntityType();
@@ -335,8 +340,9 @@ class FullcalendarViewPreprocess {
         // Load the JS library for dialog.
         $variables['#attached']['library'][] = 'fullcalendar_view/libraries.jsframe';
       }
+      $variables['view_index'] = $view_index;
       // Pass data to js file.
-      $variables['#attached']['drupalSettings'] = [
+      $variables['#attached']['drupalSettings']['fullCalendarView'][$view_index] = [
         // Allow client to select language, if it is 1.
         'languageSelector' => $options['languageSelector'],
         // Event update confirmation pop-up dialog.
