@@ -146,9 +146,10 @@ class FullcalendarViewPreprocess {
           $event_type = $current_entity->get($tax_field)->target_id;
         }
         // Calendar event start date.
-        $start_date = $current_entity->get($start_field)->getValue();
+        $start_dates = $current_entity->get($start_field)->getValue();
         // Calendar event end date.
-        $end_date = empty($end_field) || !$current_entity->hasField($end_field) ? '' : $current_entity->get($end_field)->getValue();
+        $end_dates = empty($end_field) || !$current_entity->hasField($end_field) ? '' : 
+        $current_entity->get($end_field)->getValue();
         // Render all other fields to so they can be used in rewrite.
         foreach ($fields as $field) {
           if (method_exists($field, 'advancedRender')) {
@@ -173,29 +174,31 @@ class FullcalendarViewPreprocess {
         else {
           $link_url = '';
         }
-        $entry = [
-          'title' =>  Xss::filterAdmin($title),
-          'id' => $entity_id,
-          'url' => $link_url,
-        ];
-        // Event duration.
-        if (!empty($duration_field) && !empty($fields[$duration_field])) {
-          $entry['duration'] = $fields[$duration_field]->advancedRender($row);
-        }
-        if (!empty($start_date)) {
-          // There might be more than one value for a field,
-          // but we only need the first one and ignore others.
-          $start_date = $start_date[0]['value'];
-          // Examine the field type.
-          if ($start_field_option['type'] === 'timestamp') {
-            $start_date = intval($start_date);
-            $start_date = date(DATE_ATOM, $start_date);
-          }
-          elseif (strpos($start_field_option['type'], 'datetime') === FALSE
-              && strpos($start_field_option['type'], 'daterange') === FALSE) {
+        // For multiple value field, create a respective calendar entry
+        // for each date value.
+        if (!empty($start_dates) && is_array($start_dates)) {
+          foreach ($start_dates as $i => $start_date) {
+            $entry = [
+              'title' =>  Xss::filterAdmin($title),
+              'id' => $entity_id,
+              'url' => $link_url,
+            ];
+            // Event duration.
+            if (!empty($duration_field) && !empty($fields[$duration_field])) {
+              $entry['duration'] = $fields[$duration_field]->advancedRender($row);
+            }
+            if (!empty($start_date)) {
+              $start_date_value = $start_date['value'];
+              // Examine the field type.
+              if ($start_field_option['type'] === 'timestamp') {
+                $start_date_value = intval($start_date_value);
+                $start_date_value = date(DATE_ATOM, $start_date_value);
+              }
+              elseif (strpos($start_field_option['type'], 'datetime') === FALSE
+                  && strpos($start_field_option['type'], 'daterange') === FALSE) {
                 if (empty($variables['fullcalendar_fieldtypes'])) {
                   // This field is not a valid date time field.
-                  continue;
+                  continue 2;
                 }
                 else {
                   $valid = FALSE;
@@ -208,96 +211,100 @@ class FullcalendarViewPreprocess {
                   }
                   if (!$valid) {
                     // This field is not a valid date time field.
-                    continue;
+                    continue 2;
                   }
                 }
-          }
-
-          // A user who doesn't have the permission can't edit an event.
-          if (!$current_entity->access('update')) {
-            $entry['editable'] = FALSE;
-          }
-          
-          // If we don't yet know the default_date (we're configured to use the
-          // date from the first row, and we haven't set it yet), do so now.
-          if (!isset($default_date)) {
-            // Only use the first 10 digits since we only care about the date.
-            $default_date = substr($start_date, 0, 10);
-          }
-          
-          $all_day = (strlen($start_date) < 11) ? TRUE : FALSE;
-          
-          if ($all_day) {
-            $entry['start'] = $start_date;
-            $entry['allDay'] = true;
-          }
-          else {
-            // Drupal store date time in UTC timezone.
-            // So we need to convert it into user timezone.
-            $entry['start'] = $timezone_service->utcToLocal($start_date, $timezone, DATE_ATOM);
-          }
-        }
-        else {
-          continue;
-        }
-        
-        // Deal with the end date in the same way as start date above.
-        if (!empty($end_date)) {
-          if ($end_field_option['type'] === 'timestamp') {
-            $end_date = $end_date[0]['value'];
-            $end_date = intval($end_date);
-            $end_date = date(DATE_ATOM, $end_date);
-          }
-          elseif (strpos($end_field_option['type'], 'daterange') !== FALSE) {
-            $end_date = $end_date[0]['end_value'];
-          }
-          elseif (strpos($end_field_option['type'], 'datetime') === FALSE) {
-            // This field is not a valid date time field.
-            $end_date = '';
-          }
-          else {
-            $end_date = $end_date[0]['value'];
-          }
-          
-          if (!empty($end_date)) {
-            $all_day = (strlen($end_date) < 11) ? TRUE : FALSE;
-            if ($all_day) {
-              $end = new DrupalDateTime($end_date);
-              // The end date is inclusive for a all day event,
-              // which is not what we want. So we need one day offset.
-              $end->modify('+1 day');
-              $entry['end'] = $end->format('Y-m-d');
-              $entry['allDay'] = true;
+              }
+              
+              // A user who doesn't have the permission can't edit an event.
+              if (!$current_entity->access('update')) {
+                $entry['editable'] = FALSE;
+              }
+              
+              // If we don't yet know the default_date (we're configured to use the
+              // date from the first row, and we haven't set it yet), do so now.
+              if (!isset($default_date)) {
+                // Only use the first 10 digits since we only care about the date.
+                $default_date = substr($start_date_value, 0, 10);
+              }
+              
+              $all_day = (strlen($start_date_value) < 11) ? TRUE : FALSE;
+              
+              if ($all_day) {
+                $entry['start'] = $start_date_value;
+                $entry['allDay'] = true;
+              }
+              else {
+                // Drupal store date time in UTC timezone.
+                // So we need to convert it into user timezone.
+                $entry['start'] = $timezone_service->utcToLocal($start_date_value, $timezone, DATE_ATOM);
+              }
             }
             else {
-              // Drupal store date time in UTC timezone.
-              // So we need to convert it into user timezone.
-              $entry['end'] = $timezone_service->utcToLocal($end_date, $timezone, DATE_ATOM);
+              // A event must have start date.
+              // If not, skip this row.
+              continue 2;
             }
+            
+            // Deal with the end date in the same way as start date above.
+            if (!empty($end_dates[$i])) {
+              if ($end_field_option['type'] === 'timestamp') {
+                $end_date = $end_dates[$i]['value'];
+                $end_date = intval($end_date);
+                $end_date = date(DATE_ATOM, $end_date);
+              }
+              elseif (strpos($end_field_option['type'], 'daterange') !== FALSE) {
+                $end_date = $end_dates[$i]['end_value'];
+              }
+              elseif (strpos($end_field_option['type'], 'datetime') === FALSE) {
+                // This field is not a valid date time field.
+                $end_date = '';
+              }
+              else {
+                $end_date = $end_dates[$i]['value'];
+              }
+              
+              if (!empty($end_date)) {
+                $all_day = (strlen($end_date) < 11) ? TRUE : FALSE;
+                if ($all_day) {
+                  $end = new DrupalDateTime($end_date);
+                  // The end date is inclusive for a all day event,
+                  // which is not what we want. So we need one day offset.
+                  $end->modify('+1 day');
+                  $entry['end'] = $end->format('Y-m-d');
+                  $entry['allDay'] = true;
+                }
+                else {
+                  // Drupal store date time in UTC timezone.
+                  // So we need to convert it into user timezone.
+                  $entry['end'] = $timezone_service->utcToLocal($end_date, $timezone, DATE_ATOM);
+                }
+              }
+            }
+            else {
+              // Without end date field, this event can't be resized.
+              $entry['eventDurationEditable'] = FALSE;
+            }
+            // Set the color for this event.
+            if (isset($event_type) && isset($color_tax[$event_type])) {
+              $entry['backgroundColor'] = $color_tax[$event_type];
+            }
+            elseif (isset($color_content[$entity_bundle])) {
+              $entry['backgroundColor'] = $color_content[$entity_bundle];
+            }
+            // Recurring event.
+            if (!empty($rrule_field)) {
+              $rrule = $current_entity->hasField($rrule_field) ? $current_entity->get($rrule_field)->getString() : '';
+              if (!empty($rrule)) {
+                $entry['rrule'] = Xss::filter($rrule);
+                // Recurring events are read-only.
+                $entry['editable'] = FALSE;
+              }
+            }
+            // Add this event into the array.
+            $entries[] = $entry;
           }
         }
-        else {
-          // Without end date field, this event can't be resized.
-          $entry['eventDurationEditable'] = FALSE;
-        }
-        // Set the color for this event.
-        if (isset($event_type) && isset($color_tax[$event_type])) {
-          $entry['backgroundColor'] = $color_tax[$event_type];
-        }
-        elseif (isset($color_content[$entity_bundle])) {
-          $entry['backgroundColor'] = $color_content[$entity_bundle];
-        }
-        // Recurring event.
-        if (!empty($rrule_field)) {
-          $rrule = $current_entity->hasField($rrule_field) ? $current_entity->get($rrule_field)->getString() : '';
-          if (!empty($rrule)) {
-            $entry['rrule'] = Xss::filter($rrule);
-            // Recurring events are read-only.
-            $entry['editable'] = FALSE;
-          }
-        }
-        // Add this event into the array.
-        $entries[] = $entry;
       }
       
       // Remove the row_index property as we don't it anymore.
