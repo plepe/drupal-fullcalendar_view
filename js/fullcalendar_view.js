@@ -86,7 +86,7 @@
           drupalSettings.path.baseUrl +
             "fullcalendar-view-event-update",
           {
-            eid: info.event.id,
+            eid: info.event.extendedProps.eid,
             entity_type: viewSettings.entityType,
             start: strStart,
             end: strEnd,
@@ -216,7 +216,7 @@
           drupalSettings.path.baseUrl +
             "fullcalendar-view-event-update",
           {
-            eid: info.event.id,
+            eid: info.event.extendedProps.eid,
             entity_type: viewSettings.entityType,
             start: strStart,
             end: strEnd,

@@ -180,7 +180,8 @@ class FullcalendarViewPreprocess {
           foreach ($start_dates as $i => $start_date) {
             $entry = [
               'title' =>  Xss::filterAdmin($title),
-              'id' => $entity_id,
+              'id' => $row->index,
+              'eid' => $entity_id,
               'url' => $link_url,
             ];
             // Event duration.
