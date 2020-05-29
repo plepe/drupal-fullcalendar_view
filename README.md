@@ -42,7 +42,7 @@ CONFIGURATION
     1. Navigate to Administration > Extend and enable the module.
     2. Navigate to Administration > Structure > views and create a view.
     3. Select the Full Calendar Display as the view format.
-    4. Choose the fields for Title, Start date, End date (optional).
+    4. Choose the fields for Title, Start date, End date (optional). The description field (showing in the pop-up dialog) is the last field of the fields list.
     5. Format settings (Default Date, field of start date, field of end date).
     6. Other view settings (optional), such as filter criteria, pager.
 
