@@ -116,10 +116,11 @@
     let thisEvent = info.event;
     let viewIndex = parseInt(this.el.getAttribute("calendar-view-index"));
     let viewSettings = drupalSettings.fullCalendarView[viewIndex];
+    let des = thisEvent.extendedProps.des;
     // Show the event detail in a pop up dialog.
     if (viewSettings.dialogWindow) {
       let dataDialogOptionsDetails = {};
-      if (thisEvent.url == '') {
+      if ( des == '') {
         return false;
       }
       
@@ -130,10 +131,10 @@
       let posOffset = dialogIndex * 20;
       // Dialog options.
       let dialogOptions = JSON.parse(viewSettings.dialog_options);
-      dialogOptions.left += posOffset;
-      dialogOptions.top += posOffset;
+      dialogOptions.left += posOffset + info.jsEvent.clientX;
+      dialogOptions.top += posOffset + info.jsEvent.clientY;
       dialogOptions.title = thisEvent.title.replace(/(<([^>]+)>)/ig,"");
-      dialogOptions.url = thisEvent.url;
+      dialogOptions.html = des;
       //Create window
       dialogs[dialogIndex] = jsFrame.create(dialogOptions);
       

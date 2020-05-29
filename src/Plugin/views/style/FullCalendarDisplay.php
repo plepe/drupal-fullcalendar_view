@@ -349,8 +349,15 @@ class FullCalendarDisplay extends StylePluginBase {
       '#type' => 'checkbox',
       '#fieldset' => 'display',
       '#default_value' => (empty($this->options['dialogWindow'])) ? 0 : $this->options['dialogWindow'],
-      '#title' => $this->t('Open event links in dialog window.'),
-      '#description' => $this->t('If this option is selected and the title field is linked to entity, event links in the calendar will open in a dialog window.'),
+      '#title' => $this->t('Show event description in dialog window.'),
+      '#description' => $this->t('If this option is selected, the description (the last field in the fields list) will show in a dialog window once clicking on the event.'),
+    ];
+    // Open details in new window.
+    $form['openEntityInNewTab'] = [
+      '#type' => 'checkbox',
+      '#fieldset' => 'display',
+      '#default_value' => !isset($this->options['openEntityInNewTab']) ? 1 : $this->options['openEntityInNewTab'],
+      '#title' => $this->t('Open entities (calendar items) into new tabs'),
     ];
     // Create new event link.
     $form['createEventLink'] = [
@@ -359,13 +366,6 @@ class FullCalendarDisplay extends StylePluginBase {
       '#default_value' => (empty($this->options['createEventLink'])) ? 0 : $this->options['createEventLink'],
       '#title' => $this->t('Create a new event via the Off-Canvas dialog.'),
       '#description' => $this->t('If this option is selected, there will be an Add Event link below the calendar that provides the ability to create an event In-Place.'),
-    ];
-    // Open details in new window.
-    $form['openEntityInNewTab'] = [
-      '#type' => 'checkbox',
-      '#fieldset' => 'display',
-      '#default_value' => !isset($this->options['openEntityInNewTab']) ? 1 : $this->options['openEntityInNewTab'],
-      '#title' => $this->t('Open entities (calendar items) into new tabs'),
     ];
     // Legend colors.
     $form['colors'] = [

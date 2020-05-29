@@ -107,14 +107,6 @@ class FullcalendarViewPreprocess {
     // Custom timezone or user timezone.
     $timezone = !empty($start_field_option['settings']['timezone_override']) ?
     $start_field_option['settings']['timezone_override'] : date_default_timezone_get();
-/*     // Calendar entries linked to entity.
-    $link_to_entity = FALSE;
-    if (isset($fields[$title_field]->options['settings']['link_to_entity'])) {
-      $link_to_entity = $fields[$title_field]->options['settings']['link_to_entity'];
-    }
-    elseif (isset($fields[$title_field]->options['settings']['link'])) {
-      $link_to_entity = $fields[$title_field]->options['settings']['link'];
-    } */
     // Set the first day setting.
     $first_day = isset($options['firstDay']) ? intval($options['firstDay']) : 0;
     // Left side buttons.
@@ -151,9 +143,9 @@ class FullcalendarViewPreprocess {
         $end_dates = empty($end_field) || !$current_entity->hasField($end_field) ? '' : 
         $current_entity->get($end_field)->getValue();
         // Render all other fields to so they can be used in rewrite.
-        foreach ($fields as $field) {
+        foreach ($fields as $name => $field) {
           if (method_exists($field, 'advancedRender')) {
-            $field->advancedRender($row);
+            $des = $field->advancedRender($row);
           }
         }
         // Event title.
@@ -183,6 +175,7 @@ class FullcalendarViewPreprocess {
               'id' => $row->index . "-$i",
               'eid' => $entity_id,
               'url' => $link_url,
+              'des' => isset($des) ? $des : ''
             ];
             // Event duration.
             if (!empty($duration_field) && !empty($fields[$duration_field])) {
@@ -334,12 +327,16 @@ class FullcalendarViewPreprocess {
       // For reference of JSFrame options see:
       // https://github.com/riversun/JSFrame.js/
       $dialog_options = [
-        'left' => 40,
-        'top' => 60,
+        'left' => 0,
+        'top' => 0,
         'width' => 640,
         'height' => 480,
         'movable' => true, //Enable to be moved by mouse
         'resizable' => true, //Enable to be resized by mouse
+        'style' =>  [
+          'backgroundColor' => 'rgba(255,255,255,0.9)',
+          'font-size' => '1rem'
+        ]
       ];
       
       // Load the fullcalendar js library.
@@ -349,6 +346,10 @@ class FullcalendarViewPreprocess {
         $variables['#attached']['library'][] = 'fullcalendar_view/libraries.jsframe';
       }
       $variables['view_index'] = $view_index;
+      // View name.
+      $variables['view_id'] = $view->storage->id();
+      // Display name.
+      $variables['display_id'] = $view->current_display;
       // Pass data to js file.
       $variables['#attached']['drupalSettings']['fullCalendarView'][$view_index] = [
         // Allow client to select language, if it is 1.
