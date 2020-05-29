@@ -180,7 +180,7 @@ class FullcalendarViewPreprocess {
           foreach ($start_dates as $i => $start_date) {
             $entry = [
               'title' =>  Xss::filterAdmin($title),
-              'id' => $row->index,
+              'id' => $row->index . "-$i",
               'eid' => $entity_id,
               'url' => $link_url,
             ];
