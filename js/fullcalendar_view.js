@@ -328,7 +328,8 @@
                       "?start=" +
                       slotDate +
                       "&start_field=" +
-                      viewSettings.startField,
+                      viewSettings.startField +
+                      "&destination=" + window.location.pathname,
                     "_blank"
                   );
                 }
