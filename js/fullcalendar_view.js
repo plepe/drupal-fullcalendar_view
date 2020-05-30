@@ -302,7 +302,7 @@
                 }
               });
             }
-            else {
+            else if (localeSelectorEl){
               localeSelectorEl.style.display = "none";
             }
             

@@ -8,9 +8,10 @@
  *   - defaultDate: Default date of the calendar
  *   - start: Field name of start date
  *   - end: Field name of end date
- *   - view_index: View index
- *   - showAddEvent: Show add event button
- *   - entity_id: The Entity type machine name
+ *   - languageSelector: Flag for the language dropdown box
+ * - view_index: View index
+ * - showAddEvent: Show add event button
+ * - entity_id: The Entity type machine name
  *
  * @see template_preprocess_views_view_fullcalendar()
  *
@@ -31,9 +32,11 @@
    data-dialog-options="{&quot;width&quot;:400}">{{ 'Add event'|t }}</a>
     </div>
     {% endif %}
+    {% if options.languageSelector == 1 %}
     <div class="fullcalendar-bottom-btn locale-selector">
       <label for="locale-selector">{{ 'Select Language:'|t }}</label>
       <select id='locale-selector-{{ view_index }}' calendar-view-index="{{ view_index }}"></select>
     </div>
+    {% endif %}
   </div>
 </div>
