@@ -251,6 +251,7 @@
         drupalSettings.calendar.forEach(function(calendar) {
           calendar.destroy();
           calendar.render();
+          calendar.updateSize();
         })
       }
       else {
