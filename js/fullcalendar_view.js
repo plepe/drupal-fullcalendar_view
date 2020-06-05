@@ -131,8 +131,8 @@
       let posOffset = dialogIndex * 20;
       // Dialog options.
       let dialogOptions = JSON.parse(viewSettings.dialog_options);
-      dialogOptions.left += posOffset + info.jsEvent.clientX;
-      dialogOptions.top += posOffset + info.jsEvent.clientY;
+      dialogOptions.left += posOffset + info.jsEvent.pageX;
+      dialogOptions.top += posOffset + info.jsEvent.pageY;
       dialogOptions.title = thisEvent.title.replace(/(<([^>]+)>)/ig,"");
       dialogOptions.html = des;
       //Create window
