@@ -13,7 +13,7 @@ libraries.rrule:
 
 libraries.fullcalendar-theme:
   remote: https://fullcalendar.io/
-  version: '4.4.0'
+  version: '4.4.2'
   license:
     name: MIT
     url: https://github.com/fullcalendar/fullcalendar/blob/master/LICENSE.txt
@@ -29,7 +29,7 @@ libraries.fullcalendar-theme:
 
 libraries.fullcalendar:
   remote: https://fullcalendar.io/
-  version: '4.4.0'
+  version: '4.4.2'
   license:
     name: MIT
     url: https://github.com/fullcalendar/fullcalendar/blob/master/LICENSE.txt
