@@ -313,7 +313,7 @@ class FullcalendarViewPreprocess {
           'center' => 'title',
           'right' => $right_buttons
         ],
-        'timeFormat' => $timeFormat,
+        'eventTimeFormat' => $timeFormat,
         'firstDay' => $first_day,
         'locale' => $default_lang,
         'events' => $entries,
