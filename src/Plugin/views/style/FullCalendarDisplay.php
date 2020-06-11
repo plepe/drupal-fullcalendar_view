@@ -189,8 +189,8 @@ class FullCalendarDisplay extends StylePluginBase {
       '#fieldset' => 'display',
       '#options' => [
         'dayGridMonth' => $this->t('Month'),
-        'agendaWeek' => $this->t('Week'),
-        'dayGridWeek' => $this->t('Day'),
+        'timeGridWeek' => $this->t('Week'),
+        'timeGridDay' => $this->t('Day'),
         'listYear' => $this->t('List'),
       ],
       '#default_value' => (empty($this->options['default_view'])) ? 'month' : $this->options['default_view'],
