@@ -205,8 +205,8 @@ class CalendarEventController extends ControllerBase {
             $entity->save();
             // Log the content changed.
             $this->loggerFactory->get($entity_type)->notice('%entity_type: updated %title', [
-              '%entity_type' => $entity->getType(),
-              '%title' => $entity->getTitle(),
+              '%entity_type' => $entity->getEntityType()->getLabel(),
+              '%title' => $entity->label(),
             ]);
             // Returen 1 as success.
             return new Response(1);
