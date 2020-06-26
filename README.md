@@ -25,7 +25,47 @@ This is a View plugin module that provides a calendar view format powered by Ful
 REQUIREMENTS
 ------------
 
-This module requires no modules outside of Drupal core.
+This module requires no modules outside of Drupal core. If you don't need to host any required library locally, you can skip this section. Fullcalendar View module will load all of them for you from CDN.
+If you want to host third-party libraries locally, You need to download the files for each library into following folders.
+
+ * Fullcalendar JS
+ 
+/libraries/fullcalendar/core/main.min.js
+
+/libraries/fullcalendar/core/locales-all.min.js
+
+/libraries/fullcalendar/moment/main.min.js
+
+/libraries/fullcalendar/daygrid/main.min.js
+
+/libraries/fullcalendar/interaction/main.min.js
+
+/libraries/fullcalendar/timegrid/main.min.js
+
+/libraries/fullcalendar/list/main.min.js
+
+/libraries/fullcalendar/rrule/main.min.js
+
+/libraries/fullcalendar/core/main.min.css
+
+/libraries/fullcalendar/daygrid/main.min.css
+
+/libraries/fullcalendar/timegrid/main.min.css
+
+/libraries/fullcalendar/list/main.min.css
+
+
+ * Moment.js
+ 
+/libraries/moment/2.26.0/moment.min.js
+
+* RRule JS
+
+/libraries/rrule/2.6.4/rrule.min.js
+
+* JsFrame.js
+
+/libraries/JSFrame/1.5.16/jsframe.min.js
 
 
 INSTALLATION
