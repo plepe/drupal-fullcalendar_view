@@ -133,7 +133,7 @@
       let dialogOptions = JSON.parse(viewSettings.dialog_options);
       dialogOptions.left += posOffset + info.jsEvent.pageX;
       dialogOptions.top += posOffset + info.jsEvent.pageY;
-      dialogOptions.title = thisEvent.title.replace(/(<([^>]+)>)/ig,"");
+      dialogOptions.title = dialogOptions.title ? dialogOptions.title : thisEvent.title.replace(/(<([^>]+)>)/ig,"");
       dialogOptions.html = des;
       //Create window
       dialogs[dialogIndex] = jsFrame.create(dialogOptions);
