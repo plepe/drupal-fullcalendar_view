@@ -116,6 +116,12 @@ class FullcalendarViewPreprocess {
     $entries = [];
     
     if (!empty($start_field)) {
+      // Allowed tags for title markup.
+      $title_allowed_tags = Xss::getAdminTagList();
+      // Remove the 'a' tag from allowed list.
+      if (($tag_key = array_search('a', $title_allowed_tags)) !== false) {
+        unset($title_allowed_tags[$tag_key]);
+      }
       // Timezone conversion service.
       $timezone_service = \Drupal::service('fullcalendar_view.timezone_conversion_service');
       // Save view results into entries array.
@@ -171,7 +177,7 @@ class FullcalendarViewPreprocess {
         if (!empty($start_dates) && is_array($start_dates)) {
           foreach ($start_dates as $i => $start_date) {
             $entry = [
-              'title' =>  Xss::filterAdmin($title),
+              'title' =>  Xss::filter($title, $title_allowed_tags),
               'id' => $row->index . "-$i",
               'eid' => $entity_id,
               'url' => $link_url,

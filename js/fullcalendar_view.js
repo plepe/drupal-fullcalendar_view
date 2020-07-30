@@ -24,7 +24,12 @@
     // Event list tile html markup.
     let eventListTitleEle = info.el.getElementsByClassName('fc-list-item-title');
     if(eventListTitleEle.length > 0) {
-      eventListTitleEle[0].innerHTML = info.event.title;
+      if (info.event.url) {
+        eventListTitleEle[0].innerHTML = '<a href="' + info.event.url + '">' + info.event.title + '</a>';
+      }
+      else {
+        eventListTitleEle[0].innerHTML = info.event.title;
+      }
     }
   }
   /**
