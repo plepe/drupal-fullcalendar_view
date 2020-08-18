@@ -329,12 +329,6 @@ class FullcalendarViewPreprocess {
         'editable' => $options['updateAllowed'] !== 0,
         'eventLimit' => true, // Allow "more" link when too many events.
         'eventOverlap' => $options['allowEventOverlap'] !== 0,
-        'buttonText' => [
-          'listMonth' => $this->t('List Month'),
-          'listYear' => $this->t('List Year'),
-          'listWeek' => $this->t('List Week'),
-          'listDay' => $this->t('List Day'),
-        ],
       ];
       // Dialog options.
       // Other modules can override following options by custom plugin.
