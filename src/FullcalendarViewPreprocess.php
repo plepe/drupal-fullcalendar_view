@@ -6,15 +6,15 @@ use Drupal\Component\Utility\Xss;
 use Drupal\Core\Datetime\DrupalDateTime;
 
 class FullcalendarViewPreprocess {
-  
+
   protected  static $viewIndex = 0;
   /**
    * Process the view variable array.
-   * 
+   *
    * @param array $variables
    *   Template variables.
    */
-  public function process(array &$variables) {   
+  public function process(array &$variables) {
     /* @var \Drupal\views\ViewExecutable $view */
     $view = $variables['view'];
     // View index.
@@ -22,10 +22,10 @@ class FullcalendarViewPreprocess {
     $style = $view->style_plugin;
     $options = $style->options;
     $fields = $view->field;
-    
+
     // Get current language.
     $language = \Drupal::languageManager()->getCurrentLanguage();
-    
+
     // Current user.
     $user = $variables['user'];
     // CSRF token.
@@ -33,7 +33,7 @@ class FullcalendarViewPreprocess {
     if (!$user->isAnonymous()) {
       $token = \Drupal::csrfToken()->get($user->id());
     }
-    // 
+    //
     // New event bundle type.
     $event_bundle_type = $options['bundle_type'];
     $entity_type = $view->getBaseEntityType();
@@ -49,7 +49,7 @@ class FullcalendarViewPreprocess {
         $add_form = str_replace('{' . $entity_type->id() . '}', $event_bundle_type, $entity_links['add-page']);
       }
     }
-    
+
     // Can the user add a new event?
     $entity_manager = \Drupal::entityTypeManager();
     $access_handler = $entity_manager->getAccessControlHandler($entity_type->id());
@@ -81,17 +81,17 @@ class FullcalendarViewPreprocess {
     $duration_field = isset($options['duration']) ? $options['duration'] : NULL;
     // Field machine name of excluding dates field.
     $rrule_field = isset($options['rrule']) ? $options['rrule'] : NULL;
-    
+
     // Default date of the calendar.
     switch ($options['default_date_source']) {
       case 'now':
         $default_date = date('Y-m-d');
         break;
-        
+
       case 'fixed':
         $default_date = $options['defaultDate'];
         break;
-        
+
       default:
         // Don't do anything, we'll set it below.
     }
@@ -114,7 +114,7 @@ class FullcalendarViewPreprocess {
     // Right side buttons.
     $right_buttons = Xss::filter($options['right_buttons']);
     $entries = [];
-    
+
     if (!empty($start_field)) {
       // Allowed tags for title markup.
       $title_allowed_tags = Xss::getAdminTagList();
@@ -146,7 +146,7 @@ class FullcalendarViewPreprocess {
         // Calendar event start date.
         $start_dates = $current_entity->get($start_field)->getValue();
         // Calendar event end date.
-        $end_dates = empty($end_field) || !$current_entity->hasField($end_field) ? '' : 
+        $end_dates = empty($end_field) || !$current_entity->hasField($end_field) ? '' :
         $current_entity->get($end_field)->getValue();
         // Render all other fields to so they can be used in rewrite.
         foreach ($fields as $name => $field) {
@@ -215,21 +215,21 @@ class FullcalendarViewPreprocess {
                   }
                 }
               }
-              
+
               // A user who doesn't have the permission can't edit an event.
               if (!$current_entity->access('update')) {
                 $entry['editable'] = FALSE;
               }
-              
+
               // If we don't yet know the default_date (we're configured to use the
               // date from the first row, and we haven't set it yet), do so now.
               if (!isset($default_date)) {
                 // Only use the first 10 digits since we only care about the date.
                 $default_date = substr($start_date_value, 0, 10);
               }
-              
+
               $all_day = (strlen($start_date_value) < 11) ? TRUE : FALSE;
-              
+
               if ($all_day) {
                 $entry['start'] = $start_date_value;
                 $entry['allDay'] = true;
@@ -245,7 +245,7 @@ class FullcalendarViewPreprocess {
               // If not, skip this row.
               continue 2;
             }
-            
+
             // Deal with the end date in the same way as start date above.
             if (!empty($end_dates[$i])) {
               if ($end_field_option['type'] === 'timestamp') {
@@ -263,7 +263,7 @@ class FullcalendarViewPreprocess {
               else {
                 $end_date = $end_dates[$i]['value'];
               }
-              
+
               if (!empty($end_date)) {
                 $all_day = (strlen($end_date) < 11) ? TRUE : FALSE;
                 if ($all_day) {
@@ -306,7 +306,7 @@ class FullcalendarViewPreprocess {
           }
         }
       }
-      
+
       // Remove the row_index property as we don't it anymore.
       unset($view->row_index);
       // Fullcalendar options.
@@ -344,7 +344,7 @@ class FullcalendarViewPreprocess {
           'font-size' => '1rem'
         ]
       ];
-      
+
       // Load the fullcalendar js library.
       $variables['#attached']['library'][] = 'fullcalendar_view/fullcalendar';
       if ($options['dialogWindow']) {
@@ -362,7 +362,7 @@ class FullcalendarViewPreprocess {
         'languageSelector' => $options['languageSelector'],
         // Event update confirmation pop-up dialog.
         // If it is 1, a confirmation dialog will pop-up after dragging and dropping an event.
-        'updateConfirm' => $options['updateConfirm'], 
+        'updateConfirm' => $options['updateConfirm'],
         // Open event links in dialog window.
         // If it is 1, event links in the calendar will open in a dialog window.
         'dialogWindow' => $options['dialogWindow'],
@@ -381,7 +381,7 @@ class FullcalendarViewPreprocess {
         // CSRF token.
         'token' => $token,
         // Show an event details in a new window (tab).
-        'openEntityInNewTab' => $options['openEntityInNewTab'],  
+        'openEntityInNewTab' => $options['openEntityInNewTab'],
         // The options of the Fullcalendar object.
         'calendar_options' => json_encode($calendar_options),
         // The options of the pop-up dialog object.
@@ -389,7 +389,7 @@ class FullcalendarViewPreprocess {
       ];
     }
   }
-  
+
   /**
    * Map Drupal language codes to those used by FullCalendar.
    *

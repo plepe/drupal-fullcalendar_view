@@ -77,7 +77,12 @@ class FullCalendarDisplay extends StylePluginBase {
     $options['color_taxonomies'] = ['default' => []];
     $options['vocabularies'] = ['default' => ''];
     $options['right_buttons'] = [
-      'default' => 'dayGridMonth,timeGridWeek,timeGridDay,listYear',
+      'default' => [
+        'dayGridMonth',
+        'timeGridWeek',
+        'timeGridDay',
+        'listYear',
+      ],
     ];
     $options['left_buttons'] = [
       'default' => 'prev,next today',
@@ -160,39 +165,49 @@ class FullCalendarDisplay extends StylePluginBase {
       '#title' => $this->t('Display'),
       '#description' => $this->t('Calendar display settings.'),
     ];
-    // Right side buttons.
-    $form['right_buttons'] = [
-      '#type' => 'textfield',
-      '#fieldset' => 'display',
-      '#default_value' => (empty($this->options['right_buttons'])) ? [] : $this->options['right_buttons'],
-      '#title' => $this->t('Right side buttons'),
-      '#description' => $this->t('Right side buttons. Buttons are seperated by commas or space. See the %fullcalendar_doc for availabel buttons.',
-          [
-            '%fullcalendar_doc' => Link::fromTextAndUrl($this->t('Fullcalendar documentation'), Url::fromUri('https://fullcalendar.io/docs/header', array('attributes' => array('target' => '_blank'))))->toString(),      
-          ]),
+    $fullcalendar_displays = [
+      'dayGridMonth' => $this->t('Month'),
+      'timeGridWeek' => $this->t('Week'),
+      'timeGridDay' => $this->t('Day'),
+      'listYear' => $this->t('List (Year)'),
+      'listMonth' => $this->t('List (Month)'),
+      'listWeek' => $this->t('List (Week)'),
+      'listDay' => $this->t('List (Day)'),
     ];
+    // Right side buttons.
+    $display_defaults = (empty($this->options['right_buttons'])) ? [] : $this->options['right_buttons'];
+    if (is_string($display_defaults)) {
+      $display_defaults = explode(',', $display_defaults);
+    }
     // Left side buttons.
     $form['left_buttons'] = [
       '#type' => 'textfield',
       '#fieldset' => 'display',
       '#default_value' => (empty($this->options['left_buttons'])) ? [] : $this->options['left_buttons'],
       '#title' => $this->t('Left side buttons'),
-      '#description' => $this->t('Left side buttons. Buttons are seperated by commas or space. See the %fullcalendar_doc for availabel buttons.',
+      '#description' => $this->t(
+        'Left side buttons. Buttons are separated by commas or space. See the %fullcalendar_doc for available buttons.',
+        [
+          '%fullcalendar_doc' => Link::fromTextAndUrl($this->t('Fullcalendar documentation'), Url::fromUri('https://fullcalendar.io/docs/header', array('attributes' => array('target' => '_blank'))))->toString(),
+        ]
+      ),
+    ];
+    $form['right_buttons'] = [
+      '#type' => 'checkboxes',
+      '#fieldset' => 'display',
+      '#options' => $fullcalendar_displays,
+      '#default_value' => $display_defaults,
+      '#title' => $this->t('Display toggles'),
+      '#description' => $this->t('Shown as buttons on the right side of the calendar view. See the %fullcalendar_doc.',
           [
-            '%fullcalendar_doc' => Link::fromTextAndUrl($this->t('Fullcalendar documentation'), Url::fromUri('https://fullcalendar.io/docs/header', array('attributes' => array('target' => '_blank'))))->toString(),
+            '%fullcalendar_doc' => Link::fromTextAndUrl($this->t('Fullcalendar "Views" documentation'), Url::fromUri('https://fullcalendar.io/docs', array('attributes' => array('target' => '_blank'))))->toString(),
           ]),
     ];
     // Default view.
-    // Todo: filter out disabled view from options.
     $form['default_view'] = [
       '#type' => 'radios',
       '#fieldset' => 'display',
-      '#options' => [
-        'dayGridMonth' => $this->t('Month'),
-        'timeGridWeek' => $this->t('Week'),
-        'timeGridDay' => $this->t('Day'),
-        'listYear' => $this->t('List'),
-      ],
+      '#options' => $fullcalendar_displays,
       '#default_value' => (empty($this->options['default_view'])) ? 'month' : $this->options['default_view'],
       '#title' => $this->t('Default view'),
     ];
@@ -372,7 +387,7 @@ class FullCalendarDisplay extends StylePluginBase {
       '#title' => $this->t('Legend Colors'),
       '#description' => $this->t('Set color value of legends for each content type or each taxonomy.'),
     ];
-    
+
     $moduleHandler = \Drupal::service('module_handler');
     if ($moduleHandler->moduleExists('taxonomy')) {
       // All vocabularies.
@@ -452,7 +467,7 @@ class FullCalendarDisplay extends StylePluginBase {
         '#type' => 'color',
       ];
     }
-    
+
     // Recurring event.
     $form['recurring'] = [
       '#type' => 'details',
@@ -490,7 +505,7 @@ class FullCalendarDisplay extends StylePluginBase {
         ],
       ],
     ];
-      
+
     // New event bundle type.
     $form['bundle_type'] = [
       '#title' => $this->t('Event bundle (Content) type'),
@@ -509,6 +524,21 @@ class FullCalendarDisplay extends StylePluginBase {
   }
 
   /**
+   * Options form validation handle function.
+   *
+   * @see \Drupal\views\Plugin\views\PluginBase::validateOptionsForm()
+   */
+  public function validateOptionsForm(&$form, FormStateInterface $form_state) {
+    $style_options = &$form_state->getValue('style_options');
+    $selected_displays = $style_options['right_buttons'];
+    $default_display = $style_options['default_view'];
+
+    if (!in_array($default_display, array_filter(array_values($selected_displays)))) {
+      $form_state->setErrorByName('style_options][default_view', $this->t('The default view must be one of the selected display toggles.'));
+    }
+  }
+
+  /**
    * Options form submit handle function.
    *
    * @see \Drupal\views\Plugin\views\PluginBase::submitOptionsForm()
@@ -523,7 +553,8 @@ class FullCalendarDisplay extends StylePluginBase {
         $options['color_taxonomies'][$id] = $color;
       }
     }
-    
+    $options['right_buttons'] = isset($input_value['style_options']['right_buttons']) ? implode(',', array_filter(array_values($input_value['style_options']['right_buttons']))) : '';
+
     // Sanitize user input.
     $options['timeFormat'] = Xss::filter($options['timeFormat']);
 
