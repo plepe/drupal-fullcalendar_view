@@ -3,7 +3,8 @@
  * Fullcalendar View plugin JavaScript file.
  */
 
-(function($, Drupal) {
+// Jquery wrapper for drupal to avoid conflicts between libraries.
+(function ($) {
   var initialLocaleCode = 'en';
   // Dialog index.
   var dialogIndex = 0;
@@ -241,109 +242,119 @@
     }
   }
   
-  // Todo: 
-  // Set up the weith for the behavior.
-  // Make sure it run after all others.
-  // @see https://www.drupal.org/project/drupal/issues/2367655
-  Drupal.behaviors.fullcalendarView = {
-    attach: function(context, settings) {
-      // If the BigPipe module is enabled,
-      // We need to rebuild the Calendar during Drupal.behavior loops,
-      // In case the DOM has changed.
-      // @see https://www.drupal.org/project/fullcalendar_view/issues/3136764
-      if (drupalSettings.calendar  && settings.bigPipePlaceholderIds) {
-        // Rebuild the calendars.
-        drupalSettings.calendar.forEach(function(calendar) {
-          calendar.destroy();
-          calendar.render();
-          calendar.updateSize();
-        })
-      }
-      else {
-        $('.js-drupal-fullcalendar', context)
-        .once("fullCalendarBehavior")
-        .each(function() {              
-          let calendarEl = this;
-          let viewIndex = parseInt(calendarEl.getAttribute("calendar-view-index"));
+  // Build the calendar objects.
+  function buildCalendars() {
+    $('.js-drupal-fullcalendar')
+    .each(function() {              
+      let calendarEl = this;
+      let viewIndex = parseInt(calendarEl.getAttribute("calendar-view-index"));
+      let viewSettings = drupalSettings.fullCalendarView[viewIndex];
+      var calendarOptions = JSON.parse(viewSettings.calendar_options);
+      // Bind the render event handler.
+      calendarOptions.eventRender = eventRender;
+      // Bind the resize event handler.
+      calendarOptions.eventResize = eventResize;
+      // Bind the day click handler.
+      calendarOptions.dateClick = dayClickCallback;
+      // Bind the event click handler.
+      calendarOptions.eventClick = eventClick;
+      // Bind the drop event handler.
+      calendarOptions.eventDrop = eventDrop;
+      // Language select element.
+      var localeSelectorEl = document.getElementById('locale-selector-' + viewIndex);
+      // Initial the calendar.
+      if (calendarEl) {
+        if (drupalSettings.calendar) {
+          drupalSettings.calendar[viewIndex] = new FullCalendar.Calendar(calendarEl, calendarOptions);
+        }
+        else {
+          drupalSettings.calendar = [];
+          drupalSettings.calendar[viewIndex] = new FullCalendar.Calendar(calendarEl, calendarOptions);
+        }
+        let calendarObj = drupalSettings.calendar[viewIndex];
+        calendarObj.render();
+        // Language dropdown box.
+        if (viewSettings.languageSelector) {
+          // build the locale selector's options
+          calendarObj.getAvailableLocaleCodes().forEach(function(localeCode) {
+            var optionEl = document.createElement('option');
+            optionEl.value = localeCode;
+            optionEl.selected = localeCode == calendarOptions.locale;
+            optionEl.innerText = localeCode;
+            localeSelectorEl.appendChild(optionEl);
+          });
+          // when the selected option changes, dynamically change the calendar option
+          localeSelectorEl.addEventListener('change', function() {
+            if (this.value) {
+              let viewIndex = parseInt(this.getAttribute("calendar-view-index")); 
+              drupalSettings.calendar[viewIndex].setOption('locale', this.value);
+            }
+          });
+        }
+        else if (localeSelectorEl){
+          localeSelectorEl.style.display = "none";
+        }
+        
+        // Double click event.
+        calendarEl.addEventListener('dblclick' , function(e) {
+          let viewIndex = parseInt(this.getAttribute("calendar-view-index"));
           let viewSettings = drupalSettings.fullCalendarView[viewIndex];
-          var calendarOptions = JSON.parse(viewSettings.calendar_options);
-          // Bind the render event handler.
-          calendarOptions.eventRender = eventRender;
-          // Bind the resize event handler.
-          calendarOptions.eventResize = eventResize;
-          // Bind the day click handler.
-          calendarOptions.dateClick = dayClickCallback;
-          // Bind the event click handler.
-          calendarOptions.eventClick = eventClick;
-          // Bind the drop event handler.
-          calendarOptions.eventDrop = eventDrop;
-          // Language select element.
-          var localeSelectorEl = document.getElementById('locale-selector-' + viewIndex);
-          // Initial the calendar.
-          if (calendarEl) {
-            if (drupalSettings.calendar) {
-              drupalSettings.calendar[viewIndex] = new FullCalendar.Calendar(calendarEl, calendarOptions);
+          // New event window can be open if following conditions match.
+          // * The new event content type are specified.
+          // * Allow to create a new event by double click.
+          // * User has the permission to create a new event.
+          // * The add form for the new event type is known.
+          if (
+              slotDate &&
+              viewSettings.eventBundleType &&
+              viewSettings.dblClickToCreate &&
+              viewSettings.addForm !== ""
+            ) {
+              // Open a new window to create a new event (content).
+              window.open(
+                  drupalSettings.path.baseUrl +
+                  viewSettings.addForm +
+                  "?start=" +
+                  slotDate +
+                  "&start_field=" +
+                  viewSettings.startField +
+                  "&destination=" + window.location.pathname,
+                "_blank"
+              );
             }
-            else {
-              drupalSettings.calendar = [];
-              drupalSettings.calendar[viewIndex] = new FullCalendar.Calendar(calendarEl, calendarOptions);
-            }
-            let calendarObj = drupalSettings.calendar[viewIndex];
-            calendarObj.render();
-            // Language dropdown box.
-            if (viewSettings.languageSelector) {
-              // build the locale selector's options
-              calendarObj.getAvailableLocaleCodes().forEach(function(localeCode) {
-                var optionEl = document.createElement('option');
-                optionEl.value = localeCode;
-                optionEl.selected = localeCode == calendarOptions.locale;
-                optionEl.innerText = localeCode;
-                localeSelectorEl.appendChild(optionEl);
-              });
-              // when the selected option changes, dynamically change the calendar option
-              localeSelectorEl.addEventListener('change', function() {
-                if (this.value) {
-                  let viewIndex = parseInt(this.getAttribute("calendar-view-index")); 
-                  drupalSettings.calendar[viewIndex].setOption('locale', this.value);
-                }
-              });
-            }
-            else if (localeSelectorEl){
-              localeSelectorEl.style.display = "none";
-            }
-            
-            // Double click event.
-            calendarEl.addEventListener('dblclick' , function(e) {
-              let viewIndex = parseInt(this.getAttribute("calendar-view-index"));
-              let viewSettings = drupalSettings.fullCalendarView[viewIndex];
-              // New event window can be open if following conditions match.
-              // * The new event content type are specified.
-              // * Allow to create a new event by double click.
-              // * User has the permission to create a new event.
-              // * The add form for the new event type is known.
-              if (
-                  slotDate &&
-                  viewSettings.eventBundleType &&
-                  viewSettings.dblClickToCreate &&
-                  viewSettings.addForm !== ""
-                ) {
-                  // Open a new window to create a new event (content).
-                  window.open(
-                      drupalSettings.path.baseUrl +
-                      viewSettings.addForm +
-                      "?start=" +
-                      slotDate +
-                      "&start_field=" +
-                      viewSettings.startField +
-                      "&destination=" + window.location.pathname,
-                    "_blank"
-                  );
-                }
 
-            });
-          }
         });
       }
+    });
+  }
+  
+  // document.ready event does not work with BigPipe.
+  // The workaround is to ckeck the document state
+  // every 100 milliseconds until it is completed.
+  // @see https://www.drupal.org/project/drupal/issues/2794099#comment-13274828
+  var checkReadyState = setInterval(() => {
+    if (document.readyState === "complete") {
+      clearInterval(checkReadyState);
+      // Build calendar objects.
+      buildCalendars();
     }
-  };
+  }, 100);
+  
+  // After an Ajax call, the calendar objects need to rebuild,
+  // to reflect the changes, such as Ajax filter.
+  $( document ).ajaxComplete(function( event, request, settings ) {    
+    // Remove the existing calendars except updating Ajax events.
+    if (
+        drupalSettings.calendar &&
+        settings.url !== '/fullcalendar-view-event-update'
+        ) {
+      // Rebuild the calendars.
+      drupalSettings.calendar.forEach(function(calendar) {
+        calendar.destroy();
+      });
+      //Re-build calendars.
+      buildCalendars();
+    }
+  });
+  
 })(jQuery, Drupal);
