@@ -511,7 +511,7 @@ class FullCalendarDisplay extends StylePluginBase {
       '#title' => $this->t('Event bundle (Content) type'),
       '#description' => $this->t('The bundle (content) type of a new event. Once this is set, you can create a new event by double clicking a calendar entry.'),
       '#type' => 'select',
-      '#options' => $bundlesList,
+      '#options' => array_merge(['' => t('None')], $bundlesList),
       '#default_value' => (!empty($this->options['bundle_type'])) ? $this->options['bundle_type'] : '',
     ];
     // Extra CSS classes.
