@@ -77,7 +77,7 @@ libraries.jsframe:
 # Feature libraries.
 fullcalendar:
   js:
-    js/fullcalendar_view.js: {} 
+    js/fullcalendar_view.js: {}
   dependencies:
     - core/jquery
     - core/drupalSettings
