@@ -203,8 +203,9 @@
       strStart = FullCalendar.formatDate(start, formatSettings);
     }
     const title = info.event.title.replace(/(<([^>]+)>)/ig,"");;
-    const msg = Drupal.t('@title end is now @event_end. Do you want to save this change?', {
+    const msg = Drupal.t('@title start is now @event_start and end is now @event_end - Do you want to save this change?', {
       '@title': title,
+      '@event_start': strStart,
       '@event_end': strEnd
     });
 
