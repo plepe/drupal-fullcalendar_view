@@ -16,7 +16,7 @@ class TimezoneService {
   /**
    * Return the value of the converted date from UTC date.
    */
-  public function utcToLocal($utc_date, $local_timezone, $format = DATE_ATOM, $offset = '') {
+  public function utcToLocal($utc_date, $local_timezone, $format = 'Y-m-d\TH:i:s', $offset = '') {
     // UTC timezone.
     $utc = new \DateTimeZone("UTC");
     // Local time zone.
