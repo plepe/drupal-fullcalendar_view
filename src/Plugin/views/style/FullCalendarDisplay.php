@@ -98,6 +98,7 @@ class FullCalendarDisplay extends StylePluginBase {
     $options['dialogWindow'] = ['default' => 0];
     $options['createEventLink'] = ['default' => 0];
     $options['openEntityInNewTab'] = ['default' => 1];
+    $options['eventLimit'] = ['default' => 2];
     return $options;
   }
 
@@ -380,6 +381,14 @@ class FullCalendarDisplay extends StylePluginBase {
       '#default_value' => (empty($this->options['createEventLink'])) ? 0 : $this->options['createEventLink'],
       '#title' => $this->t('Create a new event via the Off-Canvas dialog.'),
       '#description' => $this->t('If this option is selected, there will be an Add Event link below the calendar that provides the ability to create an event In-Place.'),
+    ];
+    // Event limit displayed on a day.
+    $form['eventLimit'] = [
+      '#type' => 'textfield',
+      '#fieldset' => 'display',
+      '#default_value' => (isset($this->options['eventLimit'])) ? $this->options['eventLimit'] : 2,
+      '#title' => $this->t('Limits the number of events'),
+      '#description' => $this->t('Limits the number of events displayed on a day. The rest will show up in a popover.'),
     ];
     // Legend colors.
     $form['colors'] = [

@@ -327,7 +327,8 @@ class FullcalendarViewPreprocess {
         'events' => $entries,
         'navLinks' => $options['nav_links'] !== 0,
         'editable' => $options['updateAllowed'] !== 0,
-        'eventLimit' => true, // Allow "more" link when too many events.
+        // Limits the number of events displayed on a day.
+        'eventLimit' => isset($options['eventLimit']) ? intval($options['eventLimit']) : 2,
         'eventOverlap' => $options['allowEventOverlap'] !== 0,
       ];
       // Dialog options.
