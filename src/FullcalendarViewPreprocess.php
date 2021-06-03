@@ -8,7 +8,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 class FullcalendarViewPreprocess {
   use StringTranslationTrait;
-  
+
   protected  static $viewIndex = 0;
   /**
    * Process the view variable array.
@@ -141,9 +141,8 @@ class FullcalendarViewPreprocess {
         // Entity bundle type.
         $entity_bundle = $current_entity->bundle();
         // Background color based on taxonomy field.
-        if (!empty($tax_field) && $current_entity->hasField($tax_field)) {
-          // Event type.
-          $event_type = $current_entity->get($tax_field)->target_id;
+        if (!empty($view->field[$tax_field])) {
+          $event_type = $view->style_plugin->getFieldValue($row->index, $tax_field);
         }
         // Calendar event start date.
         $start_dates = $current_entity->get($start_field)->getValue();

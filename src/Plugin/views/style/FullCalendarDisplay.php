@@ -405,7 +405,7 @@ class FullCalendarDisplay extends StylePluginBase {
       $tax_fields = [];
       // Find out all taxonomy reference fields of this View.
       foreach ($field_names as $field_name => $lable) {
-        $field_conf = FieldStorageConfig::loadByName($entity_type, $field_name);
+        $field_conf = FieldStorageConfig::loadByName($entity_type, $field_name) ?: FieldStorageConfig::loadByName('user', $field_name);
         if (empty($field_conf)) {
           continue;
         }
