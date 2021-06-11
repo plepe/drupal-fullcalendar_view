@@ -143,6 +143,16 @@ class FullcalendarViewPreprocess {
         // Background color based on taxonomy field.
         if (!empty($view->field[$tax_field])) {
           $event_type = $view->style_plugin->getFieldValue($row->index, $tax_field);
+          if (!empty($event_type)) {
+            if (is_array($event_type)) {
+              // The taxonomy field might have multiple values.
+              // We just need the first one as the color code.
+              $event_type = reset($event_type);
+            }
+          }
+          else {
+            $event_type = '';
+          }
         }
         // Calendar event start date.
         $start_dates = $current_entity->get($start_field)->getValue();
