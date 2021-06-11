@@ -162,6 +162,8 @@ class FullcalendarViewPreprocess {
         // Render all other fields to so they can be used in rewrite.
         foreach ($fields as $name => $field) {
           if (method_exists($field, 'advancedRender')) {
+            // Set the row_index property used by advancedRender function.
+            $field->view->row_index = $row->index;
             $des = $field->advancedRender($row);
           }
         }
