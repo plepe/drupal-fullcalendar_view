@@ -50,6 +50,7 @@
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
+        timeZone: 'UTC',
         locale: 'sv-SE'
       };
     // define the end date string in 'YYYY-MM-DD' format.
@@ -181,6 +182,7 @@
         hour: '2-digit',
         minute: '2-digit',
         second: '2-digit',
+        timeZone: 'UTC',
         locale: 'sv-SE'
       };
     // define the end date string in 'YYYY-MM-DD' format.
