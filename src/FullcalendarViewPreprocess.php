@@ -325,7 +325,7 @@ class FullcalendarViewPreprocess {
       // Fullcalendar options.
       $calendar_options = [
         'plugins' => [ 'moment','interaction', 'dayGrid', 'timeGrid', 'list', 'rrule' ],
-        'timeZone' => date_default_timezone_get(),
+        'timeZone' => $timezone,
         'defaultView' => isset($options['default_view']) ? $options['default_view'] : 'dayGridMonth',
         'defaultDate' => empty($default_date) ? date('Y-m-d') : $default_date,
         'header' => [
