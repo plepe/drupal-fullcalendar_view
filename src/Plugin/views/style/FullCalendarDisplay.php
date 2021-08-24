@@ -590,4 +590,12 @@ class FullCalendarDisplay extends StylePluginBase {
     return $form['color_taxonomies'];
   }
 
+  /**
+   * Should the output of the style plugin be rendered even if it's a empty view.
+   */
+  public function evenEmpty() {
+    // An empty calendar should be displayed if there are no calendar items.
+    return TRUE;
+  }
+
 }
