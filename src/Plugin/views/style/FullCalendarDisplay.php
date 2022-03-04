@@ -242,7 +242,7 @@ class FullCalendarDisplay extends StylePluginBase {
       '#type' => 'textfield',
       '#title' => $this->t('Time Format settings for month view'),
       '#default_value' => (isset($this->options['timeFormat'])) ? $this->options['timeFormat'] : 'hh:mm a',
-      '#description' => $this->t('See %momentjs_doc for available formatting options. <br />Leave it blank to use the default format "hh:mm a".', array(
+      '#description' => $this->t('See %momentjs_doc for available formatting options. <br />Leave it blank to use the default format "hh:mm a".<br />Set it to [ ] if you do not want Fullcalendar View to prepend Title Field with any time at all.', array(
         '%momentjs_doc' => Link::fromTextAndUrl($this->t('MomentJS’s formatting characters'), Url::fromUri('http://momentjs.com/docs/#/displaying/format/', array('attributes' => array('target' => '_blank'))))->toString(),
       )),
       '#size' => 20,
