@@ -13,15 +13,15 @@ libraries.moment:
 
 libraries.rrule:
   remote: https://github.com/jakubroztocil/rrule
-  version: '2.6.4'
+  version: '2.6.8'
   license:
     name: python-dateutil
     url: https://github.com/jakubroztocil/rrule/blob/master/LICENCE
     gpl-compatible: true
   cdn:
-    https://cdn.jsdelivr.net/npm/rrule@2.6.4/dist/es5/rrule.min.js
+    https://cdn.jsdelivr.net/npm/rrule@2.6.8/dist/es5/rrule.min.js
   js:
-    /libraries/rrule/2.6.4/rrule.min.js: { minified: true }
+    /libraries/rrule/2.6.8/rrule.min.js: { minified: true }
 
 libraries.fullcalendar-theme:
   remote: https://fullcalendar.io/
