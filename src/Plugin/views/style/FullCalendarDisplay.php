@@ -410,7 +410,8 @@ class FullCalendarDisplay extends StylePluginBase {
     $moduleHandler = \Drupal::service('module_handler');
     if ($moduleHandler->moduleExists('taxonomy')) {
       // All vocabularies.
-      $cabNames = taxonomy_vocabulary_get_names();
+      $cabNames = \Drupal::entityQuery('taxonomy_vocabulary')
+  ->execute();
       // Taxonomy reference field.
       $tax_fields = [];
       // Find out all taxonomy reference fields of this View.
