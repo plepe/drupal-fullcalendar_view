@@ -5,11 +5,76 @@ namespace Drupal\fullcalendar_view;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Access\CsrfTokenGenerator;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\fullcalendar_view\TimezoneService;
 
 class FullcalendarViewPreprocess {
   use StringTranslationTrait;
 
   protected  static $viewIndex = 0;
+
+  /**
+   * The language manager.
+   *
+   * @var \Drupal\Core\Language\LanguageManagerInterface
+   */
+  protected $languageManager;
+
+  /**
+   * The CSRF token generator.
+   *
+   * @var \Drupal\Core\Access\CsrfTokenGenerator
+   */
+  protected $tokenGenerator;
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * Converted date from UTC date.
+   *
+   * @var \Drupal\fullcalendar_view\TimezoneService
+   */
+  protected $utcToLocal;
+
+  /**
+   * Constructor.
+   *
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   *   The language manager.
+   * @param \Drupal\Core\Access\CsrfTokenGenerator $token_generator
+   *   The CSRF token generator.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
+   * @param \Drupal\fullcalendar_view\TimezoneService $utc_to_local
+   *   The date to utc date.
+   */
+  public function __construct(LanguageManagerInterface $language_manager, CsrfTokenGenerator $token_generator, EntityTypeManagerInterface $entity_type_manager, TimezoneService $utc_to_local) {
+    $this->languageManager = $language_manager;
+    $this->tokenGenerator = $token_generator;
+    $this->entityTypeManager = $entity_type_manager;
+    $this->utcToLocal = $utc_to_local;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('language_manager'),
+      $container->get('csrf_token'),
+      $container->get('entity_type.manager'),
+      $container->get('fullcalendar_view.timezone_conversion_service')
+    );
+  }
+
   /**
    * Process the view variable array.
    *
@@ -26,14 +91,14 @@ class FullcalendarViewPreprocess {
     $fields = $view->field;
 
     // Get current language.
-    $language = \Drupal::languageManager()->getCurrentLanguage();
+    $language = $this->languageManager->getCurrentLanguage();
 
     // Current user.
     $user = $variables['user'];
     // CSRF token.
     $token = '';
     if (!$user->isAnonymous()) {
-      $token = \Drupal::csrfToken()->get($user->id());
+      $token = $this->tokenGenerator->get($user->id());
     }
     //
     // New event bundle type.
@@ -53,7 +118,7 @@ class FullcalendarViewPreprocess {
     }
 
     // Can the user add a new event?
-    $entity_manager = \Drupal::entityTypeManager();
+    $entity_manager = $this->entityTypeManager;
     $access_handler = $entity_manager->getAccessControlHandler($entity_type->id());
     $dbl_click_to_create = FALSE;
     if ($access_handler->createAccess($event_bundle_type)) {
@@ -127,7 +192,7 @@ class FullcalendarViewPreprocess {
         unset($title_allowed_tags[$tag_key]);
       }
       // Timezone conversion service.
-      $timezone_service = \Drupal::service('fullcalendar_view.timezone_conversion_service');
+      $timezone_service = $this->utcToLocal;
       // Save view results into entries array.
       foreach ($view->result as $row) {
         // Set the row_index property used by advancedRender function.
@@ -183,7 +248,7 @@ class FullcalendarViewPreprocess {
           $title = $fields[$options['title']]->advancedRender($row);
         }
         else {
-          $title = t('Invalid event title');
+          $title = $this->t('Invalid event title');
         }
         $link_url = strstr($title, 'href="');
         if ($link_url) {
