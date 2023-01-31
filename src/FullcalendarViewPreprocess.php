@@ -64,18 +64,6 @@ class FullcalendarViewPreprocess {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('language_manager'),
-      $container->get('csrf_token'),
-      $container->get('entity_type.manager'),
-      $container->get('fullcalendar_view.timezone_conversion_service')
-    );
-  }
-
-  /**
    * Process the view variable array.
    *
    * @param array $variables
