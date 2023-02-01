@@ -2,6 +2,7 @@
 
 namespace Drupal\fullcalendar_view\Plugin\views\style;
 
+use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\fullcalendar_view\TaxonomyColor;
 use Drupal\core\form\FormStateInterface;
@@ -244,7 +245,7 @@ class FullCalendarDisplay extends StylePluginBase {
       '#description' => $this->t(
         'Left side buttons. Buttons are separated by commas or space. See the %fullcalendar_doc for available buttons.',
         [
-          '%fullcalendar_doc' => Link::fromTextAndUrl($this->t('Fullcalendar documentation'), Url::fromUri('https://fullcalendar.io/docs/header', array('attributes' => array('target' => '_blank'))))->toString(),
+          '%fullcalendar_doc' => Link::fromTextAndUrl($this->t('Fullcalendar documentation'), Url::fromUri('https://fullcalendar.io/docs/v4/header', array('attributes' => array('target' => '_blank'))))->toString(),
         ]
       ),
     ];
@@ -256,7 +257,7 @@ class FullCalendarDisplay extends StylePluginBase {
       '#title' => $this->t('Display toggles'),
       '#description' => $this->t('Shown as buttons on the right side of the calendar view. See the %fullcalendar_doc.',
           [
-            '%fullcalendar_doc' => Link::fromTextAndUrl($this->t('Fullcalendar "Views" documentation'), Url::fromUri('https://fullcalendar.io/docs', array('attributes' => array('target' => '_blank'))))->toString(),
+            '%fullcalendar_doc' => Link::fromTextAndUrl($this->t('Fullcalendar "Views" documentation'), Url::fromUri('https://fullcalendar.io/docs/v4', array('attributes' => array('target' => '_blank'))))->toString(),
           ]),
     ];
     // Default view.
@@ -282,6 +283,26 @@ class FullCalendarDisplay extends StylePluginBase {
       ],
       '#default_value' => (empty($this->options['firstDay'])) ? '0' : $this->options['firstDay'],
       '#title' => $this->t('First Day'),
+    ];
+    // MinTime
+    $form['minTime'] = [
+      '#type' => 'datetime',
+      '#fieldset' => 'display',
+      '#title' => $this->t('Start time'),
+      '#date_date_element' => 'none',
+      '#date_time_element' => 'time',
+      '#default_value' => new DrupalDateTime(!empty($this->options['minTime']) ? $this->options['minTime'] : '2000-01-01 00:00:00'),
+      '#required' => TRUE,
+    ];
+    // MaxTime
+    $form['maxTime'] = [
+      '#type' => 'datetime',
+      '#fieldset' => 'display',
+      '#title' => $this->t('End time'),
+      '#date_date_element' => 'none',
+      '#date_time_element' => 'time',
+      '#default_value' => new DrupalDateTime(!empty($this->options['maxTime']) ? $this->options['maxTime'] : '2000-01-01 23:59:59'),
+      '#required' => TRUE,
     ];
     // Nav Links.
     $form['nav_links'] = [
@@ -618,7 +639,7 @@ class FullCalendarDisplay extends StylePluginBase {
    */
   public function submitOptionsForm(&$form, FormStateInterface $form_state) {
     $options = &$form_state->getValue('style_options');
-    $input_value = $form_state->getUserInput();
+    $input_value = $form_state->getValues();
     $input_colors = isset($input_value['style_options']['color_taxonomies']) ? $input_value['style_options']['color_taxonomies'] : [];
     // Save the input of colors.
     foreach ($input_colors as $id => $color) {
@@ -626,6 +647,8 @@ class FullCalendarDisplay extends StylePluginBase {
         $options['color_taxonomies'][$id] = $color;
       }
     }
+    $options['minTime'] = $input_value['style_options']['minTime']->format("H:i:s");
+    $options['maxTime'] = $input_value['style_options']['maxTime']->format("H:i:s");
     $options['right_buttons'] = isset($input_value['style_options']['right_buttons']) ? implode(',', array_filter(array_values($input_value['style_options']['right_buttons']))) : '';
 
     // Sanitize user input.

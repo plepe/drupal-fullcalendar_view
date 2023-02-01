@@ -170,6 +170,10 @@ class FullcalendarViewPreprocess {
     $right_buttons = Xss::filter($options['right_buttons']);
     // Slot Duration.
     $slot_duration = empty($options['slotDuration']) ? '00:30:00' : Xss::filter($options['slotDuration']);
+    // Display time limit.
+    $minTime = !empty($options['minTime']) ? $options['minTime'] : '00:00:00';
+    $maxTime = !empty($options['maxTime']) ? $options['maxTime'] : '23:59:59';
+
     $entries = [];
 
     if (!empty($start_field)) {
@@ -397,6 +401,8 @@ class FullcalendarViewPreprocess {
         ],
         'eventTimeFormat' => $timeFormat,
         'firstDay' => $first_day,
+        'minTime' => $minTime,
+        'maxTime' => $maxTime,
         'locale' => $default_lang,
         'events' => $entries,
         'navLinks' => $options['nav_links'] !== 0,
