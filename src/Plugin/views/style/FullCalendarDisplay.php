@@ -153,6 +153,7 @@ class FullCalendarDisplay extends StylePluginBase {
     $options['dialogWindow'] = ['default' => 0];
     $options['createEventLink'] = ['default' => 0];
     $options['openEntityInNewTab'] = ['default' => 1];
+    $options['dialogModal'] = ['default' => 0];
     $options['eventLimit'] = ['default' => 2];
     $options['slotDuration'] = ['default' => '00:30:00'];
     $options['minTime'] = ['default' => '2000-01-01 00:00:00'];
@@ -451,6 +452,13 @@ class FullCalendarDisplay extends StylePluginBase {
       '#fieldset' => 'display',
       '#default_value' => !isset($this->options['openEntityInNewTab']) ? 1 : $this->options['openEntityInNewTab'],
       '#title' => $this->t('Open entities (calendar items) into new tabs'),
+    ];
+    // Open event link target in modal popup.
+    $form['dialogModal'] = [
+      '#type' => 'checkbox',
+      '#fieldset' => 'display',
+      '#default_value' => !isset($this->options['dialogModal']) ? 1 : $this->options['dialogModal'],
+      '#title' => $this->t('Open event title link target in a modal popup'),
     ];
     // Create new event link.
     $form['createEventLink'] = [
