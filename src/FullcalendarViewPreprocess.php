@@ -397,7 +397,7 @@ class FullcalendarViewPreprocess {
         'header' => [
           'left' => $left_buttons,
           'center' => 'title',
-          'right' => $right_buttons
+          'right' => $right_buttons ?? 'dayGridMonth,timeGridWeek,timeGridDay,listYear'
         ],
         'eventTimeFormat' => $timeFormat,
         'firstDay' => $first_day,

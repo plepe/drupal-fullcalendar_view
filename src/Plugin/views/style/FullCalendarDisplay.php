@@ -156,8 +156,8 @@ class FullCalendarDisplay extends StylePluginBase {
     $options['dialogModal'] = ['default' => 0];
     $options['eventLimit'] = ['default' => 2];
     $options['slotDuration'] = ['default' => '00:30:00'];
-    $options['minTime'] = ['default' => '2000-01-01 00:00:00'];
-    $options['maxTime'] = ['default' => '2000-01-01 23:59:59'];
+    $options['minTime'] = ['default' => '00:00:00'];
+    $options['maxTime'] = ['default' => '23:59:59'];
     return $options;
   }
 
@@ -660,7 +660,7 @@ class FullCalendarDisplay extends StylePluginBase {
     }
     $options['minTime'] = $options['minTime']->format("H:i:s");
     $options['maxTime'] = $options['maxTime']->format("H:i:s");
-    $options['right_buttons'] = isset($options['right_buttons']) ? implode(',', array_filter(array_values($options['right_buttons']))) : '';
+    $options['right_buttons'] = isset($options['right_buttons']) ? implode(',', array_filter(array_values($options['right_buttons']))) : 'dayGridMonth,timeGridWeek,timeGridDay,listYear';
 
     // Sanitize user input.
     $options['timeFormat'] = Xss::filter($options['timeFormat']);
