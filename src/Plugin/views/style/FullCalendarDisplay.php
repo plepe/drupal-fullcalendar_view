@@ -495,7 +495,7 @@ class FullCalendarDisplay extends StylePluginBase {
     $moduleHandler = $this->moduleHandler;
     if ($moduleHandler->moduleExists('taxonomy')) {
       // All vocabularies.
-      $cabNames = $this->entityTypeManager->getStorage('taxonomy_vocabulary')->getQuery()->execute();
+      $cabNames = $this->entityTypeManager->getStorage('taxonomy_vocabulary')->getQuery()->accessCheck(TRUE)->execute();
       // Taxonomy reference field.
       $tax_fields = [];
       // Find out all taxonomy reference fields of this View.
