@@ -362,7 +362,7 @@ class FullcalendarViewPreprocess {
             }
             else {
               // Without end date field, this event can't be resized.
-              $entry['eventDurationEditable'] = FALSE;
+              $entry['durationEditable'] = FALSE;
             }
             // Set the color for this event.
             if (isset($event_type) && isset($color_tax[$event_type])) {
