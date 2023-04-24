@@ -284,6 +284,10 @@
       let viewIndex = parseInt(calendarEl.getAttribute("calendar-view-index"));
       let viewSettings = drupalSettings.fullCalendarView[viewIndex];
       var calendarOptions = JSON.parse(viewSettings.calendar_options);
+      // Switch default view at mobile widths.
+      if (calendarOptions.mobileWidth !== undefined && calendarOptions.defaultMobileView !== undefined && $(window).width() <= calendarOptions.mobileWidth) {
+       calendarOptions.defaultView = calendarOptions.defaultMobileView;
+      }
       // Bind the render event handler.
       calendarOptions.eventRender = eventRender;
       // Bind the resize event handler.
