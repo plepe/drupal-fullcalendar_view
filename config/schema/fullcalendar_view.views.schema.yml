@@ -28,6 +28,12 @@ views.style.fullcalendar_view_display:
     default_view:
       type: string
       label: 'Default view'
+    default_mobile_view:
+      type: string
+      label: 'Default mobile view'
+    mobile_width:
+      type: string
+      label: 'Mobile width'
     firstDay:
       type: string
       label: 'First day'
@@ -81,9 +87,21 @@ views.style.fullcalendar_view_display:
     rrule:
       type: string
       label: 'Rrule'
+    dialogModal:
+      type: boolean
+      label: 'Enable modal popup'
     duration:
       type: string
       label: 'Duration'
+    slotDuration:
+      type: string
+      label: 'Slot duration'
+    minTime:
+      type: string
+      label: 'Start time'
+    maxTime:
+      type: string
+      label: 'End time'
     bundle_type:
       type: string
       label: 'Bundle type'
