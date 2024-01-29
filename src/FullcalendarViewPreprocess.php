@@ -458,6 +458,8 @@ class FullcalendarViewPreprocess {
         'dialogWindow' => $options['dialogWindow'],
         // Open event links in modal dialog.
         'dialogModal' => $options['dialogModal'],
+        // Open event links in sidebar canvas.
+        'dialogCanvas' => $options['dialogCanvas'],
         // The bundle (content) type of a new event.
         'eventBundleType' => $event_bundle_type,
         // The machine name of start date field.

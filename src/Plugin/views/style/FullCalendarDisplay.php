@@ -156,6 +156,7 @@ class FullCalendarDisplay extends StylePluginBase {
     $options['createEventLink'] = ['default' => 0];
     $options['openEntityInNewTab'] = ['default' => 1];
     $options['dialogModal'] = ['default' => FALSE];
+    $options['dialogCanvas'] = ['default' => FALSE];
     $options['eventLimit'] = ['default' => 2];
     $options['slotDuration'] = ['default' => '00:30:00'];
     $options['minTime'] = ['default' => '00:00:00'];
@@ -477,6 +478,18 @@ class FullCalendarDisplay extends StylePluginBase {
       '#fieldset' => 'display',
       '#default_value' => !isset($this->options['dialogModal']) ? FALSE : $this->options['dialogModal'],
       '#title' => $this->t('Open event title link target in a modal popup'),
+    ];
+    // Open event link target in sidebar canvas.
+    $form['dialogCanvas'] = [
+      '#type' => 'checkbox',
+      '#fieldset' => 'display',
+      '#default_value' => !isset($this->options['dialogCanvas']) ? FALSE : $this->options['dialogCanvas'],
+      '#title' => $this->t('Open event title link target in a Sidebar Canvas'),
+      '#states' => [
+        'visible' => [
+          ':input[name="style_options[dialogModal]"]' => ['checked' => TRUE],
+        ],
+      ],
     ];
     // Create new event link.
     $form['createEventLink'] = [

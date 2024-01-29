@@ -38,13 +38,25 @@
     if (viewSettings.dialogModal) {
       if ($(info.el).is('a')) {
         $(info.el).addClass('use-ajax');
-        $(info.el).attr('data-dialog-type', 'modal');
+        if (!viewSettings.dialogCanvas) {
+          $(info.el).attr('data-dialog-type', 'modal');
+        }
+        else {
+          $(info.el).attr('data-dialog-type', 'dialog');
+          $(info.el).attr('data-dialog-renderer', 'off_canvas');
+        }
         $(info.el).attr('data-dialog-options', viewSettings.dialog_modal_options);
         $(info.el).attr('href', $(info.el).attr('href').replaceAll('&amp;', '&'));
       }
       else {
         $(info.el).find('a').each(function(){
-          $(this).attr('data-dialog-type', 'modal');
+          if (!viewSettings.dialogCanvas) {
+            $(this).attr('data-dialog-type', 'modal');
+          }
+          else {
+            $(this).attr('data-dialog-type', 'dialog');
+            $(this).attr('data-dialog-renderer', 'off_canvas');
+          }
           $(this).attr('data-dialog-options', viewSettings.dialog_modal_options);
           $(this).addClass('use-ajax');
           $(this).attr('href', $(this).attr('href').replaceAll('&amp;', '&'));
@@ -129,12 +141,12 @@
         });
     }
   }
-  
+
   // Day entry click call back function.
   function dayClickCallback(info) {
     slotDate = info.dateStr;
   }
-  
+
   // Event click call back function.
   function eventClick(info) {
     slotDate = null;
@@ -149,7 +161,7 @@
       if ( des == '') {
         return false;
       }
-      
+
       const jsFrame = new JSFrame({
         parentElement:info.el,//Set the parent element to which the jsFrame is attached here
       });
@@ -163,7 +175,7 @@
       dialogOptions.html = des;
       //Create window
       dialogs[dialogIndex] = jsFrame.create(dialogOptions);
-      
+
       dialogs[dialogIndex].show();
       dialogIndex++;
 
@@ -190,7 +202,7 @@
 
     return false;
   }
-  
+
   // Event drop call back function.
   function eventDrop(info) {
     const end = info.event.end;
@@ -279,7 +291,7 @@
   // Build the calendar objects.
   function buildCalendars() {
     $('.js-drupal-fullcalendar')
-    .each(function() {              
+    .each(function() {
       let calendarEl = this;
       let viewIndex = parseInt(calendarEl.getAttribute("data-calendar-view-index"));
       let viewSettings = drupalSettings.fullCalendarView[viewIndex];
@@ -334,7 +346,7 @@
           // when the selected option changes, dynamically change the calendar option
           localeSelectorEl.addEventListener('change', function() {
             if (this.value) {
-              let viewIndex = parseInt(this.getAttribute("data-calendar-view-index")); 
+              let viewIndex = parseInt(this.getAttribute("data-calendar-view-index"));
               drupalSettings.calendar[viewIndex].setOption('locale', this.value);
             }
           });
@@ -342,7 +354,7 @@
         else if (localeSelectorEl){
           localeSelectorEl.style.display = "none";
         }
-        
+
         // Double click event.
         calendarEl.addEventListener('dblclick' , function(e) {
           let viewIndex = parseInt(this.getAttribute("data-calendar-view-index"));
@@ -375,7 +387,7 @@
       }
     });
   }
-  
+
   // document.ready event does not work with BigPipe.
   // The workaround is to ckeck the document state
   // every 100 milliseconds until it is completed.
@@ -390,10 +402,10 @@
       buildCalendars();
     }
   }, 100);
-  
+
   // After an Ajax call, the calendar objects need to rebuild,
   // to reflect the changes, such as Ajax filter.
-  $( document ).ajaxComplete(function( event, request, settings ) {    
+  $( document ).ajaxComplete(function( event, request, settings ) {
     // Remove the existing calendars except updating Ajax events.
     if (
         drupalSettings.calendar &&
@@ -408,5 +420,5 @@
       buildCalendars();
     }
   });
-  
+
 })(jQuery, Drupal);

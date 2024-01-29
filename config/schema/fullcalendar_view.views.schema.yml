@@ -90,6 +90,9 @@ views.style.fullcalendar_view_display:
     dialogModal:
       type: boolean
       label: 'Enable modal popup'
+    dialogCanvas:
+      type: boolean
+      label: 'Enable modal canvas'
     duration:
       type: string
       label: 'Duration'
