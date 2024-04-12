@@ -300,6 +300,16 @@
       if (calendarOptions.mobileWidth !== undefined && calendarOptions.defaultMobileView !== undefined && $(window).width() <= calendarOptions.mobileWidth) {
        calendarOptions.defaultView = calendarOptions.defaultMobileView;
       }
+      calendarOptions.views = {
+        timeGridCustom: {
+          type: 'timeGrid',
+          visibleRange: {
+            start: calendarOptions.defaultDate,
+            end: calendarOptions.defaultEndDate
+          },
+          buttonText: 'range'
+        }
+      };
       // Bind the render event handler.
       calendarOptions.eventRender = eventRender;
       // Bind the resize event handler.

@@ -233,6 +233,7 @@ class FullCalendarDisplay extends StylePluginBase {
       'dayGridMonth' => $this->t('Month'),
       'timeGridWeek' => $this->t('Week'),
       'timeGridDay' => $this->t('Day'),
+      'timeGridCustom' => $this->t('Range'),
       'listYear' => $this->t('List (Year)'),
       'listMonth' => $this->t('List (Month)'),
       'listWeek' => $this->t('List (Week)'),
