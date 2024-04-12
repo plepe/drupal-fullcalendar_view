@@ -145,6 +145,7 @@ class FullCalendarDisplay extends StylePluginBase {
     $options['default_view'] = ['default' => 'dayGridMonth'];
     $options['default_mobile_view'] = ['default' => 'listYear'];
     $options['mobile_width'] = ['default' => 768];
+    $options['allDaySlot'] = ['default' => 1];
     $options['nav_links'] = ['default' => 1];
     $options['timeFormat'] = ['default' => 'hh:mm a'];
     $options['defaultLanguage'] = ['default' => 'en'];
@@ -325,6 +326,14 @@ class FullCalendarDisplay extends StylePluginBase {
       '#date_time_element' => 'time',
       '#default_value' => new DrupalDateTime(!empty($this->options['maxTime']) ? $this->options['maxTime'] : '2000-01-01 23:59:59'),
       '#required' => TRUE,
+    ];
+    // Show slot for all day events.
+    $form['allDaySlot'] = [
+      '#type' => 'checkbox',
+      '#fieldset' => 'display',
+      '#default_value' => (!isset($this->options['allDaySlot'])) ? 1 : $this->options['allDaySlot'],
+      '#title' => $this->t('Include a slot for all day events'),
+      '#description' => $this->t('If this option is selected, a slot for all day events will be included on day/week views.'),
     ];
     // Nav Links.
     $form['nav_links'] = [
