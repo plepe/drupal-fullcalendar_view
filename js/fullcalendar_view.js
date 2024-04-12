@@ -310,6 +310,7 @@
           buttonText: 'range'
         }
       };
+      calendarOptions.slotLabelFormat = { hour: 'numeric', minute: '2-digit', omitZeroMinute: false, meridiem: false, hour12: false };
       // Bind the render event handler.
       calendarOptions.eventRender = eventRender;
       // Bind the resize event handler.
