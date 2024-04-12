@@ -358,6 +358,8 @@ class FullcalendarViewPreprocess {
                   // So we need to convert it into user timezone.
                   $entry['end'] = $timezone_service->utcToLocal($end_date, $timezone);
                 }
+
+                $default_end_date = $entry['end'];
               }
             }
             else {
@@ -396,6 +398,7 @@ class FullcalendarViewPreprocess {
         'defaultMobileView' => isset($options['default_mobile_view']) ? $options['default_mobile_view'] : 'listYear',
         'mobileWidth' => isset($options['mobile_width']) ? $options['mobile_width'] : 768,
         'defaultDate' => empty($default_date) ? date('Y-m-d') : $default_date,
+        'defaultEndDate' => $default_end_date,
         'header' => [
           'left' => $left_buttons,
           'center' => 'title',
