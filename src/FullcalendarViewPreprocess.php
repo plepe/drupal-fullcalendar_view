@@ -412,6 +412,7 @@ class FullcalendarViewPreprocess {
         'events' => $entries,
         'navLinks' => $options['nav_links'] !== 0,
         'allDaySlot' => $options['allDaySlot'] !== 0,
+        'nowIndicator' => $options['nowIndicator'] !== 0,
         'editable' => $options['updateAllowed'] !== 0,
         // Limits the number of events displayed on a day.
         'eventLimit' => isset($options['eventLimit']) ? intval($options['eventLimit']) : 2,

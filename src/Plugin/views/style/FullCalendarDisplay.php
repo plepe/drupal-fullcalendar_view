@@ -146,6 +146,7 @@ class FullCalendarDisplay extends StylePluginBase {
     $options['default_mobile_view'] = ['default' => 'listYear'];
     $options['mobile_width'] = ['default' => 768];
     $options['allDaySlot'] = ['default' => 1];
+    $options['nowIndicator'] = ['default' => 0];
     $options['nav_links'] = ['default' => 1];
     $options['timeFormat'] = ['default' => 'hh:mm a'];
     $options['defaultLanguage'] = ['default' => 'en'];
@@ -335,6 +336,14 @@ class FullCalendarDisplay extends StylePluginBase {
       '#default_value' => (!isset($this->options['allDaySlot'])) ? 1 : $this->options['allDaySlot'],
       '#title' => $this->t('Include a slot for all day events'),
       '#description' => $this->t('If this option is selected, a slot for all day events will be included on day/week views.'),
+    ];
+    // Show slot for all day events.
+    $form['nowIndicator'] = [
+      '#type' => 'checkbox',
+      '#fieldset' => 'display',
+      '#default_value' => (!isset($this->options['nowIndicator'])) ? 1 : $this->options['nowIndicator'],
+      '#title' => $this->t('Indicate the current time'),
+      '#description' => $this->t('If this option is selected, a marker is displayed that represents the current time in supported views.'),
     ];
     // Nav Links.
     $form['nav_links'] = [
